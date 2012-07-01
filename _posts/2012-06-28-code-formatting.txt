@@ -1,0 +1,14 @@
+---
+title: Code formatting
+date: 28/06/2012
+
+Once upon a time...
+
+    {{ruby}}
+    some_variable = {:first_name => 'Cristiano'
+    				 :last_name => 'Ronaldo'}
+
+    New_name_of_some_variable = {:first_name => 'Cristiano'
+    				 :last_name => 'Ronaldo'}
+    
+    
