@@ -16,7 +16,7 @@ author :
   email : ka8725@gmail.com
   github : ka8725
   twitter : ka8725
-  # feedburner : fedname
+  feedburner : ka8725@gmail.com
 
 # The production_url is only used when full-domain names are needed
 # such as sitemap.txt
@@ -26,7 +26,7 @@ author :
 # Else if you are pushing to username.github.com, replace with your username.
 # Finally if you are pushing to a GitHub project page, include the project name at the end.
 #
-production_url : http://username.github.com
+production_url : http://railsguides.net
 
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #
@@ -71,7 +71,7 @@ JB :
   # Some JB helpers refer to these paths; change theme here if needed.
   #
   archive_path: /archive.html
-  categories_path : /categories.html
+  # categories_path : /categories.html
   tags_path : /tags.html
 
   # Settings for comments helper

@@ -6,10 +6,11 @@ tags: [ruby, rails, active record, reserved_words]
 ---
 {% include JB/setup %}
 
-There are many reasons to don't give name **Test** for your _models_ in _Ruby On Rails_.
+There is a list of reserved words for Ruby On Rails framework. Full list is [here](http://oldwiki.rubyonrails.org/rails/pages/ReservedWords).
+But it doesn't contain at least one word which I will describe in this post. There are many reasons to don't give name **Test** for your _models_ in _Ruby On Rails_.
 I will try to describe in this post problems which you will have if you have _model_ with **Test** name.
 
-![Do not give name Test for your models](http://dl.dropbox.com/u/15142852/test.rb%20%E2%80%94%20test_app-2.jpg)
+![Do not give name Test for your models](/images/do_not_give_test_name_for_models.jpg)
 
 Let's start with creating new application:
 
