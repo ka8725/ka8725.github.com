@@ -95,7 +95,7 @@ Push changes to the heroku:
 	git commit -m "s3 configuration"
 	gut push heroku
 
-To start server on the heroku you should also remove this code from *config/environment.rb*:
+To start server on the heroku you should also remove or comment out this code in *config/environment.rb*:
 
 {% highlight ruby %}
 # Make sure there's no plugin in vendor/plugin before starting
