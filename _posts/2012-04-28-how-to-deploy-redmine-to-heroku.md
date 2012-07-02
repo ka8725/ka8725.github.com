@@ -1,7 +1,10 @@
 ---
-title: How to deploy Redmine to Heroku
-date: 28/04/2012
-description: This post describes how to deploy free bugtracker Redmine 2 to free Hosting - Heroku
+layout: post
+title: "How to deploy Redmine to Heroku"
+description: "This post describes how to deploy free bugtracker Redmine 2 to free Hosting - Heroku"
+tags: [heroku, redmine, rails, hosting]
+---
+{% include JB/setup %}
 
 This post describes how to deploy absolutely free bugtracker - **Redmine** to free hosting **Heroku**. That's way you will have free bugtracker in the internet. There are many post in the internet that describe how to deploy old version of **Redmine** to **Heroku**, but I couldn't find any information how to deploy new version of **Redmine**: **Redmine 2**. So if you have the same problem - you are welcome
 
@@ -35,7 +38,8 @@ Create application on the heroku:
 
 Make commit and push changes to heroku origin:
 
-	git commit -am "prepare for heroku"
+	git add -A
+	git commit -m "prepare for heroku"
 	git push heroku
 	
 Make sure that all gems was installed on the heroku server and after this run migrations there with loading default data for properly working Redmine:
@@ -57,40 +61,54 @@ Firstly add add-on on the heroku for your application:
 	
 There is a limitation for free version of this add-on: *200 emails per day*. So if you have more emails for one day you have to change plan of add-on to more appropriate. For more information, please, read [add-on desription](https://addons.heroku.com/sendgrid).
 
-Create *config/email.yml* file and add there the following changes and change user_name and password to yours:
+Create *config/configuration.yml* file and add there the following changes and change user_name and password to yours:
 
-	{{ruby}}
-	production:
-	  delivery_method: :smtp
-	  smtp_settings:
-	    address: "smtp.sendgrid.net"
-	    port: 25
-	    authentication: :plain
-	    domain: "heroku.com"
-	    user_name: "SENDGRID_USERNAME"
-	    password: "SENDGRID_PASSWORD"
+{% highlight ruby %}
+production:
+  delivery_method: :smtp
+  smtp_settings:
+    address: "smtp.sendgrid.net"
+    port: 25
+    authentication: :plain
+    domain: "heroku.com"
+    user_name: "SENDGRID_USERNAME"
+    password: "SENDGRID_PASSWORD"
+{% endhighlight %}
 
 Push changes to the heroku:
-
-	git commit -am "email configuration"
+	
+	git add -A
+	git commit -m "email configuration"
 	gut push heroku
 
 ## Save uploaded files to Amazon S3
 
 If you are going to add attachment to tasks or just upload files to redmine you can setup **redmine_s3** plugin: http://github.com/ka8725/redmine_s3.git](http://github.com/ka8725/redmine_s3.git). Please follow link to read instrunctions how to install it. This is my fork of original gem: **git://github.com/tigrish/redmine_s3.git**
 
-> **NOTE:** Since **Redmine 2** has released there are many changes there and gem **git://github.com/tigrish/redmine_s3.git** is not working with it now. That's why I forked this gem and have changed it.
-	
-> **NOTE:** Don't forget to remove directory **plugins/redmine_s3/.git** before make commit. This plugin won't be install on the **Heroku** otherwise and you won't be able to save files to **s3**.
+> Since **Redmine 2** has released there are many changes there and gem **git://github.com/tigrish/redmine_s3.git** is not working with it now. That's why I forked this gem and have changed it.
+
+> Don't forget to remove directory **plugins/redmine_s3/.git** before make commit. This plugin won't be install on the **Heroku** otherwise and you won't be able to save files to **s3**.
 
 Push changes to the heroku:
 
-	git commit -am "s3 configuration"
+	git add -A
+	git commit -m "s3 configuration"
 	gut push heroku
 
+To start server on the heroku you should also remove this code from *config/environment.rb*:
 
-That's it - you have free bugtracker on the intenet. Check it out: [http://redmine-todo.heroku.com](http://redmine-todo.heroku.com).
+{% highlight ruby %}
+# Make sure there's no plugin in vendor/plugin before starting
+vendor_plugins_dir = File.join(Rails.root, "vendor", "plugins")
+if Dir.glob(File.join(vendor_plugins_dir, "*")).any?
+  $stderr.puts "Plugins in vendor/plugins (#{vendor_plugins_dir}) are no longer allowed. " +
+    "Please, put your Redmine plugins in the `plugins` directory at the root of your " +
+    "Redmine directory (#{File.join(Rails.root, "plugins")})"
+  exit 1
+end
+{% endhighlight %}
 
+That's it - you have free bugtracker on the internet. Check it out: [http://redmine-todo.heroku.com](http://redmine-todo.heroku.com).
 
 ## Conclusion
 
