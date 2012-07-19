@@ -5,7 +5,6 @@ description: "This post describes how to use github pages (gh-pages) as hosting 
 tags: [jekyll, git, hosting, blog]
 ---
 {% include JB/setup %}
-{% include JB/sharing %}
 
 Have you ever wanted to have a nice, simple to use free blog engine for developer? If have this post is especially for you.
 
