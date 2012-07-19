@@ -20,7 +20,7 @@ I think that *Jekyll* is the best blog engine for programmer today. It has every
 * permalink customization
 * SEO features (meta tags, sitemap.xml, atom.xml are available out of box)
 * tags supporting
-# lightweight and fast
+* lightweight and fast
 * without database
 * without hosting headaches
 * comments system out of box
