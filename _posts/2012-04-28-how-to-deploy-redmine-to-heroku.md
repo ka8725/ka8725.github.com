@@ -13,7 +13,7 @@ This post describes how to deploy absolutely free bugtracker - **Redmine** to fr
 Firstly we need to clone sources from **github**:
 
 	git clone git://github.com/redmine/redmine.git
-	
+
 Open *.gitignore* file in your favourite editor and remove lines:
 
 	Gemfile.lock
@@ -23,7 +23,7 @@ Open *.gitignore* file in your favourite editor and remove lines:
 	config/initializers/secret_token.rb
 	config/configuration.yml
 	config/email.yml
-	
+
 Install gems:
 
 	bundle install
@@ -31,7 +31,7 @@ Install gems:
 Execute rake task to generate session token:
 
 	rake generate_secret_token
-		
+
 Create application on the heroku:
 
 	heroku create NAME_FOR_YOUR_APP
@@ -41,7 +41,7 @@ Make commit and push changes to heroku origin:
 	git add -A
 	git commit -m "prepare for heroku"
 	git push heroku
-	
+
 Make sure that all gems was installed on the heroku server and after this run migrations there with loading default data for properly working Redmine:
 
 	heroku run rake db:migrate
@@ -50,7 +50,7 @@ Make sure that all gems was installed on the heroku server and after this run mi
 That's all, you can test it now in the browser:
 
 	heroku open
-	
+
 Default user for Redmine is **admin** and password is **admin** too.
 
 ## Email confirmations
@@ -58,7 +58,7 @@ Default user for Redmine is **admin** and password is **admin** too.
 Firstly add add-on on the heroku for your application:
 
 	heroku addons:add sendgrid:starter
-	
+
 There is a limitation for free version of this add-on: *200 emails per day*. So if you have more emails for one day you have to change plan of add-on to more appropriate. For more information, please, read [add-on desription](https://addons.heroku.com/sendgrid).
 
 Create *config/configuration.yml* file and add there the following changes and change user_name and password to yours:
@@ -76,7 +76,7 @@ production:
 {% endhighlight %}
 
 Push changes to the heroku:
-	
+
 	git add -A
 	git commit -m "email configuration"
 	gut push heroku
@@ -88,6 +88,12 @@ If you are going to add attachment to tasks or just upload files to redmine you 
 > Since **Redmine 2** has released there are many changes there and gem **git://github.com/tigrish/redmine_s3.git** is not working with it now. That's why I forked this gem and have changed it.
 
 > Don't forget to remove directory **plugins/redmine_s3/.git** before make commit. This plugin won't be install on the **Heroku** otherwise and you won't be able to save files to **s3**.
+
+Create configuration file for *redmine_s3* gem:
+
+    cp plugins/redmine_s3/config/s3.yml.example config/s3.yml
+
+Edit *config/s3.yml* with your favourite editor: paste there your credentials (security keys) for AWS S3 and bucket name. Bucket should be already created on the S3.
 
 Push changes to the heroku:
 
