@@ -92,7 +92,7 @@ your operation system you will have to do it for each ruby version. But there is
 
 Just type in the terminal:
 
-    bundle config build.mysql  --with-mysql-config=/usr/local/Cellar/mysql/5.5.20/bin/mysql_config
+    bundle config build.mysql2  --with-mysql-config=/usr/local/Cellar/mysql/5.5.20/bin/mysql_config
 
 And now you are able to install gems through bundler without issues:
 
