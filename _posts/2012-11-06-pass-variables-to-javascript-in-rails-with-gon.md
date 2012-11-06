@@ -6,11 +6,11 @@ tags: [gem, rails, javascript]
 ---
 {% include JB/setup %}
 
-If you haven't noticed yet that there is a good solution passing *Rails* variables from controllers to javascript I will be happy to make you fun with [gon](https://github.com/gazay/gon). In this post I will show how to use it with controller's filters in clean, dry and the best way. This approach will help you to avoid growing controllers in a big monsters.
+If you haven't noticed yet that there is a good solution passing *Rails* variables from controllers to javascript I will be happy to make you fun with [gon](https://github.com/gazay/gon). In this post I will show how to use it with controller's filters in a clean, dry and the best way. This approach will help you to avoid growing controllers in a big monsters.
 
 ## Using filters in contollers
 
-If you don't know what is filters in contollers and how use them, checkout [oficial documentation](http://guides.rubyonrails.org/action_controller_overview.html#filters). In our case we have to know that there are posibilities to apply filters for one action and this one form of using:
+If you don't know what is contoller filters and how use them, checkout [oficial documentation](http://guides.rubyonrails.org/action_controller_overview.html#filters). In our case we have to know that there are posibilities to apply filters for one action and this one form of using:
 
 {% highlight ruby %}
 class ApplicationController < ActionController::Base
@@ -29,22 +29,44 @@ end
 
 ## Using Gon
 
-Say, we have to pass *location* model as json object from server side to client side (from rails controller to javascript). With *gon* we have this choise:
+Say, we have to pass *location* model as a json object from server side to client side (from rails controller to javascript). With *gon* we can reduce it to:
 
 {% highlight ruby %}
 class ProductsController < ApplicationController
   def show
     @product = Product.find(params[:id])
-    gon.location = @product.locations.as_json(:only => [:latitude, :longitude], :methods => [:address])
+    gon.locations = @product.locations.as_json(:only => [:latitude, :longitude], :methods => [:address])
   end
 end
 {% endhighlight %}
 
-Everything is ok, but if we have to pass a lot of variables to javascript we will have a fat controller. Also it's not simple to test controllers. So my choise is not connect before_filter here.
+Everything is ok, but if we have to pass a lot of variables to javascript we will get a fat controller. Also it's not easy to test controllers. So my solution will be to use `before_filter` here. Here is a example of fat controller's action:
 
-## Useing Gon in DRY way
+{% highlight ruby %}
+  def show
+    gon.locations = @product.locations.as_json(:only => [:latitude, :longitude], :methods => [:address])
+    gon.current_user = current_user.as_json(:only => [:email, :id])
+    gon.redirect_path = users_path
+    gon.global_variables = {
+      :subdomain => @product.subdomain,
+      :statistic => {
+        :count_hints => @product.count_hints,
+        :count_logins => current_user.count_logins
+      }
+    }
+    gon.image_uploader = {
+      :create_path => product_path(@product),
+      :image_tempale => render_to_string(:partial => 'image')
+    }
+    # etc. and etc.
+  end
+{% endhighlight %}
 
-Let's create `LocationGonFilter` class and move it to `app/filters` folder. You should create this folder if you don't have it.
+This code looks too bad and I don't know how you fill when you see it, but my brain explodes.
+
+## Useing Gon in a DRY way
+
+So go down to business and make something with this peace of ugly code. Let's create `LocationGonFilter` class and move it to `app/filters` folder. You should create this folder if you don't have it.
 
 {% highlight ruby %}
 class LocationGonFilter
@@ -63,7 +85,7 @@ class LocationGonFilter
 end
 {% endhighlight %}
 
-After this we are able to refactor our controller:
+After this we can refactor our controller:
 
 {% highlight ruby %}
 class ProductsController < ApplicationController
@@ -115,4 +137,4 @@ describe LocationGonFilter do
 end
 {% endhighlight %}
 
-> I use FactoryGirl here to create locations
+> I'm using FactoryGirl here to create locations
