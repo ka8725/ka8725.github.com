@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Clean up your controllers"
+title: "Clean up your controllers with inherited resources"
 description: "This posts describes how to use one of the best rails tools - inherited_resources gem. You will find out how to use it in rails development and how it can help you to spend less time have less bugs in your code. I hope this technique will be useful for all rails developers"
 tags: [rails, gem, rest, refactoring]
 ---
@@ -151,23 +151,23 @@ end
 
 It will be enough to get working contoller for our demands. Now you can change your routes:
 
-           user_channels GET    /users/channels(.:format)              channels#index
-                         POST   /users/channels(.:format)              channels#create
-        new_user_channel GET    /users/channels/new(.:format)          channels#new
-       edit_user_channel GET    /users/channels/:id/edit(.:format)     channels#edit
-            user_channel GET    /users/channels/:id(.:format)          channels#show
-                         PUT    /users/channels/:id(.:format)          channels#update
-                         DELETE /users/channels/:id(.:format)          channels#destroy
+           user_channels GET    /user/channels(.:format)              channels#index
+                         POST   /user/channels(.:format)              channels#create
+        new_user_channel GET    /user/channels/new(.:format)          channels#new
+       edit_user_channel GET    /user/channels/:id/edit(.:format)     channels#edit
+            user_channel GET    /user/channels/:id(.:format)          channels#show
+                         PUT    /user/channels/:id(.:format)          channels#update
+                         DELETE /user/channels/:id(.:format)          channels#destroy
 
 Let's complicate logic and rework our controller to listen to both variants of routes:
 
-           user_channels GET    /users/channels(.:format)              channels#index
-                         POST   /users/channels(.:format)              channels#create
-        new_user_channel GET    /users/channels/new(.:format)          channels#new
-       edit_user_channel GET    /users/channels/:id/edit(.:format)     channels#edit
-            user_channel GET    /users/channels/:id(.:format)          channels#show
-                         PUT    /users/channels/:id(.:format)          channels#update
-                         DELETE /users/channels/:id(.:format)          channels#destroy
+           user_channels GET    /user/channels(.:format)              channels#index
+                         POST   /user/channels(.:format)              channels#create
+        new_user_channel GET    /user/channels/new(.:format)          channels#new
+       edit_user_channel GET    /user/channels/:id/edit(.:format)     channels#edit
+            user_channel GET    /user/channels/:id(.:format)          channels#show
+                         PUT    /user/channels/:id(.:format)          channels#update
+                         DELETE /user/channels/:id(.:format)          channels#destroy
            user_channels GET    /users/:user_id/channels(.:format)              channels#index
                          POST   /users/:user_id/channels(.:format)              channels#create
         new_user_channel GET    /users/:user_id/channels/new(.:format)          channels#new
@@ -183,7 +183,7 @@ class ChannelsController < InheritedResources::Base
 
   protected
   def begin_of_association_chain
-    @begin_of_association_chain ||= (User.find_by_id(params[:user_id]) || current_user)
+    @begin_of_association_chain ||= (User.find_by_id(params[:user_id]) || current_user) || raise(ActiveRecord::RecordNotFound)
   end
 end
 {% endhighlight %}
@@ -195,3 +195,5 @@ This way we have universal RESTful controller and we fit it in 6 lines of code i
 Check out [InheritedResources gem](https://github.com/josevalim/inherited_resources) and read its README. I promise you will find there a lot of interesting information which I've omited in my post. Also README is not contained information for all possibilities, so I would recommend you to read sources.
 
 I hope you don't blame me for your spent time. Thank you for your reading!
+
+PS. *InheritedResources* is  compatible with [cacan](https://github.com/ryanb/cancan/wiki/Inherited-Resources). You have to add one line code `load_and_authorize_resource` and your restrictions will work exactly how you want.
