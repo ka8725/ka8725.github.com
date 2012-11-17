@@ -138,3 +138,5 @@ end
 {% endhighlight %}
 
 > I'm using FactoryGirl here to create locations
+
+PS. I believe that every class should be responsible for only one thing (this is a [Single responsibility principle (SRP)](http://en.wikipedia.org/wiki/Single_responsibility_principle)). In my post I've explained how to achieve it for controller layer. Filters are separated layer and there we should filter parameters, controllers should inly listen requests, pass action to bottom layer (model) and then response on request, they should not contain complidated logic
