@@ -13,6 +13,10 @@
   <meta name="keywords" content="{{ page.keywords }}">
   {% endif %}
 
+  {% if page.description %}
+  <meta name="description" content="{{ page.description }}">
+  {% endif %}
+
   {% if site.author.feedburner %}
     <link rel="alternate" type="application/atom+xml" href="http://feeds.feedburner.com/{{ site.author.feedburner }}" title="RSS feed" />
   {% endif %}
