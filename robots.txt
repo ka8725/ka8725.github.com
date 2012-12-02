@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /2012/09/
 Sitemap: http://railsguides.net/sitemap.xml
