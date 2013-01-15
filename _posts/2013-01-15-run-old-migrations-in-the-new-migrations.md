@@ -2,7 +2,7 @@
 layout: post
 title: "Run old migrations in the new migrations"
 description: "This post describes steps of using old migrations in the new migrations which you have just created and need to write code which you have already wrote in the older migrations."
-tags: [rails active_record migrations]
+tags: [rails, active_record, migrations]
 ---
 {% include JB/setup %}
 
