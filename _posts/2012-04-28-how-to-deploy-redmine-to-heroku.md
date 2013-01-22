@@ -83,7 +83,7 @@ Push changes to the heroku:
 
 ## Save uploaded files to Amazon S3
 
-If you are going to add attachment to tasks or just upload files to redmine you can setup **redmine_s3** plugin: http://github.com/ka8725/redmine_s3.git](http://github.com/ka8725/redmine_s3.git). Please follow link to read instrunctions how to install it. This is my fork of original gem: **git://github.com/tigrish/redmine_s3.git**
+If you are going to add attachment to tasks or just upload files to redmine you can setup **redmine_s3** plugin: [http://github.com/ka8725/redmine_s3.git](http://github.com/ka8725/redmine_s3.git). Please follow link to read instrunctions how to install it. This is my fork of original gem: **git://github.com/tigrish/redmine_s3.git**
 
 > Since **Redmine 2** has released there are many changes there and gem **git://github.com/tigrish/redmine_s3.git** is not working with it now. That's why I forked this gem and have changed it.
 
