@@ -10,9 +10,15 @@ This post describes how to deploy absolutely free bugtracker - **Redmine** to fr
 
 ## Changes for Heroku
 
-Firstly we need to clone sources from **github**:
+> NOTE: This manual is actual only for Redmine 2.2.2 version. There are a lot of changes in next release which will be I think 2.2.3. I would write manual for Redmine 2.2.3 if you donated me:
+{% include JB/donate %}
 
-	git clone git://github.com/redmine/redmine.git
+So let's go! Firstly we need to clone sources from **github**:
+
+	wget https://github.com/edavis10/redmine/archive/2.2.2.tar.gz
+  tar -zxvf 2.2.2.tar.gz
+  cd redmine-2.2.2
+  git init .
 
 Open *.gitignore* file in your favourite editor and remove lines:
 
