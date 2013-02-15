@@ -35,6 +35,7 @@ AssetSync.configure do |config|
 end
 {% endhighlight %}
 
+what are they do you think?
 Where should you define `ENV['FOG_DIRECTORY']`? Should you define it in the shell script (like `~/.bashrc`, `~/.bash_profile`, `~/.profile` and etc.) or may be in the `/etc/environment`. If you think so I have to disappoint you - you are wrong!
 
 ## Challenge
