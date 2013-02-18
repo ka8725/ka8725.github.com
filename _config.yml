@@ -12,12 +12,12 @@ markdown: rdiscount
 #
 title : Ruby On Rails guides
 tagline: ruby heroku github rails
-author :
-  name : Andrey Koleshko
-  email : ka8725@gmail.com
-  github : ka8725
-  twitter : ka8725
-  feedburner : ka8725@gmail.com
+author:
+  name: Andrey Koleshko
+  email: ka8725@gmail.com
+  github: ka8725
+  twitter: ka8725
+  feedburner: railsguides-net
 
 # The production_url is only used when full-domain names are needed
 # such as sitemap.txt
