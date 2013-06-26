@@ -192,3 +192,19 @@ end
 See the first line (1): `require File.join(Rails.root, 'db/migrate/20121107173946_add_search_content_to_products.rb')`. With this line I include migration file and after this we are able to use old migration's class. On the fifth line (2) we I just use it: `AddSearchContentToProducts.new.down` to rollback old migration. On down I have to up this migration, see mark (3): `AddSearchContentToProducts.new.up`.
 
 In this example I had to rewrite stored procedure for postgresql database and I've got clean and DRY solution as you can see. Imagine how many code I would have if I just pasted all entire migration in the new! I hope you will find this article useful and if you have issues like I had you won't have problems now to solve them.
+
+UPDATE 26.06.2013: In Rails 4 new method is appeared which allows to revert all migrations. Check it out:
+
+```ruby
+require_relative '2012121212_example_migration'
+
+class FixupExampleMigration < ActiveRecord::Migration
+  def change
+    revert ExampleMigration
+
+    create_table(:apples) do |t|
+      t.string :variety
+    end
+  end
+end
+```
