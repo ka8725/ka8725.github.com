@@ -6,7 +6,7 @@ tags: [rails, belongs_to, validator, nested_form]
 ---
 {% include JB/setup %}
 
-Recently I've resolved on more problem which concerns presence validator and *belongs_to* association. But it's involved one more role - *accepts_nested_attributes*. Assume you have nested form and parent object is not existed yet, so you can get this issue. Here I will show you how to fix it.
+Recently I've resolved one more problem which concerns presence validator and *belongs_to* association. But it's involved another thing - *accepts_nested_attributes*. Assume you have nested form and parent object is not exist yet, so you can have this issue. Here I will show you how to fix it.
 
 ## Issue
 
