@@ -10,6 +10,8 @@ Have you ever written your own __rake tasks__? If you write them very often this
 
 Today I found interesting generator in __Ruby On Rails__. I have never read about it in any post, doc, book or tutorial, I have never seen it in any sceencast, I've never heart about it from any podcast and I wondered that Google doesn't tell me nothing about it. So I decided to write about it here.
 
+{% include JB/adsense_inner %}
+
 If you want to write your own __rake task__ you have 2 ways to do it (I thought so beafore):
 
 1. Write it from scratch
