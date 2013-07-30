@@ -24,6 +24,8 @@ These magic lines of code will get rid of headache and you will forget about rem
 
 Also I recommend to don't pass action names in rails controller generator because it inserts automatically routes which always are changed later.
 
+{% include JB/adsense_inner %}
+
 Say we have runned command `rails g controller users new edit` it will generate the following *trash*.
 
 Example of generated routes:

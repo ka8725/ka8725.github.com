@@ -40,6 +40,8 @@ So this is an our challenge - we can't save account, because user can't pass val
 
 A solution for this issue is very simple - just add to *has_one* (or if you have *has_many*) one more option - *:inverse_of*. With this option *rails* won't try to get account from database when user is validated. The account will be got from memory. If you don't familiar with this option I strongly recommend you to read an official [rails guide](http://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-inverse-of).
 
+{% include JB/adsense_inner %}
+
 So, change account model try it:
 
 {% highlight ruby %}

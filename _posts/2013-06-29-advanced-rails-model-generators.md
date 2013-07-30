@@ -68,6 +68,8 @@ end
 
 It means that generated table name for *Admin::User* starts with prefix *admin_users*. This feature allows to have separated namespaced models as in rails code as in db schema. Very convenient and useful feature for multimodule applications for my opinion.
 
+{% include JB/adsense_inner %}
+
 ## Advanced usage
 
 Sometimes you have to automatically add index for columns in your migration. It's not a problem:
