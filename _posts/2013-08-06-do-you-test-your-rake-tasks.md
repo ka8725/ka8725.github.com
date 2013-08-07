@@ -7,7 +7,7 @@ tags: [rails, rake, rspec]
 ---
 {% include JB/setup %}
 
-I think that many of you think that writing tests for cutom rake tasks is a redundant thing.
+I think that many of you think that writing tests for custom rake tasks is a redundant thing.
 But as practice shows if you think so you are wrong.
 In this post I will show how to test **custom rake tasks**.
 
