@@ -44,8 +44,6 @@ end
 
 Which way do you use? Do you know what is difference between them? Let's check it in rails console.
 
-{% include JB/adsense_inner %}
-
 ### 1.1. Foreign key way
 
 {% highlight ruby %}
