@@ -6,7 +6,7 @@ tags: [coffeescript, rails, ajax]
 ---
 {% include JB/setup %}
 
-I bet you had an issue with dynamic populating values for select which related to chosen value of other select. For example when I choose country the state select should be populated by states of chosen country. There are many solutions of this problem. You could find them with Google but none of them is suitable for me because of bugs or using approach with caching. I had been meeting this issue again and again and my googling was not successful. Eventually some time ago I invented *jQuery* library and approach with solves this problem and completely fit for me. This approach assumes that you don't use javascript frameworks like *Ember.js* or *Angular.js*. If you use one of this frameworks or both my solution may be redundant in your application.
+I bet you had an issue with dynamic populating of values for *select* which depends on a chosen value of other *select*. For example when I choose the country,  *select* of the state  should be populated by the states of the chosen country. There are many solutions of this problem. You could find them with Google but none of them  is suitable for me because of bugs or using the approach with caching. I have had this issue again and again and my googling was not successful. Eventually some time ago I invented jQuery library and approach with solves this problem and completely  suits me. This approach assumes that you don't use javascript frameworks like *Ember.js* or *Angular.js*.  In other case, my solution may be needless  in your application.
 
 ## Problem
 
@@ -56,14 +56,14 @@ class DynamicSelectable
       @urlTemplate.replace(/:.+_id/, id)
 {% endhighlight %}
 
-This peace of code adds a function in the *jQuery* *dynamicSelectable* which you can call on select which should be listened to change and populate dependent select. Listened select should has data attributes: *selectable-url* and *selectable-target*. Their names explains what they are for:
+This peace of code extends jQuery with a *dynamicSelectable* function which you can call on *select* which should be listened to change and populate the dependent *select*. The listened *select* should has data attributes: *selectable-url* and *selectable-target*. Their names explain what they are for:
 
-*selectable-url* - is an url pattern with model id. For example: `/dynamic_select/:country_id/states`. In this case the pattern should be populated with chosen country id (assuming that we add listener to country's select) and request will go to this url to get JSON data for populating related select.
+*selectable-url* - is an url pattern with the model id. For example: `/dynamic_select/:country_id/states`. In this case the pattern should be populated with the chosen country id (assuming that we add listener to country's select) and request will go to this url to get JSON data for populating related *select*.
 
-*selectable-target* - is an css selector of select which should be populated with given JSON data from the server.
+*selectable-target* - is a css selector of *select* which should be populated with given JSON data from the server.
 
 
-I call *dynamicSelectable* function for any *select* on the page which has both data attributes *selectable-url* and *selectable-target*:
+I call *dynamicSelectable* function for every *select* on the page which has both data attributes *selectable-url* and *selectable-target* simultaneously:
 
 > app/assets/javascripts/application.coffee
 
@@ -73,7 +73,7 @@ $ ->
   $('select[data-dynamic-selectable-url][data-dynamic-selectable-target]').dynamicSelectable()
 {% endhighlight %}
 
-To make our application work we should have controller which will be respond to route `/dynamic_select/:country_id/states`. Firstly see how I generate route:
+To make our application workable we should have a controller which will be responsible for the route `/dynamic_select/:country_id/states`. Firstly have a look at how I generate route:
 
 > config/routes.rb
 
@@ -85,7 +85,7 @@ end
 ...
 {% endhighlight %}
 
-And this is my controller:
+And this is how my controller looks:
 
 > app/controllers/dynamic_select/states_controller.rb
 
@@ -102,7 +102,7 @@ module DynamicSelect
 end
 {% endhighlight %}
 
-And this is a view template of index action:
+And this is a template of *index action*:
 
 > app/views/dynamic_select/states.index.jbuilder
 
@@ -112,7 +112,7 @@ json.array!(@states) do |state|
 end
 {% endhighlight %}
 
-Returning JSON data from server should not include root elements:
+Returned JSON data from server should not include root elements:
 
 > config/intializers/wrap_parameters.rb
 
@@ -143,6 +143,6 @@ And the last thing which I should focus on is a form:
 {% endhighlight %}
 
 
-Check out the [code on github](https://github.com/railsguides/dynamic-selectable-demo) and the live [demo](http://afternoon-lake-2182.herokuapp.com/events/new).
+Check out the [code on github](https://github.com/railsguides/dynamic-selectable-demo) and the live [demo here](http://afternoon-lake-2182.herokuapp.com/events/new).
 
-If you have any proposal according this solution or see typo, bug, inconsistency or lacks feel free to contact with me.
+If you have any proposals concerning this solution or if you have spotted any typo, bug, inconsistency or lacks feel free to contact with me.
