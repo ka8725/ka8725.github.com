@@ -10,8 +10,8 @@ markdown: rdiscount
 # Themes are encouraged to use these universal variables
 # so be sure to set them if your theme uses them.
 #
-title : Ruby On Rails guides
-tagline: ruby heroku github rails
+title : Rails guides
+tagline: ruby rails
 author:
   name: Andrey Koleshko
   email: ka8725@gmail.com
