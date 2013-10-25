@@ -84,7 +84,9 @@ Set limit for field of integer, string, text and binary fields:
 
 Special syntax to generate decimal field with scale and precision:
 
-    $ rails generate model product price:decimal{10,2}
+    $ rails generate model product 'price:decimal{10,2}'
+
+> Pay attention that you have to wrap parameter `price:decimal{10,2}` to quotes. It's vital and you may have incorrect behavior of generator if you don't do it. Full explanation of this case is [here](https://github.com/rails/rails/pull/12642).
 
 You can combine any single curly brace option with the index options:
 
