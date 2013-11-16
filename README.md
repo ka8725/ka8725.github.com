@@ -1,1 +1,1 @@
-This is a my blog: http://railsguides.net
+This is my [blog](http://railsguides.net) and that's it.
