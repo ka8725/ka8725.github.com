@@ -55,7 +55,6 @@ end
 
 And these are results of their running:
 
-
     rake test test/helpers/events_helper_test.rb
     Run options: --seed 23668
 
