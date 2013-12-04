@@ -55,30 +55,29 @@ end
 
 And these are results of their running:
 
-{% highlight %}
-rake test test/helpers/events_helper_test.rb
-Run options: --seed 23668
 
-# Running tests:
+    rake test test/helpers/events_helper_test.rb
+    Run options: --seed 23668
 
-Rehearsal -----------------------------------------------
-string        0.010000   0.000000   0.010000 (  0.019028)
-helper        0.480000   0.010000   0.490000 (  0.498942)
-hash          1.250000   0.000000   1.250000 (  1.253836)
-polymorphic   0.920000   0.010000   0.930000 (  0.924670)
--------------------------------------- total: 2.680000sec
+    # Running tests:
 
-                  user     system      total        real
-string        0.010000   0.000000   0.010000 (  0.013747)
-helper        0.480000   0.000000   0.480000 (  0.478646)
-hash          1.200000   0.000000   1.200000 (  1.200571)
-polymorphic   0.890000   0.000000   0.890000 (  0.892464)
-.
+    Rehearsal -----------------------------------------------
+    string        0.010000   0.000000   0.010000 (  0.019028)
+    helper        0.480000   0.010000   0.490000 (  0.498942)
+    hash          1.250000   0.000000   1.250000 (  1.253836)
+    polymorphic   0.920000   0.010000   0.930000 (  0.924670)
+    -------------------------------------- total: 2.680000sec
 
-Finished tests in 5.542858s, 0.1804 tests/s, 0.0000 assertions/s.
+                      user     system      total        real
+    string        0.010000   0.000000   0.010000 (  0.013747)
+    helper        0.480000   0.000000   0.480000 (  0.478646)
+    hash          1.200000   0.000000   1.200000 (  1.200571)
+    polymorphic   0.890000   0.000000   0.890000 (  0.892464)
+    .
 
-1 tests, 0 assertions, 0 failures, 0 errors, 0 skips
-{% endhighlight %}
+    Finished tests in 5.542858s, 0.1804 tests/s, 0.0000 assertions/s.
+
+    1 tests, 0 assertions, 0 failures, 0 errors, 0 skips
 
 
 As you see the slowest here is a hash style. And then polymorphic generating goes. Helper style on the 3rd place and it's not surprise that string generating wins.
