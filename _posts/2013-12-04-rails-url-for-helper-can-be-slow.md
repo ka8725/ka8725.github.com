@@ -24,7 +24,7 @@ url_for(@event) # polymorphic
 
 All there calls of `url_for` generate the same result `/events/:id`, for example `/events/1`.
 
-The most convenient seems the last call - you just pass `@event` record and that's it. There is no any brainstorming or surfing generated routes with `rake -T` task (this task shows all available routes for your Rails application, run it if you still hadn't done this yet). It really convenient not only that's why but it will be useful when you change controller or route which serves the event. You won't have to change all your entire code in Rails application where you used old route helpers or string urls, hashes and so on.
+The most convenient seems the last call - you just pass `@event` record and that's it. There is no any brainstorming or surfing generated routes with `rake routes` task (this task shows all available routes for your Rails application, run it if you still hadn't done this yet). It really convenient not only that's why but it will be useful when you change controller or route which serves the event. You won't have to change all your entire code in Rails application where you used old route helpers or string urls, hashes and so on.
 
 The most complicated seems the hash variant. It looks the biggest and there is no doubt that why it is silently deprecated by Rails community. Rails developers avoid to using it at all. The reason is not only in this reason but in one more which I will tell you in a few seconds.
 
