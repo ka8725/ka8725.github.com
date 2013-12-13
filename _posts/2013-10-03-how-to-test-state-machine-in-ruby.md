@@ -191,3 +191,6 @@ Obviously that we have much more code, but it's readable, maintainable, the test
 With this approach I forgot my troubles with testing state machine and created reusable solution which I always will use in my code from now. I have an idea to create gem for this but I'm not sure that it will have any popularity. If you like this solution, please, let me know about it. Thank you for your attention!
 
 I've created [gist](https://gist.github.com/ka8725/6794542) for this solution.
+
+
+UPDATE: I've invented much easier solution. It's much easier and elegant. Check [it out](https://gist.github.com/ka8725/7943510)
