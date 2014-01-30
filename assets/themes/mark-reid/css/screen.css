@@ -42,14 +42,14 @@ a.pdf:before {
 
 h1,h2,h3,h4 {
   line-height:1em;
-  font-size:1.5em;
-  font-weight: normal;
+  font-size: 1.1em;
+  font-weight: bold;
   clear: left;
-  font-family: 'lucida grande', sans-serif;
+  margin:1.5em 0 1.5em 0;
 }
 h1 { margin-bottom: 1em; }
 h2 {
-  font-size: 100%;
+  font-size: 1.5em;
   line-height: 1.5em;
   margin:1.5em 0 1.5em 0;
   font-weight:bold;
