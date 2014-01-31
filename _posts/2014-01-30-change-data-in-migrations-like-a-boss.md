@@ -6,7 +6,7 @@ tags: [rails, migrations]
 ---
 {% include JB/setup %}
 
-Changing data on change database schema in production is often problem for Rails developers. Assume that you have a Rails project. Some day you decided to change the database schema and want to add some new column. Them you have to go through all your models and change actual data according this new schema. Currently there are solutions to overcome this. But all of them have their disadvantages. You will see in this chapter them. This post tells about these disadvantages and how to get rid of the issue with the `migration_data` gem.
+Changing data on change database schema in production is a common problem for Rails developers. Assume that you have a Rails project. Some day you decided to change the database schema and want to add some new column. Then you have to go through all your models and change actual data according this new schema. Currently there are solutions to overcome this. But all of them have their disadvantages. You will see in this chapter them. This post tells about these disadvantages and how to get rid of the issue with the `migration_data` gem.
 
 ## Solutions with disadvantages
 
