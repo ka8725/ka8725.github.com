@@ -13,7 +13,7 @@ The list contains different types of projects including **SaaS** applications, *
 
 Apart of the commercial commitment I have contributed to open source projects:
 Rails, Datagrid, Inherited resources, Devise, Sinatra, Rake, Enumerize, Homebrew, Cocaine and so on.
-The whole list you may see following [this link](https://github.com/dashboard/pulls?direction=desc&page=1&sort=created&state=closed).
+The whole list you may see following [this link](https://github.com/ka8725).
 
 In a development process I always follow TDD principles, I do construct or take an active part in a project architecture, deployment processes and a workflow. In the past I was a Java developer, that's why it affects my programming decisions to the best. In code I prefer to apply design patterns where it's possible and reasonable, pay more attention to code reliability and flexibility. I have big experience in a project refactoring. I prefer to solve problems rather than creating them.
 
