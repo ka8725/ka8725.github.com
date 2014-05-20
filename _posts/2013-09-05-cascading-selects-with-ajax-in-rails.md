@@ -104,7 +104,7 @@ end
 
 And this is a template of *index action*:
 
-> app/views/dynamic_select/states.index.jbuilder
+> app/views/dynamic_select/states/index.json.jbuilder
 
 {% highlight ruby %}
 json.array!(@states) do |state|
