@@ -3,8 +3,11 @@ layout: post
 title: "Git hosting"
 description: "Are you looking for free git hosting? Or, may be, do you want to find mercurial hosting? Do you want to find unfuddle VCS unlike github.com? If you answer yes at least for one of these questions this post will be useful for you. You are welcome!"
 tags: [git, hosting]
+share: true
+redirect_from:
+  - /2012/03/21/git-hosting/
 ---
-{% include JB/setup %}
+
 
 Since I've found my **github** repository instead of my project in **google** I started to search **free git hosting** which would allow to hide my projects from **google crawl**. And I wondered when I found a lot of satisfied for me services. One of them I will describe in this article it is **bitbucket**.
 

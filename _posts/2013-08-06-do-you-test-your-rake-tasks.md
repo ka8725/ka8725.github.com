@@ -3,8 +3,11 @@ layout: post
 title: "Do you test your rake tasks?"
 description: "This post explains how to test custom rake tasks in the Rails application"
 tags: [rails, rake, rspec]
+share: true
+redirect_from:
+  - /2013/08/06/do-you-test-your-rake-tasks/
 ---
-{% include JB/setup %}
+
 
 I think that many of you think that writing tests for custom rake tasks is a redundant thing.
 But as practice shows if you think so you are wrong.

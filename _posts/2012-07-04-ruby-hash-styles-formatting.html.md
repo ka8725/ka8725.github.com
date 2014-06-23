@@ -3,8 +3,11 @@ layout: post
 title: "Ruby hash styles formatting"
 description: "Advice how to improve code formatting of hash styles for Ruby/Ruby On Rails"
 tags: [ruby, rails, formatting]
+share: true
+redirect_from:
+  - /2012/07/04/ruby-hash-styles-formatting.html
 ---
-{% include JB/setup %}
+
 
 Have you ever felt annoying in formatting of hash keys/values in Ruby code? So have I. And I'm going to describe
 how to improve it in this post.

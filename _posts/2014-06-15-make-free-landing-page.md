@@ -3,8 +3,11 @@ layout: post
 title: "Make a free landing page"
 description: "This blog post describes how to make a startup landing page with minimum effort. All described tools to make the landing page are free. And as a special bonus you will see how to add a sign up form to the landing page to collect visitors' emails."
 tags: [github, mailchimp]
+share: true
+redirect_from:
+  - /2014/06/15/make-free-landing-page/
 ---
-{% include JB/setup %}
+
 
 A **landing page** may be useful in many cases for those people who want to have business on the Internet. The main goal of the **landing page** is to promote a business idea. The target may be a site, which you are going to have (or have already released) or a book, if you are the author. The page basically contains some static content with contact information, cool images and javascript or css effects to attract people. Often there is a sign up form with mandatory email field on the page. Having an one-page site like this on the Internet you have to solve at least the following issues: writing the static site, choosing a hosting, deploying the site, looking for the back-end. In this post you will see how to solve these issues with minimal effort and cost, all tools to overcome the problems are **free** of charge.
 

@@ -5,9 +5,12 @@ description: "Rails raises ActiveRecord::IrreversibleMigration when it
 can't do it. Since Rails 4 released there is a solution to avoid
 it."
 tags: [rails, migrations]
+share: true
+redirect_from:
+  - /2013/11/16/make-irreversible-migrations-work-in-change/
 ---
 
-{% include JB/setup %}
+
 
 In Rails 2 in migrations there were only 2 methods: `up` and `down`. They are
 called on running migrations up and down respectively with rake tasks `rake db:migrate`

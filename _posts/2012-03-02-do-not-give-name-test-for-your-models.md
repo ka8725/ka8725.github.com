@@ -3,8 +3,11 @@ layout: post
 title: "Do not give name Test for your models"
 description: "Ruby on Rails guides for strange situation with name Test for models. There are many reasons to do not give name Test for your models in Ruby On Rails. Validates uniqueness in scope test_id does not work. There is a already Test module in Ruby On Rails"
 tags: [ruby, rails, active record, reserved_words]
+share: true
+redirect_from:
+  - /2012/03/02/do-not-give-name-test-for-your-models/
 ---
-{% include JB/setup %}
+
 
 There is a list of reserved words for Ruby On Rails framework. Full list is [here](http://oldwiki.rubyonrails.org/rails/pages/ReservedWords).
 But it doesn't contain at least one word which I will describe in this post. There are many reasons to don't give name **Test** for your _models_ in _Ruby On Rails_.

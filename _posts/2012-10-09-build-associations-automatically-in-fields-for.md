@@ -3,8 +3,11 @@ layout: post
 title: "Build associations automatically in fields_for helper"
 description: "Check out my gem. It is extension for fields_for helper which allows to avoid boring code foe creating associated object belongs_to and has_one association."
 tags: [rails, gem]
+share: true
+redirect_from:
+  - /2012/10/09/build-associations-automatically-in-fields-for/
 ---
-{% include JB/setup %}
+
 
 Assume you have code in your project like this:
 

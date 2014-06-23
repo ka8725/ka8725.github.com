@@ -3,8 +3,11 @@ layout: post
 title: "Rails 3 does not render partial for specific format - resolving issue"
 description: "There is a problem in Rails 3: if you would like to render for example html format for partial in ajax request you won't manage it in Rails 3. In this post I will describe how to avoid this problem"
 tags: [rails3, render]
+share: true
+redirect_from:
+  - /2012/08/29/rails3-does-not-render-partial-for-specific-format/
 ---
-{% include JB/setup %}
+
 
 ## Problem
 

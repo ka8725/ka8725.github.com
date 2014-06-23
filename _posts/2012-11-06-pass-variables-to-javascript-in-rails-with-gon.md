@@ -3,8 +3,11 @@ layout: post
 title: "Pass variables to javascript with gon"
 description: "This post describes how to use gon gem with fun. Gon allows to pass ruby variables from rails server to javascript, but it can grow your controllers in huge monsters. So I offer interesting approach how to avoid it"
 tags: [gem, rails, javascript]
+share: true
+redirect_from:
+  - /2012/11/06/pass-variables-to-javascript-in-rails-with-gon/
 ---
-{% include JB/setup %}
+
 
 If you haven't noticed yet that there is a good solution passing *Rails* variables from controllers to javascript I will be happy to make you fun with [gon](https://github.com/gazay/gon). In this post I will show how to use it with controller's filters in a clean, dry and the best way. This approach will help you to avoid growing controllers in a big monsters.
 

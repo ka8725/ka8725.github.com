@@ -3,8 +3,11 @@ layout: post
 title: "Change data in migrations like a boss"
 description: "Update data in migrations like a boss. Don't write raw SQL in migration, don't define again your models in migrations again, don't use seeds. Use migration_data gem to keep your migrations up to date, migration data in production, test migration data code and remove them when you want."
 tags: [rails, migrations]
+share: true
+redirect_from:
+  - /2014/01/30/change-data-in-migrations-like-a-boss/
 ---
-{% include JB/setup %}
+
 
 Changing data on change database schema in production is a common problem for Rails developers. Assume that you have a Rails project. Some day you decided to change the database schema and want to add some new column. Then you have to go through all your models and change actual data according this new schema. Currently there are solutions to overcome this. But all of them have their disadvantages. You will see in this chapter them. This post tells about these disadvantages and how to get rid of the issue with the `migration_data` gem.
 

@@ -3,8 +3,11 @@ layout: post
 title: "Skip callbacks in tests"
 description: "Simple solution to skip callbacks in tests if they should not be run there. The solution is for Rails ActiveRecord."
 tags: [rails, callbacks]
+share: true
+redirect_from:
+  - /2014/03/25/skip-callbacks-in-tests/
 ---
-{% include JB/setup %}
+
 
 There are a lot of troubles around callbacks in Rails's ActiveRecord. In common people use callbacks to process complicated operations such as sending emails, creating related models and etc. Basically all of them should be prevented from execution in tests because of slowing down speed and increasing time execution of the tests. It's not a secret that there are best practices to avoid the problem, but in some cases it's almost impossible to apply them on your project.
 This post shares idea about how to prevent the callbacks execution if you are in the same situation.

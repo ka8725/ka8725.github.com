@@ -3,8 +3,11 @@ layout: post
 title: "Environment variables in Rails"
 description: "The post about defining ENV variables in Rails. Explanation what does ENV['FOG_PROVIDER'] mean and how to configure Capistrano deployment with ENV variables"
 tags: [rails, capistrano]
+share: true
+redirect_from:
+  - /2013/02/15/how-to-define-environment-variables-in-rails/
 ---
-{% include JB/setup %}
+
 
 When you see configuration examples in gems README like this:
 

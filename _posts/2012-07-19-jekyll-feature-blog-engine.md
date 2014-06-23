@@ -3,8 +3,11 @@ layout: post
 title: "Jekyll - the best blog engine"
 description: "This post describes how to use github pages (gh-pages) as hosting to have a simple blog based on jekyll engine. You don't have to pay for hosting at all for it"
 tags: [jekyll, git, hosting, blog]
+share: true
+redirect_from:
+  - /2012/07/19/jekyll-feature-blog-engine/
 ---
-{% include JB/setup %}
+
 
 Have you ever wanted to have a nice, simple to use free blog engine for developer? If have this post is especially for you.
 

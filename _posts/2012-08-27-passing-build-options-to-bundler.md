@@ -3,8 +3,11 @@ layout: post
 title: "Passing build options to bundler"
 description: "When you have to pass build options to bundler using bundler-config will solve your problems with very easy way."
 tags: [ruby, bundler, gems]
+share: true
+redirect_from:
+  - /2012/08/27/passing-build-options-to-bundler/
 ---
-{% include JB/setup %}
+
 
 ## Problem
 

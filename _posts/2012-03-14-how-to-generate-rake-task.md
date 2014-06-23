@@ -3,14 +3,18 @@ layout: post
 title: "How to generate rake task"
 description: "Ruby on Rails guides for generate rake task. If you want to write new rake task you can use rails generate task generator. It is Ruby On Rails generator which generates scaffold for the rake task"
 tags: [ruby, rails, rake]
+comments: true
+share: true
+redirect_from:
+  - /2012/03/14/how-to-generate-rake-task/
 ---
-{% include JB/setup %}
+
 
 Have you ever written your own __rake tasks__? If you write them very often this post will be very useful for you. I won't describe what is __rake task__ here because there are a lot of information about it yet. I will tell you how to easy _generate_ __rake task__.
 
 
 <a href="http://goo.gl/0Bw6H4">
-  <img src="/images/rake_book.jpg" alt="Rake Task Management Essentials" align="left" vspace="5" hspace="5" width="120"/>
+  <img src="/images/rake_book.jpg" alt="Rake Task Management Essentials" align="right" vspace="5" hspace="5" width="120"/>
 </a>
 
 > Recently I have written a book about **Rake**. It's called **Rake Task Management Essentials**. If you like this post's content and interested in **Rake**, if you would like to know more about this great tool you can buy it [here](http://goo.gl/0Bw6H4). I promise that after reading the book you will understand main goals of **Rake**, how to use it in your development process, daily work or just for fun. You will understand how to refactor and speed up rake tasks. You will be introduced to all **Rake**'s features by straightforward and practical examples.

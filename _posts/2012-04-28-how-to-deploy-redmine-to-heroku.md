@@ -3,15 +3,17 @@ layout: post
 title: "How to deploy Redmine to Heroku"
 description: "This post describes how to deploy free bugtracker Redmine 2 to free Hosting - Heroku"
 tags: [heroku, redmine, rails, hosting]
+share: true
+redirect_from:
+  - /2012/04/28/how-to-deploy-redmine-to-heroku/
 ---
-{% include JB/setup %}
+
 
 This post describes how to deploy absolutely free bugtracker - **Redmine** to free hosting **Heroku**. That's way you will have free bugtracker in the internet. There are many post in the internet that describe how to deploy old version of **Redmine** to **Heroku**, but I couldn't find any information how to deploy new version of **Redmine**: **Redmine 2**. So if you have the same problem - you are welcome
 
 ## Changes for Heroku
 
-> NOTE: This manual is actual only for Redmine 2.2.2 version. There are a lot of changes in next release which will be I think 2.2.3. I would write manual for Redmine 2.2.3 if you donated me:
-{% include JB/donate %}
+> NOTE: This manual is actual only for Redmine 2.2.2 version. There are a lot of changes in next release which will be I think 2.2.3.
 
 So let's go! Firstly we need to clone sources from **github**:
 

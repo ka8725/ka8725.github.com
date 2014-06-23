@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: http://railsguides.net/sitemap.xml
-Disalllow: /tags
-Disalllow: /about_author
-Disalllow: /archive

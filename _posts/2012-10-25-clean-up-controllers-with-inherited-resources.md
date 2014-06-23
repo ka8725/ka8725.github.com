@@ -3,8 +3,11 @@ layout: post
 title: "Clean up your controllers with inherited resources"
 description: "This posts describes how to use one of the best rails tools - inherited_resources gem. You will find out how to use it in rails development and how it can help you to spend less time have less bugs in your code. I hope this technique will be useful for all rails developers"
 tags: [rails, gem, rest, refactoring]
+share: true
+redirect_from:
+  - /2012/10/25/clean-up-controllers-with-inherited-resources/
 ---
-{% include JB/setup %}
+
 
 If you haven't noticed yet that main rule in rails development says do not complicate logic in controller I recommend you to read these articles:
 
