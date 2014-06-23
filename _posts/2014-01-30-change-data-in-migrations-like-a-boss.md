@@ -4,6 +4,7 @@ title: "Change data in migrations like a boss"
 description: "Update data in migrations like a boss. Don't write raw SQL in migration, don't define again your models in migrations again, don't use seeds. Use migration_data gem to keep your migrations up to date, migration data in production, test migration data code and remove them when you want."
 tags: [rails, migrations]
 share: true
+comments: true
 redirect_from:
   - /2014/01/30/change-data-in-migrations-like-a-boss/
 ---

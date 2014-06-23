@@ -6,6 +6,7 @@ can't do it. Since Rails 4 released there is a solution to avoid
 it."
 tags: [rails, migrations]
 share: true
+comments: true
 redirect_from:
   - /2013/11/16/make-irreversible-migrations-work-in-change/
 ---

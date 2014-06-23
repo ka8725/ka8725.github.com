@@ -5,6 +5,7 @@ description: "Use partials as layouts in Rails applications. It allows to nest l
 in views."
 tags: [rails, layouts, render, partial]
 share: true
+comments: true
 redirect_from:
   - /2014/05/20/rails-nested-layouts/
 ---

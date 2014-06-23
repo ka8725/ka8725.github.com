@@ -4,6 +4,7 @@ title: "Free domains from dot.tk. To be or not to be"
 description: "My experience of using free domains from dot.tk. They locked my domain *.tk without any reason. To taste the honey you've got to pay some money"
 tags: [domain]
 share: true
+comments: true
 redirect_from:
   - /2012/03/08/free-domains-from-dottk-to-be-or-not-to-be/
 ---

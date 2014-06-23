@@ -4,6 +4,7 @@ title: "A side effect of boolean parameters in Ruby"
 description: "This post describes side effect of having boolean arguments in Ruby methods. It shows how it can be elegant and confusion at the same time"
 tags: [ruby]
 share: true
+comments: true
 redirect_from:
   - /2013/11/05/side-effect-of-boolean-parameters-in-ruby/
 ---

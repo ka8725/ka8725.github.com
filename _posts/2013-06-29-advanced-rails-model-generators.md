@@ -4,6 +4,7 @@ title: "Advanced Rails model generators"
 description: "Check out how the rails generators are awesome. In this post you will read how to use rails model generators for 100%"
 tags: [rails]
 share: true
+comments: true
 redirect_from:
   - /2013/06/29/advanced-rails-model-generators/
 ---

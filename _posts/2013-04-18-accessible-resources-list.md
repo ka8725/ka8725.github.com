@@ -4,6 +4,7 @@ title: "Accessible resources list - DRY solution for controllers"
 description: "In this post I describe how to achieve DRY solution for controller's actions which return the list of scoped objects. In the another words I show here how to avoid repetitive changes in controllers actions like this: Model.where :active => true"
 tags: [rails, cancan, refactoring, gem]
 share: true
+comments: true
 redirect_from:
   - /2013/04/18/accessible-resources-list/
 ---

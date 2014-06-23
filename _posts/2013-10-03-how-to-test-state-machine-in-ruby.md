@@ -5,6 +5,7 @@ description: "I've invented approach which rids of headache of testing state mac
 This solution is only for RSpec now, but approach can be used for test unit as well."
 tags: [rspec, ruby]
 share: true
+comments: true
 redirect_from:
   - /2013/10/03/how-to-test-state-machine-in-ruby/
 ---

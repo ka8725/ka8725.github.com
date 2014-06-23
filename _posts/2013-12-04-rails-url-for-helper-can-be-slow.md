@@ -5,6 +5,7 @@ description: "url_for is used by link_to which is used any Rails developer.
 This method accepts a lot of types of arguments. And sometimes it can be slow. See how to use it with maximum performance."
 tags: [rails]
 share: true
+comments: true
 redirect_from:
   - /2013/12/04/rails-url-for-helper-can-be-slow/
 ---

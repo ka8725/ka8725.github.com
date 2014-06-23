@@ -4,6 +4,7 @@ title: "Don't generate trash with rails generators"
 description: "When you generate controller in rails application many unexpected files are generated with it. I like to disable this behavior right after generating application. This post describes how to configure rails application to avoid trash generating"
 tags: [rails]
 share: true
+comments: true
 redirect_from:
   - /2013/07/02/do-not-generate-trash-with-rails/
 ---
