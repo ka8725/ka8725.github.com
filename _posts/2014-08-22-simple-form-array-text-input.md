@@ -43,7 +43,7 @@ In the form use this example to generate a collection of text fields:
 
 {% highlight ruby %}
 form_for @location do |f|
-  f.input :zips, as: :input
+  f.input :zips, as: :array
 end
 {% endhighlight %}
 
