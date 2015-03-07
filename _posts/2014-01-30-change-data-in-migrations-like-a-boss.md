@@ -113,7 +113,7 @@ As you see the `role_type` is set incorrectly it should be `Role` without the na
 
 ### Writing raw SQL in migrations
 
-To be honest this solution doesn't have disadvantages except a few. You have to now SQL and sometimes well. And as a result requires more time to write the code. Besides of this Rails developers don't prefer to write raw SQL because if you want to migrate through PostgreSQL to MySQL for example you may have to fix much raw SQL code. Check out [official documentation](http://guides.rubyonrails.org/migrations.html#when-helpers-aren-t-enough) to get examples how to write raw SQL in migrations.
+To be honest this solution doesn't have disadvantages except a few. You have to know SQL and sometimes well. And as a result requires more time to write the code. Besides of this Rails developers don't prefer to write raw SQL because if you want to migrate through PostgreSQL to MySQL for example you may have to fix much raw SQL code. Check out [official documentation](http://guides.rubyonrails.org/migrations.html#when-helpers-aren-t-enough) to get examples how to write raw SQL in migrations.
 
 ### Using seeds
 
