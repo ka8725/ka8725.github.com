@@ -169,4 +169,23 @@ Over time you will notice that it's rather hard to maintain your old migrations.
 
 In order to perform the **migrations squashing** I added a rake task into [https://github.com/ka8725/migration_data#clean-old-migration](https://github.com/ka8725/migration_data) today. The task's name is `db:migrate:squash`. And finally don't forget to remove tests for the migrations if you have them after the task execution. Enjoy it!
 
-One not for the rake task. You have to make sure that all team members and deployment servers have already run all current migrations before the **squashing**. Otherwise they can have collisions. This process can be automated later.
+One note for the rake task. You have to make sure that all team members and deployment servers have already run all current migrations before the **squashing**. Otherwise they can have collisions. This process can be automated later.
+
+
+# Update 08/12/2015
+
+Once you can get the following state:
+
+{% highlight %}
+              Timeline
+                  |
+                  |
+                  |<— change in the DB schema
+                  |
+                  |
+         Squash —>|
+                  |
+                  |
+{% endhighlight %}
+
+This can be happened when somebody are squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try to alter the not created yet tables (for example, it just adds a new column to the `users` table). In order to fix the issue you have to update the timestamps for the migration change to be newer than the squash migration.
