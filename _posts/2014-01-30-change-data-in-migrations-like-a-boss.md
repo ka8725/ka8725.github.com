@@ -176,7 +176,7 @@ One note for the rake task. You have to make sure that all team members and depl
 
 Once you can get the following state:
 
-{% highlight %}
+{% highlight text %}
               Timeline
                   |
                   |
@@ -188,4 +188,4 @@ Once you can get the following state:
                   |
 {% endhighlight %}
 
-This can be happened when somebody are squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try to alter the not created yet tables (for example, it just adds a new column to the `users` table). In order to fix the issue you have to update the timestamps for the migration change to be newer than the squash migration.
+This can be happened when somebody does the squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try to alter the not created yet tables (for example, it just adds a new column to the `users` table, but as it applied to the fresh DB accordingly to the DB history it unfortunately fails). In order to fix the issue you have to update the timestamps for the migration change to be newer than the squash migration.
