@@ -17,4 +17,4 @@ In a development process I always follow TDD principles, I do construct or take 
 
 The main achievement in my experience as a **Ruby developer** is a writing the book [Rake Task Management Essentials](http://www.packtpub.com/rake-task-management-essentials/book). Yes, I'm the sole author of the book.
 
-If you wanted to hire me then you would like to see my CV. It's located [here](https://dl.dropboxusercontent.com/u/15142852/Resume/Resume.pdf).
+If you wanted to hire me then you would like to see my CV. It's located [here](https://github.com/ka8725/mycv/raw/master/resume.pdf).
