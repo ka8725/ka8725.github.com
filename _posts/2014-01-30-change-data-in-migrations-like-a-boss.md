@@ -162,3 +162,30 @@ The test will fail you have some unexpected changes in the code and you will be 
 # Conclusion
 
 The only solution to keep your migrations up to date with any code which lives there is to write tests for them. But if you write the migration data code and code to change database schema simultaneously in `up`, `down` or `change` methods you won't able to write tests for these migrations. Change database schema in tests is not good idea, isn't it? So if you have these problems this gem is what you are looking for.
+
+# Update 06/11/2015:
+
+Over time you will notice that it's rather hard to maintain your old migrations. Especially it's true when the code is changing a lot. At this point the best solution that I know is to just remove all the old migrations. After the removal we have to just insert current database structure into the last migration. This way we will have clean migrations history and it will be possible to run them on a new database.
+
+In order to perform the **migrations squashing** I added a rake task into [https://github.com/ka8725/migration_data#clean-old-migration](https://github.com/ka8725/migration_data) today. The task's name is `db:migrate:squash`. And finally don't forget to remove tests for the migrations if you have them after the task execution. Enjoy it!
+
+One note for the rake task. You have to make sure that all team members and deployment servers have already run all current migrations before the **squashing**. Otherwise they can have collisions. This process can be automated later.
+
+
+# Update 08/12/2015
+
+Once you can get the following state:
+
+{% highlight text %}
+              Timeline
+                  |
+                  |
+                  |<— change in the DB schema
+                  |
+                  |
+         Squash —>|
+                  |
+                  |
+{% endhighlight %}
+
+This can be happened when somebody does the squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try to alter the not created yet tables (for example, it just adds a new column to the `users` table, but as it applied to the fresh DB accordingly to the DB history it unfortunately fails). In order to fix the issue you have to update the timestamps for the migration change to be newer than the squash migration.
