@@ -14,7 +14,7 @@ var navigation = responsiveNav("#site-nav", { // Selector: The ID of the wrapper
   close: function(){} // Function: Close callback
 });
 
-$('html').click(function() {
+$('#site-nav').click(function() {
   //Hide the menus if visible
   navigation.toggle();
 });
