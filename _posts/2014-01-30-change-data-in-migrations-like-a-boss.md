@@ -189,3 +189,15 @@ Once you can get the following state:
 {% endhighlight %}
 
 This can be happened when somebody does the squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try to alter the not created yet tables (for example, it just adds a new column to the `users` table, but as it applied to the fresh DB accordingly to the DB history it unfortunately fails). In order to fix the issue you have to update the timestamps for the migration change to be newer than the squash migration.
+
+# Update 18/01/2017
+
+When you have to update a lot of data then the `migration_data` gem may be not a good choice. It takes time
+to process huge amount of data and the deployment process will be slowed down dramatically. It will increase
+downtime of your application what is not acceptable for a production ready application with many real clients.
+So if you have such type application then, please, don't use this gem. There are may be used other techniques
+that already discussed in other great posts:
+
+1. [Rails Migrations with Zero Downtime](https://blog.codeship.com/rails-migrations-zero-downtime/)
+2. [Data Migrations in Rails](https://robots.thoughtbot.com/data-migrations-in-rails)
+3. [SEEDMIGRATIONS. LIKE SCHEMA MIGRATIONS, BUT FOR YOUR DATA](http://engineering.harrys.com/2014/06/09/seed-migrations.html)
