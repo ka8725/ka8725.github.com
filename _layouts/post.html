@@ -14,15 +14,7 @@
 <div id="main" role="main">
   <article class="hentry">
     <div class="entry-wrapper">
-      <header class="entry-header">
-        <span class="entry-tags">{% for tag in page.tags %}<a href="/tags/#{{ tag }}" title="Pages tagged {{ tag }}">{{ tag }}</a>{% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}{% endfor %}</span>
-        {% if page.link %}
-          <h1 class="entry-title"><a href="{{ page.link }}">{% if page.headline %}{{ page.headline }}{% else %}{{ page.title }}{% endif %} <span class="link-arrow">&rarr;</span></a></h1>
-        {% else %}
-          <h1 class="entry-title">{% if page.headline %}{{ page.headline }}{% else %}{{ page.title }}{% endif %}</h1>
-        {% endif %}
-      </header>
-      <footer class="entry-meta">
+      <artticle class="entry-meta">
         {% if page.author.name %}
         <img src="/images/{{ page.author.avatar }}" alt="{{ page.author.name }} photo" class="author-photo">
         <span class="author vcard">By <span class="fn">{{ page.author.name }}</span></span>
@@ -39,8 +31,15 @@
             <a href="https://twitter.com/intent/tweet?hashtags={{ page.categories | join: ',' }}&text={{ page.title }}&url={{ page.url }}&via={{site.owner.twitter}}" title="Share on Twitter" itemprop="Twitter"><i class="icon-twitter-sign"></i> Tweet</a></span>
             <!-- /.social-share -->{% endif %}
         {% include ad_vertical.html %}
-      </footer>
+      </artticle>
       <div class="entry-content">
+        <h1 class="entry-title">{{ page.title }}</h1>
+        <span class="entry-tags">
+          {% for tag in page.tags %}
+            <a href="/tags/#{{ tag }}" title="Pages tagged {{ tag }}">{{ tag }}</a>
+            {% unless forloop.last %}&nbsp;&bull;&nbsp;{% endunless %}
+          {% endfor %}
+        </span>
         {{ content }}
         {% if site.disqus_shortname and page.comments %}<div id="disqus_thread"></div><!-- /#disqus_thread -->{% endif %}
       </div><!-- /.entry-content -->
