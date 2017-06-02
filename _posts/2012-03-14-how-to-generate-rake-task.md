@@ -13,7 +13,7 @@ redirect_from:
 Have you ever written your own __rake tasks__? If you write them very often this post will be very useful for you. I won't describe what is __rake task__ here because there are a lot of information about it yet. I will tell you how to easy _generate_ __rake task__.
 
 
-<a onclick="_gaq.push(['_trackEvent', 'Reference', 'Packt', '#rake-task-management-essentials']);" href="http://goo.gl/0Bw6H4">
+<a onclick="_gaq.push(['_trackEvent', 'Reference', 'Packt', '#rake-task-management-essentials']);" href="http://goo.gl/0Bw6H4" target="_blank">
   <img src="/images/rake_book.jpg" alt="Rake Task Management Essentials" align="right" vspace="5" hspace="5" width="120"/>
 </a>
 
