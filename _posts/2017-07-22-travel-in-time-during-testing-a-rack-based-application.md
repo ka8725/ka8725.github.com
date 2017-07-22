@@ -21,7 +21,7 @@ Before showing the main idea behind the solution I would like to share some hack
 
 Sometimes there is a need to change code in a Rails application locally, but these changes must not be deployed to production server or committed to a version control system. For example, I want to set an alias locally to some namespace, because it's too long and I don't want to type a lot during debugging or investigating something in rails console. I.e. I want to do `GW = ActiveMerchant::Billing::TrustCommerceGateway`. It would be great to not set this alias every time manually right after opening rails console. A possible solution could be just defining a custom initializer (I hope that's not news for you what is that and it's known that initializers are located in the `config/initializers/` folder of a Rails application, more about Rails initializers [here](http://guides.rubyonrails.org/configuring.html)). But it will be automatically tracked by a version control system. And this is not a problem - those can be configured to be ignored. E.g. for Git this file's path can be put in the `.gitignore` and that's it.
 
-I would recommend to define one such initializer, that will be general for all of your aliases, local monkey-patches and so on. By the way, check out one of very useful monkey-patch you will love:
+I would recommend to define one such initializer (for example `config/initializers/dev.rb`), that will be general for all of your aliases, local monkey-patches and so on. By the way, check out one of very useful monkey-patch you will love:
 
 ```ruby
 class BigDecimal
@@ -32,11 +32,10 @@ end
 
 ```
 
-
 And now when you fetch an ActiveRecord instance from DB in the Rails console instead of unreadable things you will see human-readable float numbers for `BigDecimal`'s. E.g. before that was `#<BigDecimal:7fb8301a25a8,'0.5005E3',18(18)>`, after - `500.50`.
 
 
-Enough introduction and excursuses, here the solution of the current time changes problem:
+Enough introduction and excursuses. This is the code snippet for changing current time:
 
 ```ruby
 class TravelTime
@@ -57,26 +56,46 @@ class TravelTimeMiddleware
   end
 end
 
-module MyApplication # Name of your application, find it in the config/application.rb
-  class Application
-    if ENV['TRAVEL_TIME']
-      require 'timecop'
+Rails::Application.subclasses.first.class_eval do
+  if ENV['TRAVEL_TIME']
+    require 'timecop'
 
-      config.middleware.use TravelTimeMiddleware
+    config.middleware.use TravelTimeMiddleware
 
-      Timecop.travel(TravelTime.take) # For Rake tasks, console and other similar processes
+    Timecop.travel(TravelTime.take) # For Rake tasks, console and other similar processes
 
-      class Delayed::Worker
-        alias origin_run run
-
-        def run(job)
-          Timecop.travel(TravelTime.take) do
-            origin_run(job)
-          end
-        end
-      end
-    end
+    # Uncomment the code below if you use Delayed Job as a queue in your application
+    # class Delayed::Worker
+    #   alias origin_run run
+    #
+    #   def run(job)
+    #     Timecop.travel(TravelTime.take) do
+    #       origin_run(job)
+    #     end
+    #   end
+    # end
   end
 end
 
 ```
+
+In order to use this code just put it into a local initializer. Create a text file with some time inside in any format compatible with Rails. This is the time that should be traveled to during testing an application. For example:
+
+```
+echo "Fri, 19 Jun 2017 10:46:52 EDT -04:00" > travel_time
+```
+
+Then set environment variable `TRAVEL_TIME` to point to this file:
+
+```
+export TRAVEL_TIME=travel_time
+```
+
+That's it. Now when you run the rails server or rails console current time will be set to "19 Jun 2017 10:46:52". Having current time defined in a file allows to change it at any time and it will be updated without restarting a rails server (note, that a console should be restarted). If you use Delayed Job in your application and want to emulate current time in its worker uncomment the commented code. Similar to the code related to Delayed Job similar code can be written for other queues.
+
+> In the snippet a middleware is used. If you are not familiar with this conception please refer [this guideline](http://guides.rubyonrails.org/rails_on_rack.html#configuring-middleware-stack).
+
+
+## Conclusion
+
+In this post you've seen how to emulate current time in a Rails application without changes in operating system settings. This allows to avoid a lot of critical issues that may arise. Also it's described some useful trick with local initializers that will be useful in different circumstances.
