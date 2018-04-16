@@ -84,6 +84,13 @@ database: test-dev
 
 When `rake db:migrate:down VERSION=20180405124704` to the previous state correspondingly.
 
+It's also can be useful the following command:
+
+```
+rale db:migrate:down VERSION=20180405124704
+```
+
+That combines the two actions (up and down) in one: firstly it tries to do `down` and then - `up`. More information about these tasks can be found in the Rails source code [here](https://github.com/rails/rails/blob/0a353a97869b2af256d4253533beeb38303cf753/activerecord/lib/active_record/railties/databases.rake#L108-L148).
 
 ### Conclusion
 
