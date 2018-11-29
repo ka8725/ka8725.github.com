@@ -20,7 +20,7 @@ There are some bits of advice on how to speed up tests and they are clearly defi
 
 We already know they are slow because of touching DB. But which code exactly causes the issue? Let's think first why we need real models created when we test a decorator. You may argue, but as I see, most of the time we need persisting models there to satisfy some select from DB, that's actually **scopes** or **associations** in the Rails models layer. So, why not to stub these things?
 
-Ok, we figured out that we need to stub associations and scopes in a test for a decorator. But how to do this exactly? Suppose, there is a code somewhere in deep of our models that's called by our decorator: we test `SubscriptionDecorator.new(subscription).active_users` that actually turns into call `subscription.users.active.verified` underneath. A stub like this `allow(subscription).to receive(users).and_return([User.new])` won't work, because there are no defined `active` or `verified` methods on it. So, looks like we need to stub it wisely. And here what I suggest. Let's create a clone of `ActiveRecord::Relation` like this one:
+Ok, we figured out that we need to stub associations and scopes in a test for a decorator. But how to do this exactly? Suppose, there is a code somewhere in deep of our models that's called by our decorator: we test `SubscriptionDecorator.new(subscription).active_users` that actually turns into call `subscription.users.active.verified` underneath. A stub like this `allow(subscription).to receive(users).and_return([User.new])` won't work, because there are no defined `active` or `verified` methods on it. So, looks like we need to stub it wisely. And here is what I suggest. Let's create a clone of `ActiveRecord::Relation` that copies an association behavior:
 
 ```ruby
 class ActiveRecordRelationStub
@@ -44,7 +44,7 @@ end
 
 ```
 
-Having this in place, we can stub our association and scope like this:
+Having this in place, we can stub our association and scope:
 
 ```ruby
 user1 = build_stubbed(:user)
@@ -52,7 +52,7 @@ user2 = build_stubbed(:user)
 allow(subscription).to receive(:users).and_return(ActiveRecordRelationStub.new(User, [user1, user2], scopes: [:active, :verified]))
 ```
 
-For the sake of simplicity let's have our `SubscriptionDecorator` class defined like this:
+In order to demonstrate how it works, for the sake of simplicity let's have our `SubscriptionDecorator` class defined in the following way:
 
 ```ruby
 class SubscriptionDecorator
@@ -63,12 +63,12 @@ class SubscriptionDecorator
 end
 ```
 
-And know when we call `SubscriptionDecorator#active_users` in tests with `SubscriptionDecorator.new(subscription).active_users` it will return the stubbed relation with the records we provided exactly like real models would behave, but here we shouldn't care about internal details of how the scopes (`verified` or `active`) are defined, what filters they use and so on. The real behavior of the scopes should be tested in the models on which they are defined. On decorators layer we rely on the scopes implementation and assume they work correctly so that we can safely stub them. But in order not to stub an association that's not defined better use [verifying partial doubles](https://relishapp.com/rspec/rspec-mocks/docs/verifying-doubles/partial-doubles). If you use it properly, RSpec will check if you don't stub a not existing method. I highly recommend you to turn this option on globally for your tests to be on the safe side.
+And now when the call `SubscriptionDecorator#active_users` in tests with `SubscriptionDecorator.new(subscription).active_users` returns the stubbed relation with the records provided exactly like real models would behave. But keep in mind, here we don't care about internal details of how the scopes (`verified` or `active`) are defined, what filters they use and so on. The real behavior of the scopes should be tested in the models on which they are defined. In other words, on decorators layer we rely on the scopes implementation and assume they work correctly and tested well, so that we can safely stub them. Please note, to prevent the mistake with stubbing an association that's not defined, it's better to use [verifying partial doubles](https://relishapp.com/rspec/rspec-mocks/docs/verifying-doubles/partial-doubles). If use it properly, RSpec checks whether the stubbed method is really defined or not, and if it's not an exception is raised. So you are informed about this typo or mistake and can fix it not waiting for an error happened in production because you relied on tests that were weak. I highly recommend you to turn this option on globally for your tests to be on the safe side.
 
 
 ### Conclusion
 
-I used the technique described in this article once and it was pretty successful. I managed to make our tests much faster. But this is not the whole story. There should be also defined aggregate functions, some filter methods and so on. If this approach works for you as well, I offer to comment on what functionality lacks there and comment it [here](https://gist.github.com/ka8725/de9e6a87d83a0f58ad3e3ba20ebaf3ae).
+I used the technique described in this article once and it was pretty successful. I managed to make our tests much faster. And of course, this approach can be used not only in tests for decorators, but for view specs, controllers specs and in any place when you don't really need to check whether DB works properly but rather want to check **your** code. But this is not the whole story. There should be also defined aggregate functions, some filter methods and so on. If this approach works for you as well, I offer to comment on what functionality lacks [here](https://gist.github.com/ka8725/de9e6a87d83a0f58ad3e3ba20ebaf3ae).
 
 ### PS
 
