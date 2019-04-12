@@ -2,7 +2,7 @@
 layout: post
 title: "Efficient algorithm to check dates overlap"
 modified: 2019-04-07 00:41:06 +0300
-description: "Need for coming up with an efficient algorithm checks a date range overlapping with some denoted set of date ranges? This article explains how to solve this problem with an efficient approach."
+description: "Do you need an efficient algorithm that checks a date range overlapping with some denoted set of date ranges? This article explains how to solve this problem with a subtle approach."
 tags: [postgresql, sql, ruby, rails, active_record]
 comments: true
 share: true
@@ -12,15 +12,15 @@ share: true
 
 ### Problem
 
-Consider the following scenario. A real estate site's guest wants to book a hotel for specific dates and the system should check whether these dates are available, i.e. if they aren't overlapping with some other already existing booking. Assume for this hypothetical site written in Rails software engineers have come up with `Booking` model represents `bookings` table with two columns `start_date` and `end_date` of `date` type. Also it's supposed there is a validation somewhere checks that `start_date <= end_date`. Although the solution below describes how to cope with this specific situation, it can be applied to another similar data model.
+Picture this. A real estate site's guest wants to book a hotel for specific dates and the system should check whether these dates are available, i.e. if they are not overlapping with some other already existing booking. Let's say, this hypothetical site is written in Rails and software engineers have come up with `Booking` model representing `bookings` table with two columns: `start_date` and `end_date` of `date` type. Also suppose, there is a validation somewhere checking `start_date <= end_date`. Although, the solution below describes how to cope with this specific situation, it can be applied to another similar data model.
 
 ### Solution
 
-Probably, the easiest solution of this problem could be written in Rails way. Just define a custom validation inside `Booking` model that performs every time when a new booking creates or existing one updates:
+Probably, the easiest solution of this problem could be handled with a Rails way. Just define a custom validation inside `Booking` model that performs every time when a new booking is created or existing one is updated:
 
 ```ruby
 class Booking < ApplicationRecord
-  # ... some code missed here for the sake of simplicity
+  # ... some code is skipped here for simplicity's sake
   validate :validate_other_booking_overlap
 
   def period
@@ -39,9 +39,9 @@ class Booking < ApplicationRecord
 end
 ```
 
-But unfortunately there is a performance bottleneck here. Keep in mind, all the bookings should be fetched from the database first, then deserialized into the `Booking` model instance and after that each of their period should be checked against the creating/updating `Booking` instance. Such easy code at first glance, but how many complicated things it actually does! It creates so many objects consume a lot of memory on the machine runs this code, what's actually the main reason of any software slowness. However, sometimes this attempt can be viable. I.e., when the number of objects fetched from DB is not high. Whether to go with it or not is up to the developer and should be picked wisely considering the possible drawback.
+But unfortunately there is a performance bottleneck here. Keep in mind, all the bookings are fetched from the database first. Then they are deserialized into the `Booking` model instance and after that the period of each is checked against the creating/updating `Booking` instance. At first glance - such an easy code, but how many complicated things it actually does! It creates so many objects consuming a lot of memory on the machine running this code. That is actually the main reason of any software slowness. However, sometimes this attempt can be viable, i.e. when the number of objects fetched from DB is not high. Whether to go with it or not is up to the developer and should be picked wisely considering the possible drawback.
 
-If this approach doesn't work a new one should be searched for. What can be done to improve this? In order to answer this question the root cause of the problem should be understood. And it's actually highlighted above - the number of allocated objects is huge. Hence, we need to reduce it. A possible way could be moving the loop into DB and luckily ActiveRecord accepts SQL. This is the code one might end up with using PostgreSQL:
+If this approach doesn't work a new one should be searched. What can be done to improve this? In order to answer this question the root cause of the problem should be understood. And it's actually highlighted above - the number of allocated objects is huge. Hence, we need to reduce it. A possible way could be moving the loop into DB and luckily `ActiveRecord` accepts `SQL`. This is the code one might end up with using `PostgreSQL`:
 
 ```ruby
 def validate_other_booking_overlap
@@ -53,9 +53,9 @@ end
 
 > Read the statement `daterange(start_date, end_date, '[]')` as "create a range of dates from `start_date` to `end_date`, right and left edges inclusively". The third argument `[]` points to the property of inclusiveness. More about this can be found [here](https://www.postgresql.org/docs/9.3/rangetypes.html).
 
-> The `&&` operator used here to check for ranges overlap. Check out the [documentation](https://www.postgresql.org/docs/9.3/functions-range.html) if still have questions.
+> The `&&` operator used here to check for ranges overlap. Check out the [documentation](https://www.postgresql.org/docs/9.3/functions-range.html) if any questions arise.
 
-What's the issue with this try? Well, this code is much more efficient comparing to the first one. But still, it creates objects for the date ranges, but on DB level this time. Remember, unnecessary number of objects is a  cause of slow program. That's why number of allocations should be reduced if possible. This code is literally translated from the previous version emphasised on readability. So even now after the into-SQL transformation it's more or less readable. But how to speed it up? This time the readability emphasise is the clue. Usually, when deal with performance issues current solution may be rewritten in a more efficient way, but sacrificing readability. Trying this way one may go with piece of SQL:
+What's the issue with this try? Well, this code is much more efficient comparing to the first one. But still creates objects for the date ranges, hovewer on DB level this time. Remember, unnecessary number of objects is a slow program cause. That's why if possible a number of allocations should be reduced. This code is literally translated from the previous version accenting readability. Therefore, even after the into-SQL transformation it is more or less readable. But how to speed it up? This time the readability emphasise is the clue. Usually, when deal with performance issues current solution may be rewritten in a more efficient way, but sacrificing readability. Trying this way one may go with piece of SQL:
 
 ```ruby
 sql = <<~SQL
@@ -119,6 +119,6 @@ The final formula is derived. But are there downsides of this solution? Well, it
 
 ### Conclusion
 
-This article provides a solution of rather popular problem - ranges of dates overlap. Sometimes it's hard to pick a proper solution for a specific problem, but there should be always balance between code readability and efficiency. Credit goes to my colleagues who reviewed my pull request solved a similar problem and where all of these issues and approaches were discussed.
+This article provides a solution of a rather popular problem - ranges of dates overlap. Sometimes it's hard to pick a proper solution for a specific problem, but there should be always balance between code readability and efficiency. Credit goes to colleagues who reviewed my pull request solved a similar problem and where all of these issues and approaches were discussed.
 
-Never give up finding a good solution of your problem, there is always opportunity to improve. Happy coding!
+Never give up finding a good solution to your problem, there is always opportunity to improve. Happy coding!
