@@ -41,7 +41,7 @@ end
 
 But unfortunately there is a performance bottleneck here. Keep in mind, all the bookings are fetched from the database first. Then they are deserialized into the `Booking` model instance and after that the period of each is checked against the creating/updating `Booking` instance. At first glance - such an easy code, but how many complicated things it actually does! It creates so many objects consuming a lot of memory on the machine running this code. That is actually the main reason of any software slowness. However, sometimes this attempt can be viable, i.e. when the number of objects fetched from DB is not high. Whether to go with it or not is up to the developer and should be picked wisely considering the possible drawback.
 
-If this approach doesn't work a new one should be searched. What can be done to improve this? In order to answer this question the root cause of the problem should be understood. And it's actually highlighted above - the number of allocated objects is huge. Hence, we need to reduce it. A possible way could be moving the loop into DB and luckily `ActiveRecord` accepts `SQL`. This is the code one might end up with using `PostgreSQL`:
+If this approach doesn't work a new one should be searched. What can be done to improve this? In order to answer this question the root cause of the problem should be understood. And it's actually highlighted above - the number of allocated objects is huge. Hence, we need to reduce it. A possible way could be moving the loop into DB and luckily ActiveRecord accepts SQL. This is the code one might end up with using PostgreSQL:
 
 ```ruby
 def validate_other_booking_overlap
