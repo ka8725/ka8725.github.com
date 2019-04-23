@@ -1,9 +1,10 @@
 ---
 layout: page
-title: Ruby experience
+title: Railsguides - Ruby experience
 description: "This blog shares my experience of being Ruby developer (I'm Andrey Koleshko, aka ka8725). Of course, not everything can be written down. Hence, all these posts are just part of everything I encounter in my work."
 ---
 
+<h3>Recent posts</h3>
 <ul class="post-list">
 {% for post in site.posts limit:10 %}
   <li><article><a href="{{ post.url }}">{{ post.title }} <span class="entry-date"><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%B %d, %Y" }}</time></span></a></article></li>
