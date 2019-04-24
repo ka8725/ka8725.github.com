@@ -8,6 +8,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
   <div class='slogan'>
     <h1>Ruby development<br />high-quality consulting</h1>
     <p>Solving any problems with any Ruby (including Rails) application.</p>
+    <a class='contact' href='mailto:helpmewithruby@gmail.com'>Contact</a>
   </div>
   <div class='invitation'>
     <strong>Contact if any</strong>

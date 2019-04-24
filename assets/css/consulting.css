@@ -25,6 +25,16 @@ body {
   font-size: 18px;
 }
 
+.introduction .slogan a.contact {
+  display: block;
+  color: black;
+  text-decoration: none;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  text-align: center;
+}
+
 .introduction .invitation strong {
   font-size: 25px;
   line-height: 36px
