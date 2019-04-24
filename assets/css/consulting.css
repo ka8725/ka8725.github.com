@@ -1,0 +1,41 @@
+body {
+  font-family: sans-serif;
+}
+
+.flex-container {
+  display: flex;
+}
+
+h1 {
+  margin: 0;
+  font-size: 48px;
+  line-height: 60px;
+  text-transform: uppercase;
+}
+
+body {
+  padding: 20px;
+}
+
+.introduction {
+  margin-bottom: 120px;
+}
+
+.introduction .slogan p {
+  font-size: 18px;
+}
+
+.introduction .invitation strong {
+  font-size: 25px;
+  line-height: 36px
+}
+
+.introduction .invitation li {
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.about-all p {
+  font-size: 18px;
+  line-height: 25px;
+}
