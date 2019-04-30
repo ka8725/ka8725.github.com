@@ -55,7 +55,7 @@ end
 
 > The `&&` operator used here to check for ranges overlap. Check out the [documentation](https://www.postgresql.org/docs/9.3/functions-range.html) if any questions arise.
 
-What's the issue with this try? Well, this code is much more efficient comparing to the first one. But still creates objects for the date ranges, hovewer on DB level this time. Remember, unnecessary number of objects is a slow program cause. That's why if possible a number of allocations should be reduced. This code is literally translated from the previous version accenting readability. Therefore, even after the into-SQL transformation it is more or less readable. But how to speed it up? This time the readability emphasise is the clue. Usually, when deal with performance issues current solution may be rewritten in a more efficient way, but sacrificing readability. Trying this way one may go with piece of SQL:
+What's the issue with this try? Well, this code is much more efficient compared to the first one. But still creates objects for the date ranges, hovewer on DB level this time. Remember, unnecessary number of objects is a slow program cause. That's why, if possible, a number of allocations should be reduced. This code is literally translated from the previous version accenting readability. Therefore, even after the into-SQL transformation it is more or less readable. But how to speed it up? This time the readability emphasis is the key. Often, to fix performance issues current solution may be rewritten in a more efficient way. But this usually sacrifices clarity. Trying this way one may end up the next piece of SQL:
 
 ```ruby
 sql = <<~SQL
@@ -68,9 +68,9 @@ sql = <<~SQL
   )
 SQL
 ```
-> The rest of the code is omitted because it remains the same. From now on only the line from the validation method that defines `sql` variable changes.
+> The rest of the code is omitted because it remains the same. From now on, only the line changes from the validation method defining `sql` variable.
 
-It simply checks whether any edge of the first range is inside of the second one or whether any edge of the second range is inside of the first range. This solution allocates even less objects, so it must be faster than the previous one. But look at this, it's a bit cumbersome, readability is obviously lower. Can it be better? It turns out it can:
+It simply checks whether any edge of the first range is inside of the second one. Or whether any edge of the second range is inside of the first one. This choice allocates even less objects, so it must be faster than the previous one. But look at this - it's a bit cumbersome. Can it be better? It turns out it can:
 
 ```ruby
 sql = ":end_date >= start_date and end_date >= :start_date"
