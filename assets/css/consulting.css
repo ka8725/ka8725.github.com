@@ -18,21 +18,29 @@ body {
 }
 
 .introduction {
-  margin-bottom: 120px;
+  margin-bottom: 50px;
 }
 
 .introduction .slogan p {
   font-size: 18px;
 }
 
-.introduction .slogan a.contact {
+a.contact {
   display: block;
   color: black;
   text-decoration: none;
-  padding: 10px;
+  padding: 20px;
   border: 1px solid black;
   border-radius: 5px;
   text-align: center;
+  margin-top: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+a.contact:hover {
+  background-color: black;
+  color: white;
 }
 
 .introduction .invitation strong {
@@ -48,4 +56,17 @@ body {
 .about-all p {
   font-size: 18px;
   line-height: 25px;
+}
+
+footer address {
+  text-align: right;
+}
+
+footer address a {
+  display: block;
+  color: black;
+}
+
+footer .copyright {
+  flex-grow: 1;
 }
