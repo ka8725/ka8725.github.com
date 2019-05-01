@@ -115,7 +115,7 @@ not (:end_date < start_date) and not (end_date < :start_date)
 
 > If this explanation is not clear, please check [it](https://stackoverflow.com/questions/3269434).
 
-The final formula is derived. But are there any downsides? Well, it's a matter of taste. On the one hand, it's less readable than the Rails way solution, in my opinion. On the other hand, it's the most efficient one we've come up with so far. If someone thinks this tricky formula is not clear, there could be just documentation provided. So everyone reading this code could understand what's hidden behind it.
+The final formula is derived. But are there any downsides? Well, it's a matter of taste. On the one hand, it's less readable than the Rails way solution, in my opinion. On the other hand, it's the most efficient one we've come up with so far. If someone thinks this trick is not clear, there could be just documentation provided. So everyone reading this code could understand what's hidden behind it.
 
 ### Conclusion
 
