@@ -115,10 +115,12 @@ not (:end_date < start_date) and not (end_date < :start_date)
 
 > If this explanation is not clear, please check [it](https://stackoverflow.com/questions/3269434).
 
-The final formula is derived. But are there any downsides of this solution? Well, it's a matter of taste. On the one hand, it's less readable than the Rails way solution, in my opinion. On the other hand, it's the most efficient one we've come up with so far. If someone thinks this code is not clear there could be just documentation provided. So everyone reading this code could understand what happens there.
+The final formula is derived. But are there any downsides? Well, it's a matter of taste. On the one hand, it's less readable than the Rails way solution, in my opinion. On the other hand, it's the most efficient one we've come up with so far. If someone thinks this tricky formula is not clear, there could be just documentation provided. So everyone reading this code could understand what's hidden behind it.
 
 ### Conclusion
 
-This article provides a solution of a rather popular problem, in particular ranges of dates overlap. Sometimes it's hard to pick a proper solution for a specific problem, but there should be always balance between code readability and efficiency. Credit goes to the colleagues who reviewed my pull request solving a similar problem and where all of these issues and approaches were discussed.
+This article provides a solution of a rather popular problem, in particular ranges of dates overlap. Sometimes it's hard to tackle a specific problem balancing between comprehension and efficiency. This journey supposes to show it up and directs to a solution.
 
-Never give up finding a good solution to your problem. There is always opportunity to improve. Happy coding!
+Credit goes to the colleagues who reviewed my pull request solving a similar problem. The suggested final approach was not clear for me and even seemed not working. But a bit of thinking made me to change the opinion. That process of thinking and the proof were pretty interesting. It made me to write this down.
+
+Never give up finding a good solution to your problem. There is always an opportunity to improve. Happy coding!
