@@ -55,7 +55,7 @@ end
 
 > The `&&` operator used here to check for ranges overlap. Check out the [documentation](https://www.postgresql.org/docs/9.3/functions-range.html) if any questions arise.
 
-What's the issue with this try? Well, this code is much more efficient compared to the first one. But still creates objects for the date ranges, hovewer on DB level this time. Remember, unnecessary number of objects is a slow program cause. That's why, if possible, a number of allocations should be reduced. This code is literally translated from the previous version accenting readability. Therefore, even after the into-SQL transformation it is more or less readable. But how to speed it up? This time the readability emphasis is the key. Often, to fix performance issues current solution may be rewritten in a more efficient way. But this usually sacrifices clarity. Trying this way one may end up the next piece of SQL:
+What's the issue with this try? Well, this code is much more efficient compared to the first one. But still creates objects for the date ranges, however on DB level this time. Remember, unnecessary number of objects is a slow program cause. That's why, if possible, a number of allocations should be reduced. This code is literally translated from the previous version accenting readability. Therefore, even after the into-SQL transformation it is more or less readable. But how to speed it up? This time the readability emphasis is the key. Often, to fix performance issues current solution may be rewritten in a more efficient way. But this usually sacrifices clarity. Trying this way one may end up the next piece of SQL:
 
 ```ruby
 sql = <<~SQL
@@ -76,7 +76,7 @@ It simply checks whether any edge of the first range is inside of the second one
 sql = ":end_date >= start_date and end_date >= :start_date"
 ```
 
-What the logic behind this formula? Ranges overlap if and only if it's not the case they overlap from the left and it's not the case when they overlap from the right. I.e. the following is not happening:
+What is the logic behind this formula? Ranges overlap if and only if it's not the case they overlap from the left and it's not the case they overlap from the right. Or the following doesn't happen:
 
 ```
                       start_date          end_date
@@ -94,15 +94,15 @@ start_date          end_date
                               |-------------------|
 ```
 
-The proof of this is rather obvious: all possible situations could be drawn and checked, after that it would be clear that all other cases lead to an intersection.
+The proof of this is rather obvious: all possible situations could be drawn and checked. After that it would be clear that all other cases intersect.
 
-Transforming this statement to boolean formula:
+Transform this statement to boolean formula:
 
 ```sql
 not (:end_date < start_date or end_date < :start_date)
 ```
 
-Getting read of the leading negation all statements inside parentheses replace with their negations:
+Get rid of the leading negation and replace all statements inside the parentheses with their negations:
 
 =>
 ```sql
@@ -113,12 +113,12 @@ not (:end_date < start_date) and not (end_date < :start_date)
 :end_date >= start_date and end_date >= :start_date
 ```
 
-> If this explanation is not clear please check out [this](https://stackoverflow.com/questions/3269434).
+> If this explanation is not clear, please check [it](https://stackoverflow.com/questions/3269434).
 
-The final formula is derived. But are there downsides of this solution? Well, it's the matter of taste, but in my opinion it's less readable than the Rails way solution. But from the other hand, it's the most efficient one we've come up with so far. If someone thinks this code is not clear there could be just documentation provided, so everyone reads this code could understand what happens there.
+The final formula is derived. But are there any downsides of this solution? Well, it's a matter of taste. On the one hand, it's less readable than the Rails way solution, in my opinion. On the other hand, it's the most efficient one we've come up with so far. If someone thinks this code is not clear there could be just documentation provided. So everyone reading this code could understand what happens there.
 
 ### Conclusion
 
-This article provides a solution of a rather popular problem - ranges of dates overlap. Sometimes it's hard to pick a proper solution for a specific problem, but there should be always balance between code readability and efficiency. Credit goes to colleagues who reviewed my pull request solved a similar problem and where all of these issues and approaches were discussed.
+This article provides a solution of a rather popular problem, in particular ranges of dates overlap. Sometimes it's hard to pick a proper solution for a specific problem, but there should be always balance between code readability and efficiency. Credit goes to the colleagues who reviewed my pull request solving a similar problem and where all of these issues and approaches were discussed.
 
-Never give up finding a good solution to your problem, there is always opportunity to improve. Happy coding!
+Never give up finding a good solution to your problem. There is always opportunity to improve. Happy coding!
