@@ -12,7 +12,7 @@ share: true
 
 ### Problem
 
-Picture this. A real estate site's guest wants to book a hotel for specific dates and the system should check whether these dates are available, i.e. if they are not overlapping with some other already existing booking. Let's say, this hypothetical site is written in Rails and software engineers have come up with `Booking` model representing `bookings` table with two columns: `start_date` and `end_date` of `date` type. Also suppose, there is a validation somewhere checking `start_date <= end_date`. Although, the solution below describes how to cope with this specific situation, it can be applied to another similar data model.
+Picture this. A real estate site's guest wants to book a hotel for specific dates. The system should check whether these dates are available, i.e. if they are not overlapping with some other existing booking. Let's say, software engineers have written this hypothetical site in Rails and have come up with `Booking` model. It represents `bookings` table with two columns: `start_date` and `end_date` of `date` type. Also suppose, there is a validation somewhere checking `start_date <= end_date`. The solution below describes how to cope with this specific situation. Similar data models can follow it, though.
 
 ### Solution
 
