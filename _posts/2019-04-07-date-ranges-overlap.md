@@ -39,7 +39,7 @@ class Booking < ApplicationRecord
 end
 ```
 
-But unfortunately there is a performance bottleneck here. Keep in mind, all the bookings are fetched from the database first. Then they are deserialized into the `Booking` model instance and after that the period of each is checked against the creating/updating `Booking` instance. At first glance - such an easy code, but how many complicated things it actually does! It creates so many objects consuming a lot of memory on the machine running this code. That is actually the main reason of any software slowness. However, sometimes this attempt can be viable, i.e. when the number of objects fetched from DB is not high. Whether to go with it or not is up to the developer and should be picked wisely considering the possible drawback.
+But unfortunately there is a performance bottleneck here. Keep in mind, all the bookings are fetched from the database first. Then they are deserialized into the `Booking` model instance. After that the period of each is checked against the creating/updating `Booking` instance. At first glance - such an easy code, but how many complicated things it actually does! It creates so many objects consuming a lot of memory on the machine running this code. That is actually the main reason of any software slowness. Yet, sometimes this attempt can be viable, i.e. when the number of objects fetched from DB is not high. Whether to go with it or not is up to the developer and should be picked wisely considering the possible drawback.
 
 If this approach doesn't work a new one should be searched. What can be done to improve this? In order to answer this question the root cause of the problem should be understood. And it's actually highlighted above - the number of allocated objects is huge. Hence, we need to reduce it. A possible way could be moving the loop into DB and luckily ActiveRecord accepts SQL. This is the code one might end up with using PostgreSQL:
 
@@ -115,7 +115,7 @@ not (:end_date < start_date) and not (end_date < :start_date)
 
 > If this explanation is not clear, please check [it](https://stackoverflow.com/questions/3269434).
 
-The final formula is derived. But are there any downsides? Well, it's a matter of taste. On the one hand, it's less readable than the Rails way solution, in my opinion. On the other hand, it's the most efficient one we've come up with so far. If someone thinks this trick is not clear, there could be just documentation provided. So everyone reading this code could understand what's hidden behind it.
+The final formula is derived. But are there any downsides? Well, it's a matter of taste. On the one hand, it's less readable than the Rails way solution. On the other hand, it's the most efficient one we've come up with so far. If someone thinks this trick is not clear, there could be documentation provided. So everyone reading this code could understand what's hidden behind it.
 
 ### Conclusion
 
