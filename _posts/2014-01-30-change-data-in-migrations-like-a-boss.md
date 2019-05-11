@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Change data in migrations like a boss"
-description: "Update data in migrations like a boss. Don't write raw SQL in migration, don't define again your models in migrations again, don't use seeds. Use migration_data gem to keep your migrations up to date, migration data in production, test migration data code and remove them when you want."
+description: "Update data in migrations like a boss. Don't write raw SQL in migration, don't define models in migrations again, don't use seeds. Use migration_data gem to keep your migrations up to date, migrate data in production, test data migration code and clean them up."
 tags: [rails, migrations]
 share: true
 comments: true
@@ -10,23 +10,23 @@ redirect_from:
 ---
 
 
-Changing data on change database schema in production is a common problem for Rails developers. Assume that you have a Rails project. Some day you decided to change the database schema and want to add some new column. Then you have to go through all your models and change actual data according this new schema. Currently there are solutions to overcome this. But all of them have their disadvantages. You will see in this chapter them. This post tells about these disadvantages and how to get rid of the issue with the `migration_data` gem.
+Changing data in production is a common problem for Rails developers. Assume you have a Rails project. One day you decide to change the database schema and want to add some new column. Then you have to go through all existing records and change data to be actual according to this new schema. There are solutions to overcome this. But they have disadvantages. You will see them in this article. And finally, figure out how to avoid the issues with `migration_data` gem.
 
 ## Solutions with disadvantages
 
-There are many solutions to avoid the issue. This is a list of them:
+There are many approaches to deal with data migrations in Rails application:
 
-* Writing code in migrations without caution
-* Duplicate classes in migrations
-* Writing raw SQL in migrations
-* Using seeds
+* Use model classes in migrations carelessly
+* Redefine models in migrations
+* Write raw SQL in migrations
+* Use seeds
 * Other methods
 
-Now let's look at all of them one by one and see what are problems have these solutions.
+Now let's look at all of them one by one and see what problems these solutions have.
 
-### Writing code in migrations without caution
+### Use model classes in migrations carelessly
 
-Say we are going to add a column to a `User` model and then update all users in our database. So the migration may look like this:
+Let's say, we are going to add a column to `User` model and then update all users in our database. So the migration may look like this:
 
 {% highlight ruby %}
 class AddStatusToUser < ActiveRecord::Migration
@@ -44,9 +44,11 @@ class AddStatusToUser < ActiveRecord::Migration
 end
 {% endhighlight %}
 
-Today this migration works without problems. We are committing this code to our version control system (I hope it's `git`). In a week we will have to run it on the production server. All our team members get this new code and run the migration. It works as expected - perfect! But tomorrow we decide to rename the `User` model to `Customer`. We create new migration to rename the table, rename the `User` model to `Customer` and don't touch the old migrations. Tests are working, new migration is working and everyone is happy. But what will be with this migration in one week when we run it on the production server? It will be broken because at those moment we won't have `User` model yet. We forgot to rename the `User` model in the old migrations. It happens too often in Rails development. So *don't be like a kamikaze and don't write code to update data in migrations*. Never!
+Today this migration works without problems. We are committing this code to our version control system (I hope it's `git`). All our team members fetch this new code and run the migration. It works as expected - perfect! But tomorrow we decide to rename the `User` model to `Customer`. We create a new migration to rename the table, rename the `User` model to `Customer` and don't touch the old migrations. Tests are working, new migration is working and everyone is happy. But what will be with this migration in one week when it gets run on the production server? It will fail because at that moment we won't have `User` model already. We forgot to rename the `User` model in the old migration. It happens too often in a startup follows the agile development approach.
 
-### Duplicate classes in migrations
+Obviously, this solution is not recommended.
+
+### Redefine models in migrations
 
 There is a similar solution to the previous one and it may be useful in some cases. Just define the `User` model in the migration:
 
@@ -69,7 +71,7 @@ class AddStatusToUser < ActiveRecord::Migration
 end
 {% endhighlight %}
 
-Now when you rename the `User` model in the new migration this code won't fail. For this example the solution is suitable. But the problems come when you have to define for example polymorphic association in the migration:
+Now when you rename the `User` model in the new migration this code won't fail. For this example the solution is suitable. But the problems come when you have to define a polymorphic association in the migration:
 
 {% highlight ruby %}
 class AddStatusToUser < ActiveRecord::Migration
@@ -93,7 +95,7 @@ class AddStatusToUser < ActiveRecord::Migration
 end
 {% endhighlight %}
 
-The code will work without exception but actually it doesn't set correct association because the defined class are under namespace `AddStatusToUser`. This is what happens in reality:
+The code will work without exception but it doesn't set correct association, because the defined classes are under namespace `AddStatusToUser`. This is what happens in reality:
 
 {% highlight ruby %}
 role = AddStatusToUser::Role.create!(name: 'admin')
@@ -101,7 +103,7 @@ AddStatusToUser::User.create!(nick: '@ka8725', role: role)
 {% endhighlight %}
 
 
-And when you have the bug in production you may decide to figure out why the association is not set for the user. You open rails console and check the association:
+A bug in production pops up after run of a migration like this. You connect to the server, open rails console, and see what's the heck:
 
 {% highlight ruby %}
 user = User.find_by(nick: '@ka8725')
@@ -109,25 +111,31 @@ user.role       # => nil
 user.role_type  # => AddStatusToUser::Role
 {% endhighlight %}
 
-As you see the `role_type` is set incorrectly it should be `Role` without the namespace. That's why this solution bug prone as well.
+As you see the `role_type` is set incorrectly it should be `Role` without the namespace. That's why this solution is bug-prone as well. It's definitely not recommended. Nevertheless, it's like a standard way to overcome the problem in Rails community.
 
 ### Writing raw SQL in migrations
 
-To be honest this solution doesn't have disadvantages except a few. You have to know SQL and sometimes well. And as a result requires more time to write the code. Besides of this Rails developers don't prefer to write raw SQL because if you want to migrate through PostgreSQL to MySQL for example you may have to fix much raw SQL code. Check out [official documentation](http://guides.rubyonrails.org/migrations.html#when-helpers-aren-t-enough) to get examples how to write raw SQL in migrations.
+To be honest, this solution doesn't have disadvantages except one - you have to know SQL and sometimes very well. So it might require more time to write the code. Even if Rails community don't prefer to write raw SQL I would recommend this approach. Once SQL skills are grasped you can cope with any data problems in production.
 
-### Using seeds
+Refer to [official documentation](http://guides.rubyonrails.org/migrations.html#when-helpers-aren-t-enough) for examples of raw SQL in migrations.
 
-Rails has useful approach to populate the database. You may write any code in the `db/seeds.rb` file and run `rake db:seed` command. This is great solution to populate the database by some data at first start but then, when your project is released and you have to change the data on changing the database schema this won't help you. Also writing the code in one file may lead to the mess. Of course you may create your own dependent files and then load them in the `seeds.rb` file but anyway you have to worry about what to do on second run. There is also gem which helps to structuring you seeds data - [seedbank](https://github.com/james2m/seedbank). But again it doesn't solve all these problems.
+### Use seeds
+
+Rails has useful approach to populate DB. You may write any code in the `db/seeds.rb` file and run `rake db:seed` command. This is a great solution to populate the database by some data at first start but then, when your project is released and you have to change the data on changing the database schema this approach is not handy anymore. Also writing the code in one file may lead to a mess. Of course, you may split the code into files and then load them in the `seeds.rb` file. But anyway, you have to worry about what to do on the second run, i.e. seeds usually are not idempotent. There is also gem which helps to structure you seeds data - [seedbank](https://github.com/james2m/seedbank). But again, this doesn't solve anything, moreover, this solution is not for the problem at all. Don't even try this approach, it just messes up two different concepts. I've provided this solution merely to notice it's not acceptable and I saw examples of this.
 
 ### Other methods
 
-No doubt that there are many other methods. For example create rake tasks, of even going to production console and write code there after deploying (I hope you don't do it). But none of them doesn't solve all problems with the problem.
+No doubt, there are many other methods. For example, rake tasks migrate data. Or even writing code in production console after deploy (I hope you don't do this). Below is an attempt to overcome the problem.
 
 ## Use migration_data gem
 
-Recently I've released gem which solves all these problems. This is the [migration_data](https://github.com/ka8725/migration_data). After it's installing you will able to define a `data` method in your migrations and write the code here. The method runs only on migrating up (i.e. on `rake db:migrate` but doesn't run on `rake db:rollback`). Additionally to keep the code in `data` method up to date just write tests for this. The gem provides `require_migration` method to help load migrations easily to the tests.
+I've formed a gem tries to solve these problems - [migration_data](https://github.com/ka8725/migration_data). The idea behind is very easy: how to ensure code doesn't fail? Correct - with aid of tests. So, why not to write tests for data migrations?
 
-Migration example:
+The gem allows defining a special method called `data` in schema migrations. Write the data migration code there. Keep in mind, this method runs only on migrate up, i.e. on `rake db:migrate`, but doesn't run on `rake db:rollback`. Additionally, to keep the code in `data` method actual just write tests for it. That's it.
+
+To have the ability testing migrations there is `require_migration` method loads migrations code easily.
+
+Check out a migration example below:
 
 {% highlight ruby %}
 class CreateUsers < ActiveRecord::Migration
@@ -157,19 +165,19 @@ desribe CreateUsers do
 end
 {% endhighlight %}
 
-The test will fail you have some unexpected changes in the code and you will be informed that your migration is not actual immediately. Currently the gem works with Ruby >= 2.0 and Rails >= 4.0.0.rc1.
+The test will fail on some unexpected changes in the code related to `User` model and you will be immediately informed that the migration is not actual anymore on your CI (you have one set up, right?).
 
 # Conclusion
 
-The only solution to keep your migrations up to date with any code which lives there is to write tests for them. But if you write the migration data code and code to change database schema simultaneously in `up`, `down` or `change` methods you won't able to write tests for these migrations. Change database schema in tests is not good idea, isn't it? So if you have these problems this gem is what you are looking for.
+The only solution to keep your migrations up to date with any code lives there is to write tests for them. But if you write the migration data code and code to change database schema simultaneously in `up`, `down` or `change` methods you won't able to write tests for these migrations. Changing database schema in tests is not a good idea, isn't it? So if you have these problems this gem is what you are looking for.
 
 # Update 06/11/2015:
 
-Over time you will notice that it's rather hard to maintain your old migrations. Especially it's true when the code is changing a lot. At this point the best solution that I know is to just remove all the old migrations. After the removal we have to just insert current database structure into the last migration. This way we will have clean migrations history and it will be possible to run them on a new database.
+Over time you may notice that it's rather hard to maintain old migrations. Especially, it's true when the code is changing a lot. At this point the best solution that I know is to just remove all the old migrations. After the removal we have to just insert current database structure into the last migration. This way we will have clean migrations history and it will be possible to run them on a new database.
 
-In order to perform the **migrations squashing** I added a rake task into [https://github.com/ka8725/migration_data#clean-old-migration](https://github.com/ka8725/migration_data) today. The task's name is `db:migrate:squash`. And finally don't forget to remove tests for the migrations if you have them after the task execution. Enjoy it!
+To perform the **migrations squash** I've added a rake task into [the gem](https://github.com/ka8725/migration_data#clean-old-migration) today. The task name is `db:migrate:squash`. And finally, don't forget to remove the migrations tests. Enjoy!
 
-One note for the rake task. You have to make sure that all team members and deployment servers have already run all current migrations before the **squashing**. Otherwise they can have collisions. This process can be automated later.
+One note for the rake task. You have to make sure all team members and deployment servers have already run all current migrations before the **squashing**. Otherwise, they can have collisions. This process can be automated later.
 
 
 # Update 08/12/2015
@@ -188,16 +196,13 @@ Once you can get the following state:
                   |
 {% endhighlight %}
 
-This can be happened when somebody does the squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try to alter the not created yet tables (for example, it just adds a new column to the `users` table, but as it applied to the fresh DB accordingly to the DB history it unfortunately fails). In order to fix the issue you have to update the timestamps for the migration change to be newer than the squash migration.
+This happens when somebody does the squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try altering the not created yet tables (for example, it just adds a new column to the `users` table, but as it applied to the fresh DB accordingly to the DB history it unfortunately fails). In other words, make sure you don't have a migration before the squashed one. The issue fix is pretty easy: you have to update timestamps for the migration change to be newer than the squash migration.
 
 # Update 18/01/2017
 
-When you have to update a lot of data then the `migration_data` gem may be not a good choice. It takes time
-to process huge amount of data and the deployment process will be slowed down dramatically. It will increase
-downtime of your application what is not acceptable for a production ready application with many real clients.
-So if you have such type application then, please, don't use this gem. There are may be used other techniques
-that already discussed in other great posts:
+When you have to update a lot of data then the `migration_data` gem might be not a good choice. It takes time to process huge amount of data and the deployment process will be slowed down dramatically. It will increase downtime of your application that's not acceptable for a production application with many online clients. So, if you have such type application then, please, don't use this gem. There are may be used other techniques has already discussed in other great posts and gems:
 
-1. [Rails Migrations with Zero Downtime](https://blog.codeship.com/rails-migrations-zero-downtime/)
-2. [Data Migrations in Rails](https://robots.thoughtbot.com/data-migrations-in-rails)
-3. [SEEDMIGRATIONS. LIKE SCHEMA MIGRATIONS, BUT FOR YOUR DATA](http://engineering.harrys.com/2014/06/09/seed-migrations.html)
+- [Rails Migrations with Zero Downtime](https://blog.codeship.com/rails-migrations-zero-downtime/)
+- [Data Migrations in Rails](https://robots.thoughtbot.com/data-migrations-in-rails)
+- [Seed Migration](https://github.com/harrystech/seed_migration)
+- [data-migrate](https://github.com/ilyakatz/data-migrate)
