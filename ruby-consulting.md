@@ -13,7 +13,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
     <div class='invitation'>
       <strong>Contact if any</strong>
       <ul>
-        <li>There are not explainable and not fixable bugs or other anomalies</li>
+        <li>Having not explainable and not fixable bugs or other anomalies</li>
         <li>Struggling with constant bugs and need for reducing them</li>
         <li>Experiencing performance issues</li>
         <li>Code review is required and seeking actions for its improvement</li>
@@ -46,10 +46,6 @@ description: "Solving any problems with any Ruby (including Rails) application. 
   <p>
    I'm always ready for enhancing my knowledge and open for constructive discussions. Especially for that, I took a recommendable course called <b>Learning How to Learn</b>. Foundation knowledge is the key to successful projects. Hence, I evolve it all over my entire life by reading books, taking courses, solving challenges.
   </p>
-</div>
-
-<div class='why'>
-  <h2>Why</h2>
 </div>
 
 <hr>
