@@ -57,6 +57,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
 </div>
 
 <hr>
+
 <footer class='flex-container'>
   <div class='copyright'>
     @ Ruby consultant Andrei Kaleshka, 2019
