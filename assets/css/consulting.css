@@ -6,8 +6,15 @@ body {
   display: flex;
 }
 
-.flex-container > li {
-  margin-left: 25px;
+ul.tags {
+  display: flex;
+  margin-top: 0;
+  padding-top: 0;
+  list-style-type: none;
+}
+
+ul.tags > li {
+  margin-left: 5px;
 }
 
 h1 {

@@ -10,7 +10,11 @@ description: "Solving any problems with any Ruby (including Rails) application. 
       <h1>Ruby development<br />high-quality consulting</h1>
       <p>
         Solving any problems with any Ruby application. Rails included.<br>
-        Over <b>10</b> years experience in software development.
+        Over <b>10</b> years experience in software development.<br>
+        <br>
+        Skills: Communication, Curiosity, Logical thinking, Critical thinking, Responsibility, Honesty, Proactiveness<br>
+        <br>
+        Portfolio: Toptal LLC, Mezuka LLC, ActivePlatform, Keenprint LLC, Keenprint LLC, Molinelli Media Group S.L., and many others
       </p>
     </div>
     <div class='invitation'>
@@ -27,34 +31,6 @@ description: "Solving any problems with any Ruby (including Rails) application. 
     </div>
   </div>
   <a class='contact' href='mailto:connect@railsguides.net?subject=Need Ruby help'>Contact</a>
-</div>
-
-
-<div class='about-all'>
-  <p>
-    <b>Developed skills:</b>
-    <ul class='flex-container'>
-      <li>Communication</li>
-      <li>Curiosity</li>
-      <li>Logical thinking</li>
-      <li>Critical thinking</li>
-      <li>Responsibility</li>
-      <li>Honesty</li>
-      <li>Proactiveness</li>
-    </ul>
-  </p>
-
-
-  <p>
-    <b>Portfolio:</b>
-    <ul class='flex-container'>
-      <li>Toptal LLC</li>
-      <li>Mezuka LLC</li>
-      <li>ActivePlatform</li>
-      <li>Keenprint LLC</li>
-      <li>Gobgob Real Estate Co. WLL</li>
-    </ul>
-  </p>
 </div>
 
 <hr>
