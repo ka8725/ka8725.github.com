@@ -45,6 +45,6 @@ description: "Solving any problems with any Ruby (including Rails) application. 
     Tel. +375292624931 <br>
     Tax Payer ID 192265774 <br>
     47-29 Franciska Skoriny st. <br>
-    Minsk, Belarus <br>
+    220141 Minsk, Belarus<br>
   </address>
 </footer>
