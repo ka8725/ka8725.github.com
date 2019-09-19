@@ -14,7 +14,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
         <br>
         Skills: Communication, Curiosity, Logical thinking, Critical thinking, Responsibility, Honesty, Proactiveness<br>
         <br>
-        Portfolio: Toptal LLC, Mezuka LLC, ActivePlatform, Keenprint LLC, Keenprint LLC, Molinelli Media Group S.L., and many others
+        Portfolio: Toptal LLC, Mezuka LLC, ActivePlatform, Keenprint LLC, Molinelli Media Group S.L., and many others
       </p>
     </div>
     <div class='invitation'>
