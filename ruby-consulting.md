@@ -30,7 +30,16 @@ description: "Solving any problems with any Ruby (including Rails) application. 
       </ul>
     </div>
   </div>
-  <a class='contact' href='mailto:connect@railsguides.net?subject=Need Ruby help'>Contact</a>
+  <a class='contact' href='mailto:connect@railsguides.net?subject=Need Ruby help'>
+    Contact
+  </a>
+  <ul class='flex-container contacts'>
+    <li><a href='https://tel.me/ka8725'>Telegram</a></li>
+    <li><a href='skype:kaleshka.a?chat'>Skype</a></li>
+    <li><a href='viber://chat/?number=+375292624931'>Viber</a></li>
+    <li><a href='mailto:connect@railsguides.net'>E-mail</a></li>
+    <li><a href='tel:+375292624931'>Phone (Belarus)</a></li>
+  </ul>
 </div>
 
 <hr>

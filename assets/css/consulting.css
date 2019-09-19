@@ -1,9 +1,14 @@
 body {
   font-family: sans-serif;
 }
+a { color: black; }
 
 .flex-container {
   display: flex;
+}
+
+ul.contacts > li {
+  margin-left: 25px;
 }
 
 h1 {
@@ -64,7 +69,6 @@ footer address {
 
 footer address a {
   display: block;
-  color: black;
 }
 
 footer .copyright {
