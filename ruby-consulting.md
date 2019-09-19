@@ -34,6 +34,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
     Contact
   </a>
   <ul class='flex-container contacts'>
+    <li><a href='https://railsguides.net' target='_blank'>Blog</a></li>
     <li><a href='https://tel.me/ka8725'>Telegram</a></li>
     <li><a href='skype:kaleshka.a?chat'>Skype</a></li>
     <li><a href='viber://chat/?number=+375292624931'>Viber</a></li>
