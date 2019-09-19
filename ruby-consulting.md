@@ -8,7 +8,10 @@ description: "Solving any problems with any Ruby (including Rails) application. 
   <div class='flex-container'>
     <div class='slogan'>
       <h1>Ruby development<br />high-quality consulting</h1>
-      <p>Solving any problems with any Ruby application. Rails included.</p>
+      <p>
+        Solving any problems with any Ruby application. Rails included.<br>
+        Over <b>10</b> years experience in software development.
+      </p>
     </div>
     <div class='invitation'>
       <strong>Contact if any</strong>
@@ -29,12 +32,8 @@ description: "Solving any problems with any Ruby (including Rails) application. 
 
 <div class='about-all'>
   <p>
-    My name is Andrey Koleshko (officially Andrei Kaleshka). My experience contains <b>10</b> years of software development.
-  </p>
-
-  <p>
     <b>Developed skills:</b>
-    <ul>
+    <ul class='flex-container'>
       <li>Communication</li>
       <li>Curiosity</li>
       <li>Logical thinking</li>
@@ -48,7 +47,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
 
   <p>
     <b>Portfolio:</b>
-    <ul>
+    <ul class='flex-container'>
       <li>Toptal LLC</li>
       <li>Mezuka LLC</li>
       <li>ActivePlatform</li>
