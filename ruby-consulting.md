@@ -30,7 +30,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
       </ul>
     </div>
   </div>
-  <a class='contact' href='mailto:connect@railsguides.net?subject=Need Ruby help'>
+  <a class='contact' onclick="_gaq.push(['_trackEvent', 'Reference', 'Contact', '#contact-btn']);" href='mailto:connect@railsguides.net?subject=Need Ruby help'>
     Contact
   </a>
   <ul class='flex-container contacts'>
