@@ -23,6 +23,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
         <li>Planning PoC or startup</li>
         <li>Automating business processes</li>
         <li>Need for business accelerate</li>
+        <li>Need for project maintenance or evolve</li>
         <li>Require code review or refactoring</li>
         <li>Eliminating problems in development process</li>
         <li>Implementing a tricky feature</li>
