@@ -96,3 +96,9 @@ footer .copyright {
   background-color: black !important;
   color: white !important;
 }
+
+@media (max-width: 1024px) {
+  .flex-container.main {
+    flex-direction: column;
+  }
+}

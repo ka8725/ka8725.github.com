@@ -5,7 +5,7 @@ description: "Solving any problems with any Ruby (including Rails) application. 
 ---
 
 <div class='introduction'>
-  <div class='flex-container'>
+  <div class='flex-container main'>
     <div class='slogan'>
       <h1>Ruby development<br />high-quality consulting</h1>
       <p>
