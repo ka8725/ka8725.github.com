@@ -49,7 +49,7 @@ A contract here is some specification that's understandable for both processes. 
 
 And here GraphQL comes into play. The point is that it has an implementation of a contract like that out of the box. It's called "schema" there. It's not possible to generate or receive data that doesn't correspond to the schema. That means smoke testing is enough here to make sure the integration works. And these tests are much cheaper.
 
-This is not the only thing GraphQL solves out of the box. The schema is actually a set of all possible fields connected with each other. All the charm of GraphQL is that a receiving process can specify **only those** data it needs, no less no more. And for all of that there is **only one** endpoint instead of a forest REST endpoints with weird names.
+This is not the only thing GraphQL solves out of the box. The schema is actually a set of all possible fields connected with each other. All the charm of GraphQL is that a receiving process can specify **only those** data it needs, no less no more. And for all of that, there is **only one** endpoint instead of a forest REST endpoints with weird names.
 
 In my opinion, the winner is GraphQL here. It's highly recommended for a sustainable relatively big application. But for MVP or PoC it may be redundant.
 
@@ -60,7 +60,7 @@ Ok, but how all of that relates to **dry-struct**?
 A structure defined with **dry-struct** is a schema as well.
 It has typed fields and connections between them, similar to GraphQL. It's easy to serialize data into and deserialize from JSON. Under the hood **dry-struct** keeps a schema in a special format - Abstract syntax tree (AST) that can be used to generate a schema in another format, GraphQL for example.
 
-What eventually means, **dry-struct** can be used with the same respect as GraphQL for communication between processes. But with one caveat. The both ends should be written in Ruby. This way it would be possible to share **dry-struct** between processes and build objects in memory on the receiving side from JSON. Otherwise, we would need to synchronize a **dry-struct** schema between a place it's defined (in Ruby, of course) and a place that doesn't have ability to reuse Ruby definitions. But this second place usually has some other format, like [json schema](https://json-schema.org/), for instance. So there should be written some tool transforms the **dry-struct** schema to a commonly used one by the specific language.
+What eventually means, **dry-struct** can be used with the same respect as GraphQL for communication between processes. But with one caveat. The both ends should be written in Ruby. This way it would be possible to share **dry-struct** between processes and build objects in memory on the receiving side from JSON. Otherwise, we would need to synchronize a **dry-struct** schema between a place it's defined (in Ruby, of course) and a place that cannot reuse Ruby definitions. But this second place usually has some other format, like [json schema](https://json-schema.org/), for instance. So there should be written some tool transforms the **dry-struct** schema to a commonly used one by the specific language.
 
 One can note, all of that sounds like just a fantasy and there is no evidence it works. But I can assure you it's not, and I have the proof in my experience. I won't provide the code in this post, but in short, it worked like that:
 - the dry-structs are defined in a "repository1"
