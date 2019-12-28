@@ -179,7 +179,7 @@ To get the whole picture check out the example how to deserialize:
 PostStruct.new(JSON.parse(params))
 ```
 
-Also, one more advise for **dry-struct**. At first glance, it may look scary because of types diversity. All types there don't exist in global scope as in Ruby. For example, in Ruby there is `String` and that's it, it's `String` everywhere. In `dry-struct` types relate to groups: `nominal`, `strict`, `coercible`, `params`, `json`, `maybe`. More about it's [here](https://dry-rb.org/gems/dry-types/1.2/built-in-types/).
+Also, one more advise. At first glance, it may look scary because of types diversity. All types there don't exist in global scope as in Ruby. For example, in Ruby there is `String` and that's it, it's `String` everywhere. In `dry-struct` types relate to groups: `nominal`, `strict`, `coercible`, `params`, `json`, `maybe`. More about it's [here](https://dry-rb.org/gems/dry-types/1.2/built-in-types/).
 
 Basically, the difference between them is how much they are strict and if automatic typecast is possible. For JSON serialization and deserialization we need strict and coercible types. But not all default dry-struct types satisfy these requirements. For instance, there is no strict and coercible `Date` out of the box. Fortunately, we can combine them like that: `Date = Strict::Date | JSON::Date`. And if put this code under the `Types` class above we can come up with the following elegant code:
 
