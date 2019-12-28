@@ -136,11 +136,11 @@ class BaseStruct < Dry::Struct
   private
 
   def serialize(object, type)
-    complex_struct?(type) ? to_hash(object, type) : object
+    complex?(type) ? to_hash(object, type) : object
   end
 
-  def complex_struct?(attribute)
-    attribute.respond_to?(:<) && attribute < Base
+  def complex?(attribute)
+    attribute.respond_to?(:<) && attribute < BaseStruct
   end
 
   def bool?(attribute)
@@ -162,13 +162,26 @@ class PostStruct < BaseStruct
 end
 ```
 
-The main function here is `BaseStruct.to_hash` as you've probably already guessed. It's just a recursive function traverses all defined attributes. Let's not pay much attention to it as it's not required to just start using it: `PostStruct.to_hash(Post.last).to_json`. That's it, serialization problem is done.
+The main function here is `BaseStruct.to_hash` as you've probably guessed. It's just a recursive function traverses all defined attributes. Let's not pay much attention to it as it's not required to just start using it: `PostStruct.to_hash(Post.last).to_json`. Keep in mind, the serializing object should have defined all methods that are specified in the struct, i.e. in this example there are `title` and `body` attributes, so that the `Post` object should have these both methods.
 
-While we are here, providing an example how to deserialize: `PostStruct.new(JSON.parse(params))`.
+Note, a complex attribute should inherit from `BaseStruct` like that:
+
+```ruby
+attribute :metadata, BaseStruct do
+  attribute :writer_id, Types::Integer
+  attribute :created_at, Types::Time
+end
+```
+
+To get the whole picture check out the example how to deserialize:
+
+```ruby
+PostStruct.new(JSON.parse(params))
+```
 
 Also, one more advise for **dry-struct**. At first glance, it may look scary because of types diversity. All types there don't exist in global scope as in Ruby. For example, in Ruby there is `String` and that's it, it's `String` everywhere. In `dry-struct` types relate to groups: `nominal`, `strict`, `coercible`, `params`, `json`, `maybe`. More about it's [here](https://dry-rb.org/gems/dry-types/1.2/built-in-types/).
 
-Basically, the difference between them is how they are strict and if automatic typecasting is possible or not. For serialization and deserialization of JSON we need strict and coercible types. But not all types satisfy these requirements. For example, there is no strict and coercible `Date` out of the box. Fortunately, we can combine them like that: `Date = Strict::Date | JSON::Date`. And if put this code under the `Types` class above we can come up with the following elegant code:
+Basically, the difference between them is how much they are strict and if automatic typecast is possible. For JSON serialization and deserialization we need strict and coercible types. But not all default dry-struct types satisfy these requirements. For instance, there is no strict and coercible `Date` out of the box. Fortunately, we can combine them like that: `Date = Strict::Date | JSON::Date`. And if put this code under the `Types` class above we can come up with the following elegant code:
 
 ```ruby
 class Types
@@ -181,7 +194,7 @@ class Types
 end
 ```
 
-And now all types under the `Types::` space are strict and coercible. We shouldn't worry about from which group to take a type specifying an attribute.
+And now all types under the `Types::` space are strict and coercible. We shouldn't worry about from which group to take a type for a specifying attribute.
 
 #### 4. Ruby debugging is a pain. Can you recommend something to reduce the time spending on that?
 
@@ -190,7 +203,7 @@ Of course, I can. Use **dry-struct**! Seriously, having strictly defined structu
 Example of methods signature documentation:
 
 ```ruby
-# @post_params [PostStruct]
+# @param post_params [PostStruct]
 def publish(post_params)
 ```
 
