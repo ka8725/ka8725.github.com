@@ -206,7 +206,7 @@ And now all types under the `Types::` space are strict and coercible. We shouldn
 
 Of course, I can. Use **dry-struct**! Seriously, strictly defined structures in the code make it much more readable that reduces debugging time drastically. Which type is used and where becomes clear almost immediately after the first look at the code. If the signature of the methods receiving these structures is documented, we get almost statically typed language out of the box. So we benefit from both worlds: dynamic and static.
 
-Example of methods signature documentation:
+Example of methods signature documentation in YARD format:
 
 ```ruby
 # @param post_params [PostStruct]
