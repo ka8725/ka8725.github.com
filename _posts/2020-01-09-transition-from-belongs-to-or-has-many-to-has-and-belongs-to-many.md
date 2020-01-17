@@ -8,33 +8,34 @@ comments: true
 share: true
 ---
 
-**TL;DR:** Follow the following incremental approach. Divide the entire problem to small sub-problems and ship them separately one by one:
+**TL;DR:** Follow incremental approach below. Divide the entire problem into small sub-problems and deploy them one by one:
 - define the new DB structure
-- fill it in simultaneously with the old DB structure
+- fill it in along with the old DB structure simultaneously
 - migrate the old data
-- use the new DB structure in the old associations
-- define the new associations
-- drop the old DB structure
+- define the new associations and make the code use them
+- drop the old DB structure and the code that's not relevant anymore.
 
-In this article you will see:
-
-- how to maintain a Rails application in production with **zero downtime**
-- how to make necessary changes on the current DB structure and deliver new features
-- how to ship new features in a live Rails application without outages, bugs, and downtimes.
+In this article you will:
+- learn how to maintain a Rails application in production with **zero downtime**
+- see how to make necessary changes on the current DB structure and deliver new features
+- figure out how to ship new features to production without outages, bugs, and downtimes
+- feel what's **Continuous Delivery** by a case happened on a Rails application in live.
 
 ### Problem
 
-A Rails application is deployed to production and already serves requests from real users all around the clock. That is, a live application performs 24/7 for now and forever (the most important requirement a good business asks about, right?). Maintenance downtime is not desired and must be avoided as much as possible. Now, consider the following change requested by business. There is a drop-down allows to pick one choice on UI, but from now on it should allow multiple choices. Technically speaking, there is a **"belongs to"**/**"has many"** association in the system that's in use and has to be changed to **"has and belongs to many"**.
+Picture a Rails application is deployed to production that serves requests from real users all around the clock. That is, a live application performs **24/7 for now and forever**. Maintenance downtime is not desired and must be avoided as much as possible. The most important requirement a good business asks about, isn't it?
+
+As time goes by, the business decides to make the next changes. There is a drop-down allows to pick one choice on UI. But now it should have multiple choices. Speaking in ActiveRecord terms, there is a **"belongs to"**/**"has many"** association in the system that has to be changed to **"has and belongs to many"**.
 
 A graphical explanation of the problem:
 
 ![From single to multiple drop-down](/images/hbtm-ui.png)
 
-How to approach that? Well, one might think it's not a big deal for MVP, PoC, or a fresh startup without real users. And they will be right. Everything can be changed and re-deployed with the old data deleted at once.
+How to approach that? Well, someone might think it's not a big deal for MVP, PoC, or a fresh startup without real users. And that's true. In all these cases everything can be changed and re-deployed with the old data deleted at a time.
 
 But for a mature live application with zero downtime requirements, where any data loss or bugs are not acceptable, this exercise might be a big challenge.
 
-This post is going to guide step by step what to do to make the necessary transition happen without any outages, breaks, data loss, or bugs. So that it complies the [Continuous Delivery](https://continuousdelivery.com/) approach.
+This post guides step by step making the transition above happen without any outages, breaks, data loss, or bugs. And it turns out the suggested idea follows **[Continuous Delivery](https://continuousdelivery.com/)** approach So that it brings clarification on what that chicky term means.
 
 ### Starting point
 
