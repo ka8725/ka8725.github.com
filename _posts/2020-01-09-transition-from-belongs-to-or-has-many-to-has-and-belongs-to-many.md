@@ -91,27 +91,31 @@ If the necessary changes take place at once it means the calls `@property.manage
 
 ### What to do
 
-For that reason it's better to deliver the changes incrementally. That would allow to ship many small pieces to production continuously not blocking the whole development process or the entire business uses the software. That would provide an immediate feedback whether the deployed small piece works or not. A small not working piece can be fixed or rolled back much more easier and faster than a huge bunch of changes. This way reduces risks. It makes the delivery process comfortable and safe for both sides: working business and software development. It's a guaranteed nerves-free process.
+For that reason it's better to deliver the changes gradually. That would allow to ship many small pieces to production continuously not blocking the whole development process or the entire business uses the software. That would provide an immediate feedback whether the deployed small piece works or not. A small not working piece can be fixed or rolled back much more easier and faster than a huge bunch of changes. That reduces risks. It makes the delivery process comfortable and safe for both sides: working business and software development. It's a guaranteed nerves-free process.
 
-But first these small incremental steps should be identified. The process of steps recognition may seem hard and not obvious. In fact, this assumption is true. But once one feels how to do that on a particular example, like this one, similar cases should be easier to tackle.
+But first these small self-sufficient pieces should be identified. That may seem hard and not obvious. In fact, this suspect is true. But once one feels how to do that on a particular example, like this one, similar cases should be easier to tackle.
 
 On the very first step think about the initial an final stages. What's the difference between them? Which places should be changed to move from the starting point to the final one? The previous sections have already figured out that. These are places to change:
 
-- DB structures. A new table `properties_managers` for the **has and belongs to many** association should be created and the old column `properties.manager_id` should be deleted
+- DB structures. A new table `properties_managers` for the **has and belongs to many** association should be created and the old column `properties.manager_id` should be deleted.
 
-- Data. Remember, the old column has to be represented by another one `properties_managers.manager_id` in the new state of the system. So there should be a data migration fills in the new table with the old data
+- Data. Remember, the old column has to be represented by another one `properties_managers.manager_id` in the new state of the system. So there should be a data migration fills in the new table with the old data. That allows not to lose data when the new data structure becomes actual.
 
-- Active record API. Mind the old association `@property.manager` gets renamed to `@property.managers` along with the bunch of automatically generated readers/writers methods
+- Active record API. Mind the old association `@property.manager` gets renamed to `@property.managers` along with the bunch of automatically generated readers/writers methods. All the places refer to these methods should be modified appropriately.
 
-- UI. The drop-down with single choice should be replaced with the one allows to choose many manages. See the first picture of this article
-
+- UI. The drop-down with single choice should be replaced with a group of check-boxes allow to choose many managers (see the first picture of this article).
 
 #### Step 1: DB structure changes
 
-My suggestion is to start with the DB structure first, if this step is present in the list of required changes. In our case it's in (1). And it's not hard to implement it: just make a usual Rails migration creates the new table. Pay attention, as all further steps it's an easy change can hardly break something on production servers. It can be shipped without nerves at all. The only caveat is not to forget to add necessary indexes, foreign keys, columns with correct types, and constraints. Otherwise, a new migration should be added, deployed again. That takes time. So it's better to spend some time on analyze of the requirements. Try to anticipate possible usages of the new structures at this stage. The spent time defines a correct DB structure is a good investment as it will save time later.
+My suggestion is to start with the DB structure first, if this step is present in the list of required changes. In our case it's there.
 
-Let's observe the following migration should satisfy all needs:
+Its implementation is not hard: just make a usual Rails migration creates the new table. It can be shipped without nerves at all.
 
+> Pay attention, as all further steps this is an easy change can hardly break something on production servers.
+
+The only caveat is not to forget necessary indexes, foreign keys, columns with correct types, and constraints. Otherwise, a new migration should be added and deployed again. That takes time. So it's better to spend some time on analyze of the requirements. Try to anticipate possible usages of the new structures at this stage. The spent time defines a correct DB structure is a good investment as it will save time later.
+
+Let's observe the following migration should satisfy all the needs:
 
 ```ruby
 class CreateHbtmTable < ActiveRecord::Migration[6.0]
@@ -126,14 +130,16 @@ class CreateHbtmTable < ActiveRecord::Migration[6.0]
 end
 ```
 
-Pay attention to the table name. It should consist of two joined tables, pluralized, in the lexical order. Refer to the [original documentation](https://guides.rubyonrails.org/association_basics.html#creating-join-tables-for-has-and-belongs-to-many-associations), if there are questions. To keep data integrity:
+Pay attention to the table name. It should contain names of the two joined tables by underscore, pluralized, in the lexical order. Refer to the [original documentation](https://guides.rubyonrails.org/association_basics.html#creating-join-tables-for-has-and-belongs-to-many-associations), if there are questions.
+
+To keep the data integrity:
 - the columns `manager_id` and `property_id` are not nullable
 - there are the foreign keys constraints for them as they refer to other tables
 - there is the unique index for `manager_id + property_id`.
 
-For PostgreSQL DB a multicolumn index is used in a select query filters by any column that is in the index. In other words, the compound `manager_id + property_id` index will come into play for both ActiveRecord statements `.where(manager_id: ...)` and `.where(property_id: ...)`. That's why there are no separate indexes for `property_id` and `manager_id`. This not only reduces the DB structure complexity, but also saves a data storage space.
+For PostgreSQL a multicolumn index is used in a select query filters by any column that is in the index. In other words, the compound `manager_id + property_id` index will come into play for both ActiveRecord statements `.where(manager_id: ...)` and `.where(property_id: ...)`. That's why there are no separate indexes for `property_id` and `manager_id`. This not only reduces the DB structure complexity, but also saves space on the data store.
 
-> Keep in mind, this trick may not work for some older PostgreSQL versions or other databases, such as MySQL. That's why this question should be verified in each particular case.
+> Keep in mind, this trick with complex indexes may not work for some older PostgreSQL versions or other databases, such as MySQL. That's why this question should be verified in each particular case.
 
 #### Step 2: start writing into the new DB structure
 
