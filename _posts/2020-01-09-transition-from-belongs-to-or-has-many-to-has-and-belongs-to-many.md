@@ -8,10 +8,10 @@ comments: true
 share: true
 ---
 
-**TL;DR:** Follow incremental approach below. Divide the entire problem into small sub-problems and deploy them one by one:
+**TL;DR:** Follow the incremental approach below. Divide the entire problem into small sub-problems and deploy them one by one:
 - define the new DB structure
 - fill it in along with the old DB structure simultaneously
-- migrate the old data
+- migrate the old data to the new one
 - define the new associations and make the code use them
 - drop the old DB structure and the code that's not relevant anymore.
 
@@ -19,17 +19,17 @@ In this article you will:
 - learn how to maintain a Rails application in production with **zero downtime**
 - see how to make necessary changes on the current DB structure and deliver new features
 - figure out how to ship new features to production without outages, bugs, and downtimes
-- feel what's **Continuous Delivery** by a case happened on a Rails application in live.
+- feel what's **Continuous Delivery** by a case that happened with a Rails application in production.
 
 ### Problem
 
-Picture a Rails application is deployed to production that serves requests from real users all around the clock. That is, a live application performs **24/7 for now and forever**. Maintenance downtime is not desired and must be avoided as much as possible. The most important requirement a good business asks about, isn't it?
+Picture a Rails application that's deployed to production. And it serves requests from real users all around the clock. That is, a live Rails application performs **24/7 for now and forever**. Maintenance downtime is not desired and must be avoided as much as possible. This is the most important requirement a good business asks about, isn't it?
 
-As time goes by, the business decides to make the next changes. There is a drop-down allows to pick one choice on UI. But now it should have multiple choices. Speaking in ActiveRecord terms, there is a **"belongs to"**/**"has many"** association in the system that has to be changed to **"has and belongs to many"**.
+As time goes by, the business decides to make the following changes. There is a drop-down allows to pick one choice on UI. But from now on it should have multiple choices. Speaking in ActiveRecord terms, there is a **"belongs to"**/**"has many"** association in the system that has to be changed to **"has and belongs to many"**.
 
 A graphical explanation of the problem:
 
-![From single to multiple drop-down](/images/hbtm-ui.png)
+![From single drop-down to multiple check-boxes](/images/hbtm-ui.png)
 
 How to approach that? Well, someone might think it's not a big deal for MVP, PoC, or a fresh startup without real users. And that's true. In all these cases everything can be changed and re-deployed with the old data deleted at a time.
 
@@ -41,7 +41,7 @@ This post guides step by step making the transition above happen without any out
 
 The following example supposes to bring more clarity of the approach. It dives deep into the problem and allows to feel the describing solution. So that similar situations can benefit from the knowledge.
 
-Consider a **real estate** system has **properties**. And **managers** manage them, i.e. add properties into the system, keep them up to date, make them inactive/active/searchable/etc. From Rails prospective that means there are `Property` and `Manager` models. They relate to each other as `Property` *belongs to* `Manager` and `Manager` *has many* `Property`:
+Consider a **real estate** system has **properties**. And **managers** that are responsible for them, i.e. add properties into the system, keep them up to date, make them inactive/active/searchable/etc. From Rails prospective that means there are `Property` and `Manager` models. They relate to each other as `Property` *belongs to* `Manager` and `Manager` *has many* `Property`:
 
 ```ruby
 class Property < ApplicationRecord
@@ -57,17 +57,17 @@ In DB it looks like that:
 
 ![Property belongs to manager in DB](/images/hbtm-db1.png)
 
-Nowadays, there are many technologies to implement UI. That's why it's barely possible to give a common recommendation how to handle all of them. For simplicity, assume that UI is rendered by the traditional Rails approach on the server side in "views". And the following assumptions and suggestions base on this agreement.
+Nowadays, there are many technologies to implement UI. That's why it's barely possible to give a common recommendation how to handle that part of the system. For simplicity, assume that UI is rendered by the traditional Rails approach on the server side in "views". The following assumptions and suggestions base on this agreement.
 
 From the code point of view it means that somewhere there are calls:
-- on model, controller, or view layer
-  - read data `@property.manager / @property.manager_id / @manager.properties / @manager.property_ids`
-  - write data `@property.manager_id= / @property.manager= / @manager.property_ids= / @manager.properties=`
-  - `params.require(:property).permit(:manager_id)`
-- on view layer
-  - render HTML `= f.input :manager_id, ... / select_tag :manager_id, ... / f.input :propery_ids, ...`, etc.
+- on model, controller, or view layer that
+  - read data `@property.manager`, `@property.manager_id`,  `@manager.properties`, `@manager.property_ids`
+  - write data `@property.manager_id=`, `@property.manager=`, `@manager.property_ids=`, `@manager.properties=`
+  - allow params `params.require(:property).permit(:manager_id)`
+- on view layer that
+  - render HTML `= f.input :manager_id, ...`, `select_tag :manager_id, ...`, `f.input :propery_ids, ...`, etc.
 
-Note, the methods above can be called explicitly. So that it's possible to easily find them by "grepping" the code. Or they can be called implicitly. For example, with mass assignment of parameters to the models. But nevertheless, whenever the **property-manager** relation needs to be addressed, the methods above are eventually called. And that in turn means, they form an **interface**. An **API** if you will.
+Note, the methods above can be called explicitly. It's possible to find them by "grepping" the code easily. Or they can be called implicitly. For example, with mass assignment of parameters to the models. But nevertheless, whenever the **property-manager** relation needs to be addressed, the methods above are eventually called. And that in turn means, they form an **interface**. An **API** if you will.
 
 ### Goal
 
@@ -87,7 +87,7 @@ And this DB state:
 
 ![Property has and belongs to managers in DB](/images/hbtm-db2.png)
 
-If the necessary changes take place at once it means the calls `@property.manager / @properly.manager_id / @properly.manager_id = / @property.manager =` are no longer possible. They are replaced with the respective calls `@property.managers / @properly.manager_ids / @properly.manager_ids = / @property.managers =`. And these changes at once are dangerous. They may impact the system. There may be a lot of changes has to be deployed one-time. Eventually, that may lead to unexpected bugs or even outages. No one well-established business would accept this.
+If the necessary changes take place at once it means the calls `@property.manager`, `@properly.manager_id`, `@properly.manager_id=`, `@property.manager=` are no longer possible. They are replaced with the respective calls `@property.managers`, `@properly.manager_ids`, `@properly.manager_ids=`, `@property.managers=`. In other words, they break the current interface - API mentioned earlier. And these changes at once are dangerous. They may impact the system. There may be a lot of changes has to be deployed at a time. Eventually, that may lead to unexpected bugs or even outages. No one well-established business would accept that.
 
 ### What to do
 
