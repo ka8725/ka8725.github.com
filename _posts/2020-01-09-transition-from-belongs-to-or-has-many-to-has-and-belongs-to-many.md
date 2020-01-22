@@ -143,22 +143,22 @@ For PostgreSQL a multicolumn index is used in a select query filters by any colu
 
 #### Step 2: start writing into the new DB structure
 
-The previous step migration can be deployed without any problems. But the created table is not useful while nothing writes into it. While empty, there is no point to read from it. So let's start writing then.
+The previous step migration can be deployed without any problems. But the created table is not useful while nothing writes into it. While empty, there is no point to read from it. Let's start writing then!
 
-We need to fill in the currently known data from the **belongs to** association in the the new table despite the fact it supposes to hold the **had and belongs to many** association. This trick guarantees that switch to the new association doesn't lose any data. Basically, the data should write into the old field `properties.manager_id` and into the new table `managers_properties` **in parallel**.
+We need to fill in the currently known data from the old **belongs to** association into the the new table despite the fact it supposes to hold the new **had and belongs to many** association. This trick guarantees that switching to the new association doesn't lose any data. In other words, the data represents the **manager-property** association should write into the old field `properties.manager_id` and into the new table `managers_properties` **simultaneously**.
 
 There are at least two ways how do that in a Rails application: use ActiveRecord [callbacks](https://guides.rubyonrails.org/active_record_callbacks.html) or DB [triggers](https://www.postgresqltutorial.com/postgresql-triggers/). Which one to choose is up to the code authors. Both solutions have pros and cons. But play well if properly implemented.
 
-Whatever way to choose the following logic should be implemented:
+Whatever way to choose, the following logic should be implemented:
 - if `property#manager_id` gets changed:
   - the `managers_properties` row having `property#id` and `property#manager_id_was` should be deleted
-  - the new row with `property#id` and `property#manager_id` should be inserted if `property#manager_id` is not `nil`
+  - the new row with `property#id` and `property#manager_id` should be inserted if the new value for `property#manager_id` is not `nil`
 - if a property gets removed, the corresponding row in `managers_properties` should be removed
 - if a manager gets removed, the corresponding association `property#manager` should be nullified and the corresponding row in `managers_properties` should be removed too.
 
-If go with ActiveRecord callbacks, it may require many changes and much more afford to put. Callbacks are skipped in some cases. For example, `update_column/update_columns/update_all` call doesn't execute callbacks. Consider these methods can be called with meta programming implicitly. And now the implementation seems very tricky. All the code should be read carefully. And all places that call these methods should take care about data alignment on the **many-to-many** table explicitly.
+If go with ActiveRecord callbacks, it may require many changes and much more effort to put. Callbacks are skipped in some cases. For example, `#update_column`, `#update_columns`, `.update_all` calls on ActiveRecord models doesn't execute callbacks. Consider these methods can be called with meta programming implicitly. And now the implementation doesn't look easy at all. All the code should be read carefully. And all the places that call these and possibly other methods should take care of the simultaneous write. Additionally, if some new code is added afterwards and misses that point there may be data inconsistency.
 
-That's why I recommend to use DB triggers. Once they are written they work as is without any caveats. No need to read the whole code, implement some tricky code, etc. Check out the implementation for PostgreSQL:
+That's why it's better to use DB triggers. Once they are written they work as designed without any caveats. No need to read the whole code base searching the methods above and changing those lines. No need to implement some tricky code, etc. Check out the implementation for PostgreSQL:
 
 ```ruby
 class AddTriggers < ActiveRecord::Migration[6.0]
@@ -204,13 +204,15 @@ class Manager < ApplicationRecord
 end
 ```
 
-Thanks to Rails' `dependent: :nullify` option above, whenever a manager gets removed it sets `manager_id` to `null` for all associated properties. That change to `null` executes the DB trigger. What in turn means, all the data integrity requirements are satisfied.
+Thanks to Rails' `dependent: :nullify` option above, whenever a manager gets removed it sets `manager_id` to `null` for all of the associated properties. That change to `null` executes the DB trigger. What in turn means, all the data integrity requirements above are satisfied.
 
-It's time to deploy this migration to production.
+Now it's time to deploy this migration to production.
 
 #### Step 3: migrate the old data
 
-But that's not all when it comes to data. There is still old data on the `properties.manager_id` without related `managers_properties` row. This can be fixed with so called "data migration". In short, it's just a code snippet makes the job done. There are many ways implement it. All of them can be found in another article [Change data in migrations like a boss](/change-data-in-migrations-like-a-boss/). Here I just show an easy SQL snippet can be put into DB production console:
+But that's not all when it comes to data. There is still old data on the `properties.manager_id` without related `managers_properties` row. This can be fixed with so called "data migration". In short, it's just a code snippet makes the job done. There are many ways implement it. All of them can be found in another article [Change data in migrations like a boss](/change-data-in-migrations-like-a-boss/).
+
+Run the following SQL snippet agains the production DB and that makes all what's needed on this step:
 
 ```SQL
 insert into managers_properties (property_id, manager_id)
@@ -218,11 +220,11 @@ insert into managers_properties (property_id, manager_id)
   on conflict do nothing;
 ```
 
-Run this SQL on the DB in production. By the way, it can be run many times, i.e. it's idempotent and doesn't conflict with any other process is writing data into `managers_properties` simultaneously due to whatever reason.
+The snippet is idempotent, so that it can be run many times without any harm to data. Also, it doesn't conflict with any other process is writing data into `managers_properties` at the same time due to whatever reason.
 
 #### Step 4: verify data
 
-To prove the data is correct, it would be good to allow the system work for a while, say one week. And run a script checks the data integrity:
+To prove the data is consistent, it would be good to allow the system work for a while. Say, one week. After that run this script agains production DB:
 
 ```SQL
 select id, manager_id from properties where manager_id is not null
@@ -233,12 +235,12 @@ select property_id, manager_id from managers_properties
   select id, manager_id from properties where manager_id is not null;
 ```
 
-The first select statement just checks whether all filled in "property-manager" relations have corresponding rows in `managers_properties` table and should return no results. The second one just checks if there are no "aliens" in the table and should be empty as well. Both statements together guarantee that the old **belongs to/has many** data structure is in sync with the new **has and belongs to many** data structure.
+The first select statement checks whether all filled in **property-manager** relations have corresponding rows in `managers_properties` table. It should return no results. The second one checks if there are no "aliens" in the new table. The result should be empty as well. Both statements together guarantee that the old **belongs to/has many** DB data structure is in sync with the new one - **has and belongs to many**.
 
 
 #### Step 5: switch to has–and-belongs-to-many association
 
-When the data integrity between the old and the new structures is proved, there is only one major step is left. The one relates to UI changes and supposes to have changes on the rest places of a Rails application: models, views, controllers. Probably, the easiest place will be model as it needs only definition of the new relation:
+When the data integrity between the old and the new structures is proved, there is only one major step is left. This one relates to UI changes. It supposes to have fixes on the rest places of a Rails application: models, views, controllers. Probably, the easiest place will be model as it needs only definition of the new relation:
 
 ```ruby
 class Property < ApplicationRecord
@@ -252,13 +254,13 @@ end
 
 Changes to controllers may differ from project to project. But commonly the idea is to allow `manager_ids` instead of previous `manager_id` going through `params`. For example, if use [Strong Parameters](https://edgeapi.rubyonrails.org/classes/ActionController/StrongParameters.html) the code `params.require(:property).permit(:manager_id)` should be changed to `params.require(:property).permit(manager_ids: [])`.
 
-The form updates managers for properties may look like this:
+On the view layer, the form updates managers for properties may look like this:
 
 ```ruby
 = f.collection_check_boxes :manager_ids, Manager.all, :id, :id
 ```
 
-All of these changes may be deployed at once or incrementally. For example, the views that render read-only information of the association can be delivered first. After this controllers and models can be prepared to the new associations and `params` structure without dropping the old functionality yet. Then UI that updates property managers can be changed.
+All of these changes may be deployed at once or incrementally. For example, the views that render read-only information of the association can be delivered first. After this, controllers and models can be prepared to the new associations along with `params` structure without dropping the old functionality yet. Next, the UI updates property managers can be changed.
 
 #### Step 6: cleanup
 
@@ -266,19 +268,19 @@ On the final step the not used code should be just dropped. It may include the f
 - removal of the old `properties.manager_id` column. Keep in mind, it should be done in several steps: first ignore the column on the code level, then delete the column from DB. More about this is [here](https://blog.codeship.com/rails-migrations-zero-downtime/)
 - removal of the old defined associations along with old `params` keys
 - drop of the trigger along with its function
-- scripts/snippets/rake tasks that refer to the old associations yet.
+- scripts/snippets/rake tasks that refer to the old associations yet should be updated or deleted.
 
 That's all steps needed to be done in order to make the transition happen.
 
 ### Conclusion
 
-We've seen how a DB change on a Rails application **with production setup** should be done. This is a multi-step and not fast process. It takes time to make the transition happen **without bugs** and **downtimes**. At first glance, the set task may seem too hard. But all the steps it requires are small and easy.
+We've seen how a DB change on a Rails application **with production setup** should be done. This is a multi-step and not fast process. It takes time to make the transition happen **without bugs** and **downtimes**. At first glance, the given task may seem too hard. But all the required steps are small and easy.
 
-The described technique is a very powerful tool that confirmed by experience on live applications. Despite the fact it shows the concrete example to change single select to multiple choices on UI, the idea is applicable to **any** transition requires changes in DB on a Rails application has production setup with **zero downtime** **24/7** requirements.
+The described technique is a very powerful tool confirmed by experience on live applications. The post shows the concrete example how to change a single select to multiple choices on UI. But the idea is applicable to **any** transition requires changes in DB on a Rails application that has production setup with **zero downtime** **24/7** requirements.
 
 Unfortunately, it's hard or even not possible to describe all niceties of the whole process. There are still many aspects this article doesn't show:
-- how to understand which places in the code require changes
-- how to handle the migration if UI is a separate single page application (SPA)
-- how to implement parallel write into the old and the new DB structures if go with ActiveRecord callbacks. Is it worth at all?
+- how to understand exact places in the code that require changes
+- how to handle the migration if UI is a separate single page application ([SPA](https://en.wikipedia.org/wiki/Single-page_application))
+- how to implement the parallel write into the old and the new DB structures if go with ActiveRecord callbacks. Is it worth at all? Partially, this question was elaborated in this article. But those brief explanations may seem not convincing enough.
 
 If you have any of those or other questions, don't hesitate to [ask me](/ruby-consulting/). Thanks for your attention and happy bugless coding in production!
