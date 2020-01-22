@@ -214,7 +214,7 @@ But that's not all when it comes to data. There is still old data on the `proper
 
 Run the following SQL snippet against the production DB and that makes all that's needed on this step:
 
-```SQL
+```sql
 insert into managers_properties (property_id, manager_id)
   (select id, manager_id from properties where manager_id is not null)
   on conflict do nothing;
@@ -226,7 +226,7 @@ The snippet is idempotent, so that it can be run many times without any harm to 
 
 To prove the data is consistent, it would be good to allow the system to work for a while with the deployed steps above. Say, for one week. After that run this script against production DB:
 
-```SQL
+```sql
 select id, manager_id from properties where manager_id is not null
   except
   select property_id, manager_id from managers_properties;
