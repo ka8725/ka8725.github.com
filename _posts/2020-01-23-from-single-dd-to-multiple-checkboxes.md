@@ -97,9 +97,9 @@ But first, these small self-sufficient pieces should be identified. That may see
 
 On the very first step think about the initial and the final stages. What's the difference between them? Which places should be changed to move from the starting point to the final one? The previous sections have already figured out that. These are places to change:
 
-- DB structures. A new table `properties_managers` for the **has and belongs to many** association should be created and the old column `properties.manager_id` should be deleted.
+- DB structures. A new table `managers_properties` for the **has and belongs to many** association should be created and the old column `properties.manager_id` should be deleted.
 
-- Data. Remember, the old column has to be represented by another one `properties_managers.manager_id` in the new state of the system. So there should be a data migration fills in the new table with the old data. That allows not to lose data when the new data structure becomes actual.
+- Data. Remember, the old column has to be represented by another one `managers_properties.manager_id` in the new state of the system. So there should be a data migration fills in the new table with the old data. That allows not to lose data when the new data structure becomes actual.
 
 - Active record API. Mind the old association `@property.manager` gets renamed to `@property.managers` along with the bunch of automatically generated readers/writers methods. All the places that refer to these methods should be modified appropriately.
 
