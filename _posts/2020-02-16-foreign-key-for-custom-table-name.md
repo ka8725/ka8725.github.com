@@ -41,7 +41,6 @@ class CreatePayments < ActiveRecord::Migration[6.0]
   def change
     create_table :payments do |t|
       t.belongs_to :receiver, null: false, foreign_key: true
-
       t.timestamps
     end
   end
@@ -75,3 +74,6 @@ And now the migration runs without any failures and produces a correct result th
 So, the solution is to use `foreign_key: {to_table: :users}` for that example above.
 
 I kindly ask you to participate in the docs improvement. Just vote for this [PR](https://github.com/rails/rails/pull/38469). Thank you!
+
+
+UPDATE 02/20/2020: The PR got merged, what means the documentation got improved!
