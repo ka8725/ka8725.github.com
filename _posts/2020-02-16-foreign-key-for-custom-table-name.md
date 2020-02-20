@@ -13,7 +13,7 @@ share: true
 When it comes to a Rails migration for a `belongs_to` association which name doesn't correspond to the joined table name, it may hard to find out how to do that quickly after reading the Rails documentation or sources. This post should help with that.
 
 Let's start with the following example:
-- there is a `Payment` and `User` models
+- there should be a `Payment` and there is already `User` models
 - `Payment` belongs to a `receiver`, that's `User`.
 
 In the code it would look like that:
@@ -24,14 +24,13 @@ end
 
 class Payment < ApplicationRecord
   belongs_to :receiver, class_name: 'User'
-  belongs_to :sender, class_name: 'User'
 end
 ```
 
 Let's try to generate a migration for it as per the [documentation](https://edgeguides.rubyonrails.org/active_record_migrations.html#creating-a-standalone-migration):
 
 ```shell
-rails g model received_payment user:references banknote:references
+rails g model payment receiver:references
 ```
 
 That produces the following migration:
