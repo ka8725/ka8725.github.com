@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Define enums in your Rails with confidence"
+title: "Define enums in your Rails app with confidence"
 modified: 2020-02-16 00:41:06 +0300
 description: "The post provides a DSL that allows enums definition that are constants."
 tags: [ruby, enums, DSL]
