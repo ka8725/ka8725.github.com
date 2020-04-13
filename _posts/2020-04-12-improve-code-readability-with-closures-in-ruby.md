@@ -100,7 +100,7 @@ class MessageService
   # @param recipients [Array<User>]
   def broadcast(message, recipients)
     recipients.each do |recipient|
-      SMSGateway.send_message(message, recipient) if recipient.active
+      SMSGateway.send_message(recipient.phone, message) if recipient.active
     end
   end
 end
@@ -137,7 +137,7 @@ Then I want to learn more details about `#broadcast` and jump into its implement
 ```ruby
 def broadcast(message, recipients)
   recipients.each do |recipient|
-    SMSGateway.send_message(message, recipient) if recipient.active
+    SMSGateway.send_message(recipient.phone, message) if recipient.active
   end
 end
 ```
