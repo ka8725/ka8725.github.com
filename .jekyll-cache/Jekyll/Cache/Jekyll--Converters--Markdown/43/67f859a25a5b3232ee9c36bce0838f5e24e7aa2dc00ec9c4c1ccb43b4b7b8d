@@ -1,0 +1,42 @@
+I"�<p>Recently I’ve resolved one more problem which concerns presence validator and <em>belongs_to</em> association. But it’s involved another thing - <em>accepts_nested_attributes</em>. Assume you have nested form and parent object is not exist yet, so you can have this issue. Here I will show you how to fix it.</p>
+
+<h2 id="issue">Issue</h2>
+
+<p>Let’s we have the following models and their relations:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Account</span>
+  <span class="n">has_one</span> <span class="ss">:user</span>
+  <span class="n">accepts_nested_attributes_for</span> <span class="ss">:user</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">User</span>
+  <span class="n">belongs_to</span> <span class="ss">:account</span>
+  <span class="n">validates</span> <span class="ss">:account</span><span class="p">,</span> <span class="ss">:presence</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Go to <em>rails console</em> and check the validator out:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">001</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:account</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:user_attributes</span> <span class="o">=&gt;</span> <span class="p">{}}}</span>
+<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">002</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="no">Account</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:account</span><span class="p">])</span>
+<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">003</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">.</span><span class="nf">valid?</span> <span class="c1"># =&gt; false</span>
+<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">004</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">.</span><span class="nf">errors</span><span class="p">.</span><span class="nf">full_messages</span> <span class="c1"># =&gt; ["User account can't be blank"]</span></code></pre></figure>
+
+<p>So this is an our challenge - we can’t save account, because user can’t pass validation rules because account (parent model) is not existed yet! But to remove validator won’t be right solution. Are you agree with me?</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>A solution for this issue is very simple - just add to <em>has_one</em> (or if you have <em>has_many</em>) one more option - <em>:inverse_of</em>. With this option <em>rails</em> won’t try to get account from database when user is validated. The account will be got from memory. If you don’t familiar with this option I strongly recommend you to read an official <a href="http://guides.rubyonrails.org/association_basics.html#options-for-belongs-to-inverse-of">rails guide</a>.</p>
+
+<p>So, change account model try it:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Account</span>
+  <span class="n">has_one</span> <span class="ss">:user</span><span class="p">,</span> <span class="ss">:inverse_of</span> <span class="o">=&gt;</span> <span class="ss">:account</span>
+  <span class="n">accepts_nested_attributes_for</span> <span class="ss">:user</span>
+<span class="k">end</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">001</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:account</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:user_attributes</span> <span class="o">=&gt;</span> <span class="p">{}}}</span>
+<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">002</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="no">Account</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="ss">:account</span><span class="p">])</span>
+<span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">003</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">a</span><span class="p">.</span><span class="nf">valid?</span> <span class="c1"># =&gt; true</span></code></pre></figure>
+
+<p>I hope this article was helpful for you.</p>
+:ET

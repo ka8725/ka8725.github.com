@@ -1,11 +1,16 @@
+div.highlight, figure.highlight {
+	margin-top: 56px;
+	background: rgba(0, 0, 0, 0.05);
+	padding: 20px;
+	@media @medium {
+		margin-top: 34px;
+	}
+}
 .highlight {
-	margin-bottom: 1.5em;
-	.font(12);
-	border: 1px solid darken(@body-color, 5);
+	.font(11);	
 	pre {
-		position: relative;
-		margin: 0;
-		padding: 1em;
+		margin: -0.35em 0;
+		white-space: pre-wrap;
 	}
 	.hll { background-color: #ffffcc }
 	.c { color: #999988; font-style: italic } /* Comment */
@@ -14,7 +19,7 @@
 	.o { color: #000000; font-weight: bold } /* Operator */
 	.cm { color: #999988; font-style: italic } /* Comment.Multiline */
 	.cp { color: #999999; font-weight: bold; font-style: italic } /* Comment.Preproc */
-	.c1 { color: #999988; font-style: italic } /* Comment.Single */
+	.c1 { color: #616158; font-style: italic } /* Comment.Single */
 	.cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
 	.gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
 	.ge { color: #000000; font-style: italic } /* Generic.Emph */

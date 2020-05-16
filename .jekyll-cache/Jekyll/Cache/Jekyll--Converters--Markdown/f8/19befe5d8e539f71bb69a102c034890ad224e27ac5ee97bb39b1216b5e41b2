@@ -1,0 +1,70 @@
+I"c<p>Since I’ve found my <strong>github</strong> repository instead of my project in <strong>google</strong> I started to search <strong>free git hosting</strong> which would allow to hide my projects from <strong>google crawl</strong>. And I wondered when I found a lot of satisfied for me services. One of them I will describe in this article it is <strong>bitbucket</strong>.</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p><strong>Bitbucket</strong> is the both <strong>mercurial</strong> and <strong>git hosting</strong> with <strong>unlimited number of private projects</strong> and <strong>unlimited disk space</strong> per account! This system has written by Alassian company (JIRA and Confluence founder). Go to their <a href="http://bitbucket.org/">site</a> and check it out.</p>
+
+<h2 id="pricing">Pricing</h2>
+<p><img src="/images/bitbucket.jpg" alt="BitBucket pricing" /></p>
+
+<blockquote>
+  <p>It can be expired screenshot. To know actual pricing please, follow <a href="/images/bitbucket.jpg">bitbucket site</a>.</p>
+</blockquote>
+
+<p>As you see for free account you have constrain - maximum 5 users with write access to your project. 5 members for one team are very big number. If this plan won’t be enough you can buy the next plan with 10 collabarators for 10$ per month. Compare with github price - 24$ per month for 10 collabarators and 20 projects, but here you have unlimit number of private projects and unlimit disk space. It is very cheap and tempting offer!</p>
+
+<h2 id="sign-up">Sign up</h2>
+
+<p>It is very easy to sign up here. OpenID is available through services:</p>
+
+<ul>
+  <li>Google</li>
+  <li>Yahoo!</li>
+  <li>AOL</li>
+  <li>OpenID</li>
+  <li>MyOpenID</li>
+  <li>LiveJournal</li>
+  <li>Flickr</li>
+  <li>WordPress</li>
+  <li>VeriSign</li>
+  <li>ClaimID</li>
+</ul>
+
+<p>After sign up you are able to create repository.</p>
+
+<h2 id="migrate-from-github">Migrate from github</h2>
+
+<p>It is very easy to create git repository here. You have 2 choices: create project from scratch like you do it on <strong>github</strong> or import existing repository from <strong>github</strong>, <strong>Google code</strong>, <strong>Mercurial</strong>, <strong>SourceForge</strong> or <strong>Subversion</strong>. I preffered import my source code from <strong>github</strong>:</p>
+
+<ol>
+  <li>Type url for your public repo. If you want to migrate private repo you should check <em>Requires authorization</em> checkbox and fill in <em>username</em> and <em>password</em> for your github account</li>
+  <li>Type repository name which will be used by <strong>bitbucket</strong>. You are also able to check if this repo will be <strong>private</strong> or <strong>public</strong>. Select VCS: <strong>git</strong> ot <strong>mercurial</strong></li>
+  <li>You are able also check <strong>issues tracking</strong> and <strong>Wiki pages</strong></li>
+  <li>Select then main programming language for your repository. Also you can write <strong>description</strong> and set <strong>website url</strong></li>
+</ol>
+
+<p>And that’s it! Press <strong>Import</strong> button, wait while <strong>bitbucket</strong> fetch code from <strong>github</strong>. Nice feature - you can migrate your existing source code from <strong>github</strong> in several minutes. Don’t forget to add your ssh key for <strong>bitbucket</strong> account if you want to commit in the migrated repository.</p>
+
+<h2 id="alternatives">Alternatives</h2>
+
+<p>Theare many another similiar services:</p>
+
+<ul>
+  <li><a href="http://unfuddle.com/">Unfuddle</a></li>
+  <li><a href="http://repositoryhosting.com/">repositoryhosting.com</a></li>
+  <li><a href="http://www.assembla.com/">Assembla</a></li>
+  <li><a href="http://beanstalkapp.com/">Beanstalkapp</a></li>
+  <li><a href="http://www.indefero.net/">InDefero</a></li>
+  <li><a href="http://www.projectlocker.com/">Project Locker</a></li>
+  <li><a href="http://www.codebasehq.com/">Codebase</a></li>
+  <li><a href="http://www.springloops.com/v2">Springloops</a></li>
+  <li><a href="http://gitorious.org/">Gitorius</a></li>
+  <li><a href="http://sourcerepo.com/">SourceRepo</a></li>
+  <li><a href="http://bettercodes.org/">Bettercodes</a></li>
+  <li><a href="https://codeplane.com/">Codeplane</a></li>
+  <li><a href="http://codesion.com/">Codesion</a></li>
+  <li><a href="http://xp-dev.com/">XP-dev</a></li>
+</ul>
+
+<p>But they have a more constrains or bigger price. So my choice is <strong>bitbucket</strong>!</p>
+:ET

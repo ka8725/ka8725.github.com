@@ -1,0 +1,27 @@
+I"�
+<p>Recently I noticed that there is no a Rubyß library that allows to convert Ruby ranges to regular expressions. That’s why I decided to write it by myself and this post is just a sharing the gem’s link and a few examples how to use the gem.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>Assume you have a Ruby <strong>range</strong> and have to transform it to a <strong>regular expression</strong>. Say, you have <code class="highlighter-rouge">-9..9</code> and have to get <code class="highlighter-rouge">/-[1-9]|\d/</code>. For the first glance the solution looks rather easy but to get an optimized solution it requires a lot of time if you don’t know an algorithm to do this.</p>
+
+<p>Recently I had to solve an issue like this and, honestly, I couldn’t solve the task in 2 hours. Then I started to search a ready solution in Google and finally I found its implementation in Python. Thankfully my curiosity I’ve already learned Python and could manage to translate the algorithm into Ruby within 1 hour. And finally I released a gem with the algorithm.</p>
+
+<p>So if you have the issue the gem may be helpful for you.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>The gem is called <code class="highlighter-rouge">range_regexp</code> and located <a href="https://github.com/ka8725/range_regexp">here</a>.</p>
+
+<p>These are few examples of its usage:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">'range_regexp'</span>
+<span class="n">converter</span> <span class="o">=</span> <span class="no">RangeRegexp</span><span class="o">::</span><span class="no">Converter</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="o">-</span><span class="mi">9</span><span class="o">..</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">converter</span><span class="p">.</span><span class="nf">convert</span> <span class="c1"># =&gt; /-[1-9]|\d/</span>
+<span class="n">converter</span> <span class="o">=</span> <span class="no">RangeRegexp</span><span class="o">::</span><span class="no">Converter</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">12</span><span class="o">..</span><span class="mi">3456</span><span class="p">)</span>
+<span class="n">converter</span><span class="p">.</span><span class="nf">convert</span> <span class="c1"># =&gt;/1[2-9]|[2-9]\d|[1-9]\d{2}|[1-2]\d{3}|3[0-3]\d{2}|34[0-4]\d|345[0-6]/</span></code></pre></figure>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Now we can convert ranges to regular expressions easily using Ruby. You don’t have to reinvent a wheel, just get the gem and use it. If you have any suggestions or questions, feel free to contact me.</p>
+:ET

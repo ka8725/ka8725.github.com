@@ -1,0 +1,91 @@
+I"�<p>Many Rails projects have a “constant” list of some predefined things, such as user roles, food categories, types of apartments, etc. These things are usually called “enums”.
+In the beginning, people prefer some easy implementation for that. For example, someone can use symbols, like <code class="highlighter-rouge">:admin</code> or <code class="highlighter-rouge">:leader</code> all over the application code.
+And that’s perfectly fine… until the time comes for changes. The business decides to rename <code class="highlighter-rouge">:admin</code> to <code class="highlighter-rouge">:superadmin</code>.
+On try applying this change in the code the initial implementation might seem not so straightforward.
+And the problem is that it’s not enough just to rename <code class="highlighter-rouge">:admin</code> to <code class="highlighter-rouge">:superadmin</code> in all places.
+<code class="highlighter-rouge">:admin</code> can be used in different contexts and might mean not a user role at all.
+It might be something else, i.e. scope of a controller, or model, or … you get the point, right?</p>
+
+<p>If someone goes forward and does the rename, the whole application should be tested manually.
+I don’t think, there is someone in the world would be happy doing that, don’t you?</p>
+
+<p>What to do then?</p>
+
+<p>I suggest to define constants for these things called “enums” and keep them in their namespaces.
+Check out the following Ruby snippet:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">HasEnumConstants</span>
+  <span class="k">class</span> <span class="nc">ConstantsBuilder</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="n">const</span><span class="p">)</span>
+      <span class="vi">@namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+      <span class="vi">@collection</span> <span class="o">=</span> <span class="vi">@namespace</span><span class="p">.</span><span class="nf">const_get</span><span class="p">(</span><span class="n">const</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">constant</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+      <span class="n">val</span> <span class="o">=</span> <span class="nb">name</span><span class="p">.</span><span class="nf">to_s</span><span class="p">.</span><span class="nf">downcase</span>
+      <span class="vi">@collection</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+      <span class="vi">@namespace</span><span class="p">.</span><span class="nf">const_set</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="c1"># Introduces DSL for constants definition.</span>
+  <span class="c1"># The all defined contants are put into the `collection` constant.</span>
+  <span class="c1">#</span>
+  <span class="c1"># Usage example:</span>
+  <span class="c1">#   class User</span>
+  <span class="c1">#     extend HasEnumConstants</span>
+  <span class="c1">#</span>
+  <span class="c1">#     constants_group :KINDS do</span>
+  <span class="c1">#       constant :ADMIN</span>
+  <span class="c1">#       constant :GUEST</span>
+  <span class="c1">#     end</span>
+  <span class="c1">#   end</span>
+  <span class="c1">#   User::KINDS # =&gt; ['admin', 'guest']</span>
+  <span class="c1">#   User::ADMIN # =&gt; 'admin'</span>
+  <span class="c1">#   User::GUEST # =&gt; 'guest'</span>
+  <span class="k">def</span> <span class="nf">constants_group</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="nb">const_set</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="no">ConstantsBuilder</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="nb">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">).</span><span class="nf">instance_eval</span><span class="p">(</span><span class="o">&amp;</span><span class="n">block</span><span class="p">)</span>
+    <span class="nb">const_get</span><span class="p">(</span><span class="n">collection</span><span class="p">).</span><span class="nf">freeze</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>If consume it by <code class="highlighter-rouge">ApplicationRecord</code> like below all models obtain the DSL that allows enums definition as constants:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApplicationRecord</span>
+  <span class="kp">extend</span> <span class="no">HasEnumConstants</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>For example, the former <code class="highlighter-rouge">:admin</code> key could be defined on <code class="highlighter-rouge">User</code> model like this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">constants_group</span> <span class="ss">:KINDS</span> <span class="k">do</span>
+    <span class="n">constant</span> <span class="ss">:ADMIN</span>
+    <span class="n">constant</span> <span class="ss">:GUEST</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Feel how it works:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="no">User</span><span class="o">::</span><span class="no">KINDS</span> <span class="c1"># =&gt; ['admin', 'guest']</span>
+<span class="o">&gt;</span> <span class="no">User</span><span class="o">::</span><span class="no">ADMIN</span> <span class="c1"># =&gt; 'admin'</span>
+<span class="o">&gt;</span> <span class="no">User</span><span class="o">::</span><span class="no">GUEST</span> <span class="c1"># =&gt; 'guest'</span>
+</code></pre></div></div>
+
+<p>If apply this practice, all the code refers to <code class="highlighter-rouge">:admin</code> should refer to constant <code class="highlighter-rouge">User::ADMIN</code>. Now that name is
+pretty unique as you see (because it’s scoped by <code class="highlighter-rouge">User</code>). The chance this thing may mean something else is minimized.</p>
+
+<p>Consider there is a misspelling in the code, i.e. <code class="highlighter-rouge">User::AMDIN</code> instead of <code class="highlighter-rouge">User::ADMIN</code>.
+If the code has good coverage, the code will fail immediately during the unit tests run with an adequate exception.
+Having that exception it’s very easy to understand what’s the problem.
+And this is why it’s better than the built-in ActiveRecord enums. ActiveRecord enums are weaker in terms of strong types and preventing mistakes during the development process.
+Basically, it’s not much better than having just a bunch of not related symbols,
+like in the example of this post beginning.</p>
+
+<p>As one might notice, the module can be used by the other layers of a pure Ruby or Rails application, i.e. controllers, services, mailers, etc.</p>
+
+<p>As practice shows, if it comes to release in production and maintenance it’s better to follow a practice like that as sooner as better.</p>
+:ET

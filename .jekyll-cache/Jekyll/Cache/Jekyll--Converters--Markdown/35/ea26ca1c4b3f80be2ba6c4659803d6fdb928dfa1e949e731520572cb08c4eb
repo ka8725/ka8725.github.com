@@ -1,0 +1,167 @@
+I"uB<p>For those people who came into Ruby from Java, C# and similar OOP languages, it may be very
+surprising that Ruby doesn’t have enums implementation out from box. Someone could argue that
+there is <code class="highlighter-rouge">Symbol</code> type in Ruby and it will be enough using this instead. Well, it may be true for
+a very small project but if you have a big one things go much harder.</p>
+
+<p><strong>TL;DR:</strong> use <a href="https://github.com/mezuka/enum">this gem</a>.</p>
+
+<h2 id="what-the-heck">What the heck?</h2>
+
+<p>Firstly let’s try to understand what are <em>enums</em>, which issues they solve and what for they were
+invented. I will quote <a href="https://en.wikipedia.org/wiki/Enumerated_type#Rationale">Wikipedia</a> for this:</p>
+
+<blockquote>
+  <p><em>…</em> If a programmer wanted a variable, for example <code class="highlighter-rouge">myColor</code>, to have a value of <code class="highlighter-rouge">red</code>, the variable <code class="highlighter-rouge">red</code> would be declared and assigned <strong>some arbitrary value</strong>, usually an integer constant. The variable <code class="highlighter-rouge">red</code> would then be assigned to <code class="highlighter-rouge">myColor</code><em>…</em></p>
+</blockquote>
+
+<blockquote>
+  <p>These arbitrary values were sometimes referred to as <strong>magic numbers</strong> since there often was no explanation as to how the numbers were obtained or whether their actual values were significant. These magic numbers could make the source code harder for others to understand and maintain.</p>
+</blockquote>
+
+<blockquote>
+  <p>Enumerated types, on the other hand, made the code more self-documenting. Depending on the language, the compiler could automatically assign default values to the enumerators thereby hiding unnecessary detail from the programmer. These values may not even be visible to the programmer. Enumerated types can also prevent a programmer from writing illogical code such as performing mathematical operations on the values of the enumerators. If the value of a variable that was assigned an enumerator were to be printed, some programming languages could also print the name of the enumerator rather than its underlying numerical value. A further advantage is that enumerated types can allow compilers to enforce semantic correctness. For instance:
+<code class="highlighter-rouge">myColor = TRIANGLE</code>
+can be forbidden, whilst
+<code class="highlighter-rouge">myColor = RED</code>
+is accepted, even if <code class="highlighter-rouge">TRIANGLE</code> and <code class="highlighter-rouge">RED</code> are both internally represented as <code class="highlighter-rouge">1</code>.</p>
+</blockquote>
+
+<blockquote>
+  <p>Conceptually, an enumerated type is similar to a list of nominals (numeric codes), since each possible value of the type is assigned a distinctive natural number. A given enumerated type is thus a concrete implementation of this notion. When order is meaningful and/or used for comparison, then an enumerated type becomes an ordinal type.</p>
+</blockquote>
+
+<p>In brief currently we have implementations of enums in many programming languages (note that only <strong>Python</strong> from scripting family implements them and it’s interestingly that starting only from one of latest versions - 3.4). Earlier people used integers for the purpose of enumeration of values and this approach had drawbacks. In programming the enum type basically solves the following issues:</p>
+
+<ul>
+  <li>Unpredictable behavior;</li>
+  <li>Maintenance;</li>
+  <li>Code readability.</li>
+</ul>
+
+<p>And this type has the following characteristics:</p>
+
+<ul>
+  <li>It defines a set of identifiers (set of named values, called enumerators of the type or elements);</li>
+  <li>The elements behave as constants;</li>
+  <li>A variable that has been declared as having an enumerated type can be assigned any of elements.</li>
+</ul>
+
+<p>Notably that neither existing Symbols nor other standard Ruby types cover all of the enum definition.</p>
+
+<h2 id="the-solution">The solution</h2>
+
+<p>In our project (<a href="https://mezuka.com">Mezuka</a>) we have a lot of entities that should behave like enums. And we, actually, used one of the already implemented gem (to be honest I used many implementations of enums in Ruby in my projects before). But it wasn’t fit to us and has excess functionality. During yet another refactoring we introduced our own library that solves the issues and completely fits us. And finally we released this <a href="https://github.com/mezuka/enum">gem</a> which is called <a href="https://rubygems.org/gems/safe-enum">safe-enum</a>.</p>
+
+<p>So, what the issues does it solve?:</p>
+
+<ul>
+  <li>Serialization into DB - the value should be as written as read and represented in Ruby without any pitfalls;</li>
+  <li>Safety - if there is not defined enum value I should have runtime error (ideally complication error, but, remember, in Ruby we don’t have a compiler);</li>
+  <li>Easy to define - simple DSL;</li>
+  <li>It should be an ordinal type - we should be able to compare the enum values and sort them sometimes;</li>
+  <li>It should be used in pure Ruby classes (not only with ActiveRecord or other ORM);</li>
+  <li>Easy enum values internationalization (I18n) and their keys maintenance.</li>
+</ul>
+
+<p>And these are architect decisions of the <a href="https://rubygems.org/gems/safe-enum">gem</a> that allows to implement it as we wanted:</p>
+
+<ul>
+  <li>As the enum value should be written into DB, due to the integer disadvantages and the fact that symbols (or atoms) are not supported by our DB (PostgreSQL) all the enum values are represented only and only as strings in the gem internals.</li>
+  <li>The enums are saved into <code class="highlighter-rouge">Set</code> in order to quickly figure out if the value is valid and defined;</li>
+  <li>The order of the values definition is saved and they have their integer representation for comparison (just their definition index for simplicity);</li>
+  <li>Raise an <strong>exception</strong> if there is no defined enum value when there is an attempt to use it;</li>
+  <li>Easy to use DSL for the enum values and the I18n keys definition.</li>
+</ul>
+
+<p>I paste here a few examples of the gem usage:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">'enum'</span>
+<span class="nb">require</span> <span class="s1">'i18n'</span>
+<span class="nb">require</span> <span class="s1">'yaml'</span>
+
+
+<span class="c1"># The enum values definition feature demo:</span>
+<span class="k">class</span> <span class="nc">Side</span> <span class="o">&lt;</span> <span class="no">Enum</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">values</span> <span class="ss">:left</span><span class="p">,</span> <span class="ss">:right</span>
+<span class="k">end</span>
+
+
+<span class="c1"># The safe enums retrieving feature demo:</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">enum</span><span class="p">(</span><span class="ss">:left</span><span class="p">)</span> <span class="c1"># =&gt; "left"</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">enum</span><span class="p">(</span><span class="s1">'left'</span><span class="p">)</span> <span class="c1"># =&gt; "left"</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">enum</span><span class="p">(</span><span class="ss">:invalid</span><span class="p">)</span> <span class="c1"># =&gt; Enum::TokenNotFoundError: token 'invalid'' not found in the enum Side</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">enum</span><span class="p">(</span><span class="s1">'invalid'</span><span class="p">)</span> <span class="c1"># =&gt; Enum::TokenNotFoundError: token 'invalid'' not found in the enum Side</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">all</span> <span class="c1"># =&gt; ['left', 'rigth', 'whole']</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">enums</span><span class="p">(</span><span class="ss">:left</span><span class="p">,</span> <span class="ss">:right</span><span class="p">)</span> <span class="c1"># =&gt; ['left', 'right']</span>
+
+
+<span class="c1"># The I18n feature demo:</span>
+<span class="no">I18n</span><span class="p">.</span><span class="nf">enforce_available_locales</span> <span class="o">=</span> <span class="kp">false</span>
+
+<span class="c1"># This is the content of yaml file that holds the enum values translations:</span>
+<span class="n">translations</span> <span class="o">=</span> <span class="o">&lt;&lt;-</span><span class="no">YAML</span><span class="sh">
+enum:
+  Side:
+    left: 'Left'
+    right: 'Right'
+</span><span class="no">YAML</span>
+
+<span class="no">I18n</span><span class="p">.</span><span class="nf">backend</span><span class="p">.</span><span class="nf">store_translations</span><span class="p">(</span><span class="no">I18n</span><span class="p">.</span><span class="nf">locale</span><span class="p">,</span> <span class="no">YAML</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">translations</span><span class="p">))</span>
+
+<span class="no">Side</span><span class="p">.</span><span class="nf">name</span><span class="p">(</span><span class="ss">:left</span><span class="p">)</span> <span class="c1"># =&gt; "Left"</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">name</span><span class="p">(</span><span class="s1">'left'</span><span class="p">)</span> <span class="c1"># =&gt; "Left"</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">name</span><span class="p">(</span><span class="ss">:right</span><span class="p">)</span> <span class="c1"># =&gt; "Right"</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">name</span><span class="p">(</span><span class="s1">'right'</span><span class="p">)</span> <span class="c1"># =&gt; "Right"</span>
+<span class="no">Side</span><span class="p">.</span><span class="nf">name</span><span class="p">(</span><span class="ss">:invalid</span><span class="p">)</span> <span class="c1"># =&gt; Enum::TokenNotFoundError: token 'invalid'' not found in the enum Side</span>
+
+<span class="c1"># The enum values comparison feature demo:</span>
+<span class="k">class</span> <span class="nc">WeekDay</span> <span class="o">&lt;</span> <span class="no">Enum</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">values</span> <span class="ss">:sunday</span><span class="p">,</span> <span class="ss">:monday</span><span class="p">,</span> <span class="ss">:tuesday</span><span class="p">,</span> <span class="ss">:wednesday</span><span class="p">,</span> <span class="ss">:thusday</span><span class="p">,</span> <span class="ss">:friday</span><span class="p">,</span> <span class="ss">:saturday</span>
+<span class="k">end</span>
+<span class="no">WeekDay</span><span class="p">.</span><span class="nf">index</span><span class="p">(</span><span class="ss">:sunday</span><span class="p">)</span> <span class="o">==</span> <span class="no">Date</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">).</span><span class="nf">wday</span> <span class="c1"># =&gt; true</span>
+<span class="no">WeekDay</span><span class="p">.</span><span class="nf">index</span><span class="p">(</span><span class="ss">:monday</span><span class="p">)</span> <span class="c1"># =&gt; 1</span>
+<span class="no">WeekDay</span><span class="p">.</span><span class="nf">indexes</span> <span class="c1"># =&gt; [0, 1, 2, 3, 4, 5, 6]</span></code></pre></figure>
+
+<blockquote>
+  <p>Note: the I18n functionality is optional. So If you don’t have installed I18n in your project NameError exception will be raised on the name method call.</p>
+</blockquote>
+
+<p>As a bonus we introduced safe setters and convenient predicates in order to manipulate the enum values in a Ruby object:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Table</span>
+  <span class="kp">extend</span> <span class="no">Enum</span><span class="o">::</span><span class="no">Predicates</span>
+
+  <span class="nb">attr_accessor</span> <span class="ss">:side</span>
+
+  <span class="n">enumerize</span> <span class="ss">:side</span><span class="p">,</span> <span class="no">Side</span>
+<span class="k">end</span>
+
+<span class="vi">@table</span> <span class="o">=</span> <span class="no">Table</span><span class="p">.</span><span class="nf">new</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="ss">:left</span><span class="p">)</span> <span class="c1"># =&gt; false</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span> <span class="c1"># =&gt; false</span>
+
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side</span> <span class="o">=</span> <span class="no">Side</span><span class="p">.</span><span class="nf">enum</span><span class="p">(</span><span class="ss">:left</span><span class="p">)</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="ss">:left</span><span class="p">)</span> <span class="c1"># =&gt; true</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="ss">:right</span><span class="p">)</span> <span class="c1"># =&gt; false</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span> <span class="c1"># =&gt; false</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="ss">:invalid</span><span class="p">)</span> <span class="c1"># =&gt; Enum::TokenNotFoundError: token 'invalid'' not found in the enum Side</span>
+
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side</span> <span class="o">=</span> <span class="s1">'invalid'</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span> <span class="c1"># =&gt; false</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_is?</span><span class="p">(</span><span class="ss">:left</span><span class="p">)</span> <span class="c1"># =&gt; Enum::TokenNotFoundError: token 'invalid'' not found in the enum Side</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_any?</span><span class="p">(</span><span class="ss">:left</span><span class="p">,</span> <span class="ss">:right</span><span class="p">)</span> <span class="c1"># =&gt; true</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_any?</span><span class="p">(</span><span class="ss">:right</span><span class="p">)</span> <span class="c1"># =&gt; false</span>
+<span class="vi">@table</span><span class="p">.</span><span class="nf">side_any?</span><span class="p">(</span><span class="ss">:invalid</span><span class="p">,</span> <span class="ss">:left</span><span class="p">)</span> <span class="c1"># =&gt; Enum::TokenNotFoundError: token 'invalid'' not found in the enum Side</span></code></pre></figure>
+
+<blockquote>
+  <p>If you pass to the predicate <code class="highlighter-rouge">nil</code> or have <code class="highlighter-rouge">nil</code> value in the field the result will be always <code class="highlighter-rouge">false</code>. If you want to check that the field is <code class="highlighter-rouge">nil</code> just use Ruby’s standard method <code class="highlighter-rouge">nil?</code>.</p>
+</blockquote>
+
+<h2 id="alternatives">Alternatives</h2>
+
+<p>There are many other gems that tried to implement Ruby enums but as I already said no one of them suites us. And there are many reasons why. I won’t review them in this post separately but, in two words, I can say here that all of them violates the rule - <strong>enums should behave like constants</strong>. Some of the implementations break other rules of the enum definition of have redundancy.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In our gem we tried to follow the enum definition rules and having easy solution to use and maintain. I think we managed to do this. If you have any feedback please comment, post issues in <a href="https://github.com/mezuka/enum/issues">github</a> and your pull requests are always welcome.</p>
+:ET

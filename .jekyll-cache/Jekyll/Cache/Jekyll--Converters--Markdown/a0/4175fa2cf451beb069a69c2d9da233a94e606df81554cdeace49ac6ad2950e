@@ -1,0 +1,43 @@
+I"œ<h2 id="problem">Problem</h2>
+
+<p>For example you make ajax request with json format to the server. And assume we have to render some partial in the controller or view and return it in json object. In the view you may have code like this:</p>
+
+<ul>
+  <li><em>Rails3 view</em></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">&lt;</span><span class="sx">%= {:form =</span><span class="o">&gt;</span> <span class="n">render</span><span class="p">(</span><span class="s1">'form'</span><span class="p">)}.</span><span class="nf">to_json</span> <span class="sx">%&gt;</span></code></pre></figure>
+
+<p>In the Rails 2 you could pass format as option in reder function and it fixed problem:</p>
+
+<ul>
+  <li><em>Rails2 view</em></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">&lt;</span><span class="sx">%= {:form =</span><span class="o">&gt;</span> <span class="n">render</span><span class="p">(</span><span class="ss">:partial</span> <span class="o">=&gt;</span> <span class="s1">'form'</span><span class="p">,</span> <span class="ss">:format</span> <span class="o">=&gt;</span> <span class="ss">:html</span><span class="p">)}.</span><span class="nf">to_json</span> <span class="sx">%&gt;</span></code></pre></figure>
+
+<p>But in Rails 2 this is not working. But there is a fix this issue and it merged to the master. So, in rails 4 it indeed will work and signature for method will be like this:</p>
+
+<ul>
+  <li><em>Rails4 view</em></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">&lt;</span><span class="sx">%= {:form =</span><span class="o">&gt;</span> <span class="n">render</span><span class="p">(</span><span class="ss">:partial</span> <span class="o">=&gt;</span> <span class="s1">'form'</span><span class="p">,</span> <span class="ss">:formats</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="ss">:html</span><span class="p">])}.</span><span class="nf">to_json</span> <span class="sx">%&gt;</span></code></pre></figure>
+
+<p>To enable this feature in Rails 3 you can make monkey patch: just create new file <em>config/initializers/renderer.rb</em> in your application and paste there this code:</p>
+
+<ul>
+  <li><em>Mokeypatch for Rails3</em></li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ActionView::PartialRenderer</span>
+  <span class="kp">private</span>
+  <span class="k">def</span> <span class="nf">setup_with_formats</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+    <span class="n">formats</span> <span class="o">=</span> <span class="no">Array</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="ss">:formats</span><span class="p">])</span>
+    <span class="vi">@lookup_context</span><span class="p">.</span><span class="nf">formats</span> <span class="o">=</span> <span class="n">formats</span> <span class="o">|</span> <span class="vi">@lookup_context</span><span class="p">.</span><span class="nf">formats</span>
+    <span class="n">setup_without_formats</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">alias_method_chain</span> <span class="ss">:setup</span><span class="p">,</span> <span class="ss">:formats</span>
+<span class="k">end</span></code></pre></figure>
+:ET

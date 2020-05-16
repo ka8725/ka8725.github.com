@@ -1,0 +1,68 @@
+I"� <p>In this post I will show you how it can be confusing to have method which accepts boolean variables. This approach which is a little bit complicated but much robust and can be acceptable in applications with high requirements of security.</p>
+
+<h2 id="the-problem">The problem</h2>
+
+<p>Say we have a method <code class="highlighter-rouge">destroy</code> which accepts boolean argument <code class="highlighter-rouge">forced</code> which says how to destroy object:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="n">forced</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
+  <span class="n">forced</span> <span class="p">?</span> <span class="n">forced_destroy</span> <span class="p">:</span> <span class="n">soft_destroy</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>And this is a version of simplified version of <code class="highlighter-rouge">forced_destroy</code> and <code class="highlighter-rouge">soft_destroy</code> methods respectively:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">forced_destroy</span>
+  <span class="nb">puts</span> <span class="s1">'forced destroy...'</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">soft_destroy</span>
+  <span class="nb">puts</span> <span class="s1">'soft destroy...'</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>For the first glance this code looks precise and doesn’t have any pitfalls or side effects. We can use it rather simple and have expected behavior what we want from this method:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">&gt;&gt;</span> <span class="n">destroy</span><span class="p">(</span><span class="kp">true</span><span class="p">)</span>  <span class="c1"># =&gt; forced destroy...</span>
+<span class="o">&gt;&gt;</span> <span class="n">destroy</span><span class="p">(</span><span class="kp">false</span><span class="p">)</span> <span class="c1"># =&gt; soft destroy...</span></code></pre></figure>
+
+<p>But really because of typeless <em>Ruby</em> nature we can pass in the method argument of any type. And knowing that <em>Ruby</em> treats <code class="highlighter-rouge">nil</code> as <code class="highlighter-rouge">false</code> and any other value as <code class="highlighter-rouge">true</code> we will have this behavior:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="o">&gt;&gt;</span> <span class="n">destroy</span><span class="p">(</span><span class="ss">:forced</span><span class="p">)</span> <span class="c1"># =&gt; forced destroy...</span>
+<span class="o">&gt;&gt;</span> <span class="n">destroy</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span>     <span class="c1"># =&gt; soft destroy...</span>
+<span class="o">&gt;&gt;</span> <span class="n">destroy</span><span class="p">(</span><span class="ss">:soft</span><span class="p">)</span>   <span class="c1"># =&gt; forced destroy...</span></code></pre></figure>
+
+<p>So here is a Ruby side efect or feature (who knows). On the one hand it’s convenient to have this behavior - we can have readable code (look at <code class="highlighter-rouge">destroy(:forced)</code>) but on the other hand we can’t pass there human <code class="highlighter-rouge">:soft</code> argument. Actually it’s possible but as you see we have unexpected behavior for human. Also if you prefer to use this Ruby feature you have to be prepared for changes - what will be if <code class="highlighter-rouge">destroy</code> method implementation will be changed in the feature to something like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="n">forced</span> <span class="o">=</span> <span class="kp">false</span><span class="p">)</span>
+  <span class="n">forced</span> <span class="o">==</span> <span class="kp">true</span> <span class="p">?</span> <span class="n">forced_destroy</span> <span class="p">:</span> <span class="n">soft_destroy</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The code where you do call <code class="highlighter-rouge">destroy(:forced)</code> will fail and it can be in many cases. Some time ago I saw that this ability was used in <code class="highlighter-rouge">ActiveRecord</code> in some internals feature. It’s really confusing when you see it for the first time. Refuse this approach.</p>
+
+<p>But the code <code class="highlighter-rouge">destroy(true)</code> or <code class="highlighter-rouge">destroy(false)</code> looks confusing. What does mean <code class="highlighter-rouge">true</code> or <code class="highlighter-rouge">false</code> here? To be completely sure you have to see method documentation or see the method  implementation every time when you are going to use this method. It looks like boring way.</p>
+
+<h2 id="escape">Escape</h2>
+
+<p>I see here only one solution how to avoid pitfalls and misconceptions - use Hash options:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:forced</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">})</span>
+  <span class="c1"># set to false if there is no passed `:forced` option and translate it to the boolean variable</span>
+  <span class="n">forced</span> <span class="o">=</span> <span class="n">options</span><span class="p">.</span><span class="nf">fetch</span><span class="p">(</span><span class="ss">:forced</span><span class="p">)</span> <span class="p">{</span> <span class="kp">false</span> <span class="p">}</span>
+
+  <span class="k">raise</span> <span class="no">ArgumentError</span><span class="p">,</span> <span class="s1">':forced option should be true or false'</span> <span class="k">unless</span> <span class="p">[</span><span class="kp">true</span><span class="p">,</span> <span class="kp">false</span><span class="p">].</span><span class="nf">include?</span><span class="p">(</span><span class="n">forced</span><span class="p">)</span>
+
+  <span class="n">forced</span> <span class="p">?</span> <span class="n">forced_destroy</span> <span class="p">:</span> <span class="n">soft_destroy</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>On this way we can call method by human readable code: <code class="highlighter-rouge">destroy(:forced =&gt; true)</code> or <code class="highlighter-rouge">destroy(:forced =&gt; false)</code>. To avoid collisions I filtered option <code class="highlighter-rouge">:forced</code> to accept only <code class="highlighter-rouge">true</code> or <code class="highlighter-rouge">false</code>. That’s why we are going to replace typeless language with language with static types like Java. If you have code like above in your application it’s a sign to refactor it or change application architecture.</p>
+
+<p>So the preferable variant is this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span><span class="ss">:forced</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">})</span>
+  <span class="n">options</span><span class="p">[</span><span class="ss">:forced</span><span class="p">]</span> <span class="p">?</span> <span class="n">forced_destroy</span> <span class="p">:</span> <span class="n">soft_destroy</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>It looks like the first variant but method calls are more readable: <code class="highlighter-rouge">destroy(:forced =&gt; true)</code> or <code class="highlighter-rouge">destroy(:forced =&gt; false)</code>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Just remember about boolean arguments in Ruby and their side effects. Write concise readable code and someone will thank you ever for it.</p>
+:ET

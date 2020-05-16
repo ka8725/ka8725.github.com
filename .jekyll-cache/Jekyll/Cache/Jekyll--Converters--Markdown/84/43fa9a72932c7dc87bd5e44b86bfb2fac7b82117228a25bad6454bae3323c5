@@ -1,0 +1,52 @@
+I"�<p>In Rails 2 in migrations there were only 2 methods: <code class="highlighter-rouge">up</code> and <code class="highlighter-rouge">down</code>. They are
+called on running migrations up and down respectively with rake tasks <code class="highlighter-rouge">rake db:migrate</code>
+and <code class="highlighter-rouge">rake db:rollback</code>. In <code class="highlighter-rouge">up</code> method of migration definition you had to write
+code which is called only on running migration forward and in down - the code
+which is called only on rolling migration back. For example, if you create table
+on up you had to drop it manually on rolling back. Rails 3 produced us great method
+<code class="highlighter-rouge">change</code> which allowed us to write there code which creates a table and drops the
+table automatically on rolling migration back. This really great step forward
+and thankfully it’s exist in Rails 4 still. But unfortunately there was a problem - you didn’t
+have opportunity to say “don’t run this peace of code on down but run this
+only on up”. So the solution was just to use old syntax. Since Rails 4 has released
+there is a feature to fix this situation.</p>
+
+<h2 id="reversible">Reversible</h2>
+
+<p>How would you write migration which should add new column on up and
+fill all records in table only on up, and only delete this column on
+down? I bet that in Rails 3 you would write it like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">up</span>
+  <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:location</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="no">User</span><span class="p">.</span><span class="nf">update_all</span><span class="p">(</span><span class="ss">location: </span><span class="s1">'Minsk'</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">down</span>
+  <span class="n">remove_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:location</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>You had to avoid using <code class="highlighter-rouge">change</code> method which allows to save some time.
+For example, if you didn’t need to update column value immediately
+after it’s adding you would cut this code down to like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">change</span>
+  <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:location</span><span class="p">,</span> <span class="ss">:string</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>And that’s it. On up it will add column to table and remove it on
+down. Much less code and it’s a profit.</p>
+
+<p>Rails 4 provides us one more useful way to write what we need in one
+place:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">change</span>
+  <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:location</span><span class="p">,</span> <span class="ss">:string</span>
+  <span class="n">reversible</span> <span class="k">do</span> <span class="o">|</span><span class="n">direction</span><span class="o">|</span>
+    <span class="n">direction</span><span class="p">.</span><span class="nf">up</span> <span class="p">{</span> <span class="no">User</span><span class="p">.</span><span class="nf">update_all</span><span class="p">(</span><span class="ss">location: </span><span class="s1">'Minsk'</span><span class="p">)</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Check out the original
+<a href="http://api.rubyonrails.org/classes/ActiveRecord/Migration.html#method-i-reversible">documentation</a>.</p>
+:ET

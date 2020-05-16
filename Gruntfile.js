@@ -63,7 +63,7 @@ module.exports = function(grunt) {
     watch: {
       less: {
         files: [
-          'assets/less/*.less'
+          'assets/less/**/*.less'
         ],
         tasks: ['recess']
       },

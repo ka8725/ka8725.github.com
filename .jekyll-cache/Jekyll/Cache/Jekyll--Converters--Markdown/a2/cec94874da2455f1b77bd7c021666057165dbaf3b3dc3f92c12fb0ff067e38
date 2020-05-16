@@ -1,0 +1,189 @@
+I"�><p>Code readability is a very critical parameter for any project maintainability.
+Serious business needs reacting to failures and fixing bugs as soon as possible.
+That allows not to lose old clients and make the service more attractive for new ones.</p>
+
+<p>But how to improve readability? One might think that installing, configuring, and following automatic tools
+ such as <a href="https://github.com/rubocop-hq/rubocop">Rubocop</a> or <a href="https://github.com/troessner/reek">Reek</a>
+ is more than enough. Indeed, these tools are great. They are highly recommended and really help a lot.
+ Unfortunately, they are not a silver bullet. They cannot eliminate one important factor - distance to natural language.
+ As closer code to natural language as better its readability. This is the measure everyone should strive to.</p>
+
+<p>Languages that support higher-order functions has
+a nice concept called closures. Closures are just functions (anonymous or not) that are received by other functions as arguments.
+The receiving functions can optionally call the passed closures whenever it’s needed. An interesting fact is that closures are bounded to
+the context from which they are passed. That allows interfering into executing of distant contexts.</p>
+
+<blockquote>
+  <p>If that definition sounds cumbersome and scary, I recommend to look into <a href="https://www.w3schools.com/js/js_function_closures.asp">this</a> introduction
+by an example based on JavaScript.</p>
+</blockquote>
+
+<p>Ruby has functions equivalent called methods. Even though Ruby doesn’t allow having method names as arguments,
+it’s possible to implement closures.</p>
+
+<p>Check out this example demonstrating that methods cannot be used as arguments:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">foo</span>
+  <span class="nb">puts</span> <span class="s1">'hello from foo'</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+  <span class="n">f</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="n">bar</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span> <span class="c1"># =&gt; NoMethodError (undefined method `f' for main:Object)</span>
+</code></pre></div></div>
+
+<p>Ruby has <a href="https://www.rubyguides.com/2016/02/ruby-procs-and-lambdas/">lambdas and procs</a> to implement the closures concept.</p>
+
+<p>Moving further, a method is an object as <a href="https://www.ruby-lang.org/en/about/">anything else</a>.
+That means it’s possible getting an object that represents a method. Here is how to do that:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">method</span><span class="p">(</span><span class="ss">:foo</span><span class="p">)</span> <span class="c1"># =&gt; #&lt;Method: main.foo&gt;</span>
+</code></pre></div></div>
+
+<p>But the example above will still not work:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bar</span><span class="p">(</span><span class="nb">method</span><span class="p">(</span><span class="ss">:foo</span><span class="p">))</span> <span class="c1"># =&gt; NoMethodError (undefined method `f' for main:Object)</span>
+</code></pre></div></div>
+
+<p>Execution of lambdas, procs, and <code class="highlighter-rouge">Method</code> objects with <code class="highlighter-rouge">()</code> is not possible.
+They <code class="highlighter-rouge">#call</code> method for that. Applying a fix with that knowledge:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+  <span class="n">f</span><span class="p">.</span><span class="nf">call</span><span class="p">()</span>
+<span class="k">end</span>
+<span class="n">bar</span><span class="p">(</span><span class="nb">method</span><span class="p">(</span><span class="ss">:foo</span><span class="p">))</span> <span class="c1"># =&gt; hello from foo</span>
+</code></pre></div></div>
+
+<p>Ta-da! Finally, the closure works!</p>
+
+<p>By the way, there is a shorthand for <code class="highlighter-rouge">f.call()</code>, that’s <code class="highlighter-rouge">f.()</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+  <span class="n">f</span><span class="o">.</span><span class="p">()</span>
+<span class="k">end</span>
+<span class="n">bar</span><span class="p">(</span><span class="nb">method</span><span class="p">(</span><span class="ss">:foo</span><span class="p">))</span> <span class="c1"># =&gt; hello from foo</span>
+</code></pre></div></div>
+
+<p>It’s rare in commercial development, but often used in popular open sourced projects.</p>
+
+<p>Enough theory. Switching into real work. Assume, we need to write an application that sends text messages
+to particular recipients. Look at the following code one might come up with implementing that idea:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">User</span> <span class="o">=</span> <span class="no">Struct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:phone</span><span class="p">,</span> <span class="ss">:active</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">SMSGateway</span>
+  <span class="c1"># @param phone [String]</span>
+  <span class="c1"># @param message [String]</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">send_message</span><span class="p">(</span><span class="n">phone</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="nb">puts</span> <span class="s2">"Hello </span><span class="si">#{</span><span class="n">phone</span><span class="si">}</span><span class="s2">, </span><span class="si">#{</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">MessageService</span>
+  <span class="c1"># @param message [String]</span>
+  <span class="c1"># @param recipients [Array&lt;User&gt;]</span>
+  <span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">recipients</span><span class="p">)</span>
+    <span class="n">recipients</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">recipient</span><span class="o">|</span>
+      <span class="no">SMSGateway</span><span class="p">.</span><span class="nf">send_message</span><span class="p">(</span><span class="n">recipient</span><span class="p">.</span><span class="nf">phone</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> <span class="k">if</span> <span class="n">recipient</span><span class="p">.</span><span class="nf">active</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">recipients</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'+12222222222'</span><span class="p">,</span> <span class="kp">true</span><span class="p">),</span>
+  <span class="no">User</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="s1">'+13333333333'</span><span class="p">,</span> <span class="kp">false</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">service</span> <span class="o">=</span> <span class="no">MessageService</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">service</span><span class="p">.</span><span class="nf">broadcast</span><span class="p">(</span><span class="s1">'have a good day!'</span><span class="p">,</span> <span class="n">recipients</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Now, picture how humans read the code. I will speak from myself. In order to grasp the code idea fast,
+I start from learning the application programming interface (API) first.
+I don’t start from nitty-gritty details. That works at least for me and I find this way to learn the code very useful.</p>
+
+<p>So, I begin from these two lines:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">service</span> <span class="o">=</span> <span class="no">MessageService</span><span class="p">.</span><span class="nf">new</span>
+<span class="n">service</span><span class="p">.</span><span class="nf">broadcast</span><span class="p">(</span><span class="s1">'have a good day!'</span><span class="p">,</span> <span class="n">recipients</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>I see the API immediately. The <code class="highlighter-rouge">MessageService#broadcast</code> method is our “entry point”. At this point
+it’s already clear what it does intuitively. That’s because the method has a good name.</p>
+
+<blockquote>
+  <p>It’s not always like that, unfortunately.
+Imagine, if someone named this method as <code class="highlighter-rouge">call</code> or <code class="highlighter-rouge">perform</code>, then its responsibility would not be so obvious.
+In practice, there are examples that are completely confusing and even worse than obscured <code class="highlighter-rouge">call/perform/whatever</code>.
+API and naming are very important! Feel that by this example.</p>
+</blockquote>
+
+<p>Then I want to learn more details about <code class="highlighter-rouge">#broadcast</code> and jump into its implementation:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">recipients</span><span class="p">)</span>
+  <span class="n">recipients</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">recipient</span><span class="o">|</span>
+    <span class="no">SMSGateway</span><span class="p">.</span><span class="nf">send_message</span><span class="p">(</span><span class="n">recipient</span><span class="p">.</span><span class="nf">phone</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> <span class="k">if</span> <span class="n">recipient</span><span class="p">.</span><span class="nf">active</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>It’s pretty straightforward, but nevertheless it already forces to stop my eyes for a while and think.
+I need to keep at least 3 variables in my memory to understand this code. For this particular code, it’s not a problem.
+But in the real world a method like this is not a 3 lines of code, even though it lays on the very top of API.
+It’s usually a huge piece of … (you know what I mean, right?)
+Therefore, the question of its improvement is of paramount importance.</p>
+
+<p>Here is my solution that makes it better using the theory above:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">MessageService</span>
+  <span class="c1"># @param message [String]</span>
+  <span class="c1"># @param recipients [Array&lt;User&gt;]</span>
+  <span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">recipients</span><span class="p">)</span>
+    <span class="n">recipients</span><span class="p">.</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="n">send_message</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="c1"># @param message [String]</span>
+  <span class="c1"># @return [Proc] a closure sends the given message to the recipient</span>
+  <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="p">(</span><span class="n">recipient</span><span class="p">)</span> <span class="p">{</span> <span class="no">SMSGateway</span><span class="p">.</span><span class="nf">send_message</span><span class="p">(</span><span class="n">recipient</span><span class="p">.</span><span class="nf">phone</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span> <span class="k">if</span> <span class="n">recipient</span><span class="p">.</span><span class="nf">active</span><span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>Working example is located <a href="https://gist.github.com/ka8725/4fa4e94b059a9b1f7c4fe5393fa7e850">here</a>.</p>
+</blockquote>
+
+<p>I move all low level details down to <code class="highlighter-rouge">#send_message</code> and use another transition from method to proc (that’s what <code class="highlighter-rouge">&amp;</code> does).
+That allows me using the method as a block expected by <code class="highlighter-rouge">each</code>.</p>
+
+<p><code class="highlighter-rouge">#send_message</code> returns a closure in the flesh of proc constructed with <code class="highlighter-rouge">-&gt;</code> shorthand.
+Consider it as a deferred message send to a <code class="highlighter-rouge">recipient</code> that comes from the <code class="highlighter-rouge">recipients.each</code> iterator.</p>
+
+<blockquote>
+  <p>Read more about the “method to proc” technique <a href="https://www.brianstorti.com/understanding-ruby-idiom-map-with-symbol/">here</a>.</p>
+</blockquote>
+
+<p>Agree or not, but the resulted <code class="highlighter-rouge">#broadcast</code> method implementation is a way more readable than the previous version:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># @param message [String]</span>
+<span class="c1"># @param recipients [Array&lt;User&gt;]</span>
+<span class="k">def</span> <span class="nf">broadcast</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">recipients</span><span class="p">)</span>
+  <span class="n">recipients</span><span class="p">.</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="n">send_message</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>When I read it I see immediately what’s is happening
+just using my intuition and natural language knowledge. If I need more details I can jump into <code class="highlighter-rouge">#send_message</code>
+and learn even more details. To traverse a bug stopping at this point could be enough.
+This point doesn’t have a lot details anymore. Hence, it’s easier and faster to spot a bug.</p>
+
+<p>As a bonus, the method separation gives an opportunity documenting it and outlining types for
+params and returned values. Lack of types that draw a strict API is another pain in Ruby
+and we should do everything to improve it, I believe.</p>
+
+<p>Happy complexity relief in your Ruby code!</p>
+:ET

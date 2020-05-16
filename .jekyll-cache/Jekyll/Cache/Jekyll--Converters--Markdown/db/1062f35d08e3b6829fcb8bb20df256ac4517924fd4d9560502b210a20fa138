@@ -1,0 +1,93 @@
+I"g<h2 id="brief-description">Brief description</h2>
+
+<p><a href="http://www.locomotivecms.com/">Locomotive CMS</a> is open source content management system which based on <strong>Ruby On Rails</strong> framework.</p>
+
+<p><img src="/images/loco.jpg" alt="Locomotive cms - open source content management system" /></p>
+
+<p>It uses <strong>MongoDB</strong> for backend and compatible for deployement with all <strong>rails</strong> web-servers such as: unicorn, passenger or puma and etc. It provides configs for connection with sendgrid and s3, and also there is a <a href="https://github.com/locomotivecms/locomotive-heroku">gem</a> wich allows <a href="http://doc.locomotivecms.com/installation/heroku">deploy</a> loco to <a href="http://heroku.com">Heroku</a>, so this means that you are able to have absolutely free web site in the internet (certainly not without limitations as I have alreay said <a href="http://railsguides.net/2012/03/19/deploy-ruby-on-rails-3-application-to-free-hosting">here</a>)</p>
+
+<h2 id="features">Features</h2>
+
+<ul>
+  <li>Provides multisite content management system</li>
+</ul>
+
+<p>This means that you are able to create many sites within one admin space, give them domains and manage content from one place - loco’s admin.</p>
+
+<ul>
+  <li>Internationalized admin interface</li>
+</ul>
+
+<p>English, Brazilian Portuguese, Norwegian, Estonian, German, Italian, Spanish, French, Dutch and Russian languages are available for now.</p>
+
+<ul>
+  <li>Ability to define models with custom fields and associations between them</li>
+</ul>
+
+<p>It’s the main benefit of the system for my mind. You are able to define model this fields types: text fields for text area, text field for text inputs (for text less than 255 letters), select, date, checkbox, and file (!!!) (based on carriarwave gem). There are available associations between models: belongs_to, has many, many to many. You define model in the UI interface and it doesn’t require developer at all.</p>
+
+<p><img src="/images/loco_fields.jpg" alt="Defining models in locomotive cms admin" /></p>
+
+<ul>
+  <li>Ability to create entities for your models</li>
+</ul>
+
+<p>After defining model you can add entities for this models and also associate another entities according your defined associated models.</p>
+
+<ul>
+  <li>Simple and powerful visual editor for site content</li>
+</ul>
+
+<p>It uses nice wysiwyg <a href="http://www.tinymce.com/">TinyMCE editor</a></p>
+
+<p><img src="/images/loco_editor.jpg" alt="wysiwyg editor locomotive cms" /></p>
+
+<ul>
+  <li>Inline iditiing</li>
+</ul>
+
+<p>You are able to edit content for site even on the frontend. You don’t have to go to admin to change content for the site - just click on inline editor link and that’s it!</p>
+
+<ul>
+  <li>Supports cloud systems</li>
+</ul>
+
+<p>As I have already said it supports out of box cloud systems like Amazon s3, Heroku, MongoHQ, SendGrid.</p>
+
+<ul>
+  <li>Liquid templates</li>
+</ul>
+
+<p>With liquid template you are able to show dynamic content with your defined model entities. Liquid is quite simple language and it doesn’t require a lot of programming knowledge. I’m sure every html coder can use it!</p>
+
+<ul>
+  <li>SEO tags out of the box</li>
+</ul>
+
+<p>Just paste liquid tag in the layout or specific page and it will generate SEO tags automatically!</p>
+
+<ul>
+  <li>Layout system</li>
+</ul>
+
+<p>Just define your main layout once ond inherit another pages from this one and replace needed blocks. Very simple and powerful!</p>
+
+<ul>
+  <li>Google analitic out of the box</li>
+  <li>Pagination out of the box</li>
+  <li>Content localization</li>
+  <li>Navigation out of the box</li>
+</ul>
+
+<p>There is a liquid template which generate main menus for site automatically.</p>
+
+<ul>
+  <li>API</li>
+</ul>
+
+<p>Api provides communicate admin with frontend and this allow you to create your forms in the frontend - great!</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I’m using this content management system for <a href="http://new.private-tutor.ru/">one of my projects</a> and it is awesome. I’ve fallen in love Locomotive CMS - it’s exactly that what I’ve been looking for ages. No doubt it is the best content management system for today. To get started with it after installation I would recomend to read <a href="http://www.tommyblue.it/2011/02/28/how-to-build-a-website-with-locomotive-cms-from-scratch">this post</a>, it describes steps for beginners. Unfortunetely there are not so many information (documentation) as I would like and sometimes I’m reading locomotive cms sources to understand how it works, but you have me ;) I will be glad to see your questions and I will answer for them with pleasure. Thanks for reading!</p>
+:ET

@@ -1,0 +1,138 @@
+I"�3<p>There are a lot of troubles around callbacks in Rails’s ActiveRecord. In common people use callbacks to process complicated operations such as sending emails, creating related models and etc. Basically all of them should be prevented from execution in tests because of slowing down speed and increasing time execution of the tests. It’s not a secret that there are best practices to avoid the problem, but in some cases it’s almost impossible to apply them on your project.
+This post shares idea about how to prevent the callbacks execution if you are in the same situation.</p>
+
+<h2 id="problem">Problem</h2>
+
+<p>Consider the most frequent use case. We have a <code class="highlighter-rouge">User</code> model and we want to send an email on its creation. With callbacks we could have the code like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">after_create</span> <span class="ss">:send_greating_email</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">send_greating_email</span>
+    <span class="no">NotificationSystem</span><span class="p">.</span><span class="nf">send_email</span><span class="p">(</span><span class="ss">:greeting</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Here we have one <code class="highlighter-rouge">after_create</code> callback <code class="highlighter-rouge">:send_greeting_email</code> which will be called after user creation. The callback should send real email to the user.</p>
+
+<blockquote>
+  <p>Note: We are not provided here with the <code class="highlighter-rouge">NotificationSystem</code> class because it is not required to understand the problem.</p>
+</blockquote>
+
+<p>For the first glance there is no problem with this code. But when you start to test it you may have a problem. The problem is that the callback should not be run in all tests except one place where we want to test only the callback. How to do it?</p>
+
+<p>One of possible solution may be to just stub the <code class="highlighter-rouge">send_greeting_email</code> in all tests and <em>unstub</em> it where its call is really needed. Of course this solution will work but it requires some monkey business because you have to place the stubbing code in all test files of your project. This is possible <code class="highlighter-rouge">RSpec</code> code to do it:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
+  <span class="n">before</span><span class="p">(</span><span class="ss">:all</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">any_instance</span><span class="p">.</span><span class="nf">stub</span><span class="p">(</span><span class="ss">:send_greeting_email</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">context</span> <span class="s2">"tests which don't require sending greeting email"</span> <span class="k">do</span>
+    <span class="c1"># Common tests are here</span>
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+
+  <span class="n">context</span> <span class="s1">'testing sending greeting email'</span> <span class="k">do</span>
+    <span class="n">before</span><span class="p">(</span><span class="ss">:all</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">User</span><span class="p">.</span><span class="nf">any_instance</span><span class="p">.</span><span class="nf">unbstub</span><span class="p">(</span><span class="ss">:send_greeting_email</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="c1"># Test sending greeting email</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>And the code in <code class="highlighter-rouge">before(:all)</code> blocks we should include in all tests where we have some manipulations with a <code class="highlighter-rouge">user</code> object. It’s not convenient solution at all and moreover is not robust, because, if you change the callback name, you will have to fix a number of tests. Finally, remember, that we have to test class’s interface but not its internals, but here, stubbing the callback method, we violate the rule.</p>
+
+<p>Another solution may be using <a href="https://github.com/rails/rails-observers">rails observers</a>. Having observers you may disable them in tests as default and enable in desired places. Simple speaking this solution works on some straightforward projects. But the observers bring to problems in debugging process on complicated projects where you have models inheritance, many observers per model and so on. So, this solution is not our case either, because, as you’ve already guessed, we have a complicated project.</p>
+
+<p>So this solution won’t work for us.</p>
+
+<h2 id="trending-solutions">Trending solutions</h2>
+
+<p>The most popular solution is to don’t trap in this problem at all. You may use best practices like <a href="http://blog.codeclimate.com/blog/2012/10/17/7-ways-to-decompose-fat-activerecord-models/">service objects</a> or <a href="http://blog.codeclimate.com/blog/2012/10/17/7-ways-to-decompose-fat-activerecord-models/">form objects</a>. It will allow you to write callbacks’ logic separately from the model. With this approach we won’t have defined callbacks in models at all. Also service or form objects can be tested easily in isolation.</p>
+
+<p>But despite of the fact that this solution doesn’t have minuses there are cases where the appliance may be too expensive. For example, if you already have a big project with a lot of objects and controllers. In this case we will have to write a number of service of form objects and change code in almost all controllers. It is a huge piece of work.</p>
+
+<h2 id="solution-with-skipping-callbacks">Solution with skipping callbacks</h2>
+
+<p>Reasonable solution here can be just turn off all callbacks in tests and turn on them in particular places. We can do it with implementing a switcher in all models and add a condition for all callbacks. The condition will check for the switcher’s status and will pass callbacks if it’s allowed and will deny them if it’s prohibited.</p>
+
+<p>Let’s implement it. Firstly, add switcher to the models with this monkey patch:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">ActiveRecord::Base</span>
+  <span class="n">cattr_accessor</span> <span class="ss">:skip_callbacks</span>
+<span class="k">end</span></code></pre></figure>
+
+<blockquote>
+  <p>Note: the most suitable place for this code in a Rails project is the <code class="highlighter-rouge">config/initializers</code> folder. If you place the code in <code class="highlighter-rouge">config/initializers/active_record.rb</code>, for example, it will run on each application start.</p>
+</blockquote>
+
+<p>On the next step add the condition to the controlled callbacks. Check out how to do it on the <code class="highlighter-rouge">User</code> model:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">after_create</span> <span class="ss">:send_greating_email</span><span class="p">,</span> <span class="ss">unless: :skip_callbacks</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">send_greating_email</span>
+    <span class="no">NotificationSystem</span><span class="p">.</span><span class="nf">send_email</span><span class="p">(</span><span class="ss">:greeting</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>That’s all. Now we can turn on callbacks and turn off them where we need it:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">skip_callbacks</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="no">User</span><span class="p">.</span><span class="nf">create</span> <span class="c1"># callbacks won't be run</span>
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">skip_callbacks</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="no">User</span><span class="p">.</span><span class="nf">create</span> <span class="c1"># callbacks will be run</span></code></pre></figure>
+
+<blockquote>
+  <p>You can find the ready to use example <a href="https://gist.github.com/ka8725/9767340">here</a> and run it with the command <code class="highlighter-rouge">ruby &lt;exmaple&gt;.rb</code>. To run the code you should have installed <em>Rails</em> any version.</p>
+</blockquote>
+
+<p>With this approach you even may write simple switcher for the tests. Place this code to the <code class="highlighter-rouge">spec/spec_helper.rb</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">RSpec</span><span class="p">.</span><span class="nf">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">before</span><span class="p">(</span><span class="ss">:all</span><span class="p">,</span> <span class="ss">callbacks: </span><span class="kp">true</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">skip_callbacks</span> <span class="o">=</span> <span class="kp">false</span>
+  <span class="k">end</span>
+
+  <span class="n">config</span><span class="p">.</span><span class="nf">after</span><span class="p">(</span><span class="ss">:all</span><span class="p">,</span> <span class="ss">callbacks: </span><span class="kp">true</span><span class="p">)</span> <span class="k">do</span>
+    <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">skip_callbacks</span> <span class="o">=</span> <span class="kp">true</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+
+<span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span><span class="p">.</span><span class="nf">skip_callbacks</span> <span class="o">=</span> <span class="kp">true</span></code></pre></figure>
+
+<p>Now you are able to write context or tests with enabled/disabled callbacks in your tests:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">describe</span> <span class="no">User</span> <span class="k">do</span>
+  <span class="c1"># As default callbacks are turned off, so we don't have to switch off them explicitly</span>
+  <span class="n">context</span> <span class="s2">"tests which don't require sending greeting email"</span> <span class="k">do</span>
+    <span class="c1"># Common tests are here</span>
+    <span class="c1"># ...</span>
+  <span class="k">end</span>
+
+  <span class="c1"># These tests should run callbacks - add "callbacks" option with the "true" value</span>
+  <span class="n">context</span> <span class="s1">'testing sending greeting email'</span><span class="p">,</span> <span class="ss">callbacks: </span><span class="kp">true</span> <span class="k">do</span>
+    <span class="c1"># Test sending greeting email</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>If you want you may even turn on/off callbacks for particular model:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">User</span><span class="p">.</span><span class="nf">skip_callbacks</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="no">User</span><span class="p">.</span><span class="nf">create</span>
+<span class="c1"># Callbacks are run</span>
+<span class="no">User</span><span class="p">.</span><span class="nf">skip_callbacks</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="no">User</span><span class="p">.</span><span class="nf">create</span>
+<span class="c1"># Callbacks are not run</span></code></pre></figure>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>If you start a new Rails project think over and avoid using callbacks. Use service objects or form objects instead callbacks. But if your project already started and it has a lot of models the skipping callbacks solution may save you.</p>
+:ET

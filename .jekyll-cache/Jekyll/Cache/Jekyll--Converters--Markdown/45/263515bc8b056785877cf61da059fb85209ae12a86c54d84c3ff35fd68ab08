@@ -1,0 +1,134 @@
+I"�2<p>I’m a fan of minimalistic and clear code. Recently, I’ve faced some repetitive code. I believe, that everyone should keep the code as DRY (don’t repeat yourself) as possible. The code was like this: call to a third party API, check the response and do something if it’s successful, do something else if it’s not. A basic code, but the implementation is boring.</p>
+
+<h3 id="problem">Problem</h3>
+
+<p>To not be verbose and not repeat that I’ve already said, I just provide an example of the code:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">response</span> <span class="o">=</span> <span class="no">StripeCall</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">number: </span><span class="s1">'valid'</span><span class="p">).</span><span class="nf">call</span>
+<span class="k">if</span> <span class="n">response</span><span class="p">.</span><span class="nf">success?</span>
+  <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span>
+<span class="k">else</span>
+  <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Basically, there is no any issue with this code. But, I find it’s not good enough, because there are too many details to be aware of:</p>
+<ul>
+  <li>the two classes for which their public interface is has to be known (it’s <code class="highlighter-rouge">StripeCall</code> and the class of <code class="highlighter-rouge">response</code> object);</li>
+  <li>don’t forget to check the response everywhere where it’s used and use for this <code class="highlighter-rouge">if</code> clause;</li>
+  <li>don’t forget to instantiate the object of <code class="highlighter-rouge">StripeCall</code> class properly (pass <code class="highlighter-rouge">params</code> into <code class="highlighter-rouge">new</code>, but not into <code class="highlighter-rouge">call</code>).</li>
+</ul>
+
+<p>There are may be other objections, but unfortunately I can’t identify them for now. All in all, we are humans and everyone has their own feelings.</p>
+
+<h3 id="solution">Solution</h3>
+
+<p>From my practice, the bad feelings could be eliminated by introduction some sort of DSL. Start with imagination, but don’t go too far away from Ruby syntax (otherwise there will be needed a new language implemented, but I don’t want this today as I’m good with Ruby). Firstly, the problem with keeping in mind the details wether pass <code class="highlighter-rouge">params</code> into <code class="highlighter-rouge">new</code> or <code class="highlighter-rouge">call</code> can be rid of by defining <code class="highlighter-rouge">call</code> method on the class level. Then, knowing that <code class="highlighter-rouge">.call(params)</code> can be replaced with <code class="highlighter-rouge">.(params)</code>, the number of typed symbols is reduced. After this, knowledge from other languages comes into the action: in Javascript there is pretty syntax for processing similar cases like this - <code class="highlighter-rouge">.onSuccess(func1).onError(func2)</code>. I personally find it useful and handy. So, the final solution could be look something like this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">StripeCall</span><span class="o">.</span><span class="p">(</span><span class="ss">number: </span><span class="s1">'valid'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">on_success</span> <span class="p">{</span> <span class="o">|</span><span class="n">response</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span> <span class="p">}</span>
+  <span class="p">.</span><span class="nf">on_error</span> <span class="p">{</span> <span class="o">|</span><span class="n">response</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>Let’s implement it:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># A base class for all classes implement calls to API.</span>
+<span class="k">class</span> <span class="nc">ApiCall</span>
+  <span class="nb">attr_reader</span> <span class="ss">:params</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">call</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="p">).</span><span class="nf">call</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="vi">@params</span> <span class="o">=</span> <span class="n">params</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">call</span>
+    <span class="vi">@res</span> <span class="o">=</span> <span class="n">execute</span>
+    <span class="nb">self</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">on_success</span>
+    <span class="k">yield</span> <span class="vi">@res</span> <span class="k">if</span> <span class="vi">@res</span><span class="p">.</span><span class="nf">success</span>
+    <span class="nb">self</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">on_error</span>
+    <span class="k">yield</span> <span class="vi">@res</span> <span class="k">unless</span> <span class="vi">@res</span><span class="p">.</span><span class="nf">success</span>
+    <span class="nb">self</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">execute</span>
+    <span class="nb">fail</span> <span class="no">NotImplementedError</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># A concrete class implements call to API.</span>
+<span class="k">class</span> <span class="nc">StripeCall</span> <span class="o">&lt;</span> <span class="no">ApiCall</span>
+  <span class="no">Response</span> <span class="o">=</span> <span class="no">Struct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">:success</span><span class="p">,</span> <span class="ss">:body</span><span class="p">)</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">execute</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="ss">:number</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'valid'</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">success</span> <span class="p">?</span> <span class="s1">'ok response'</span> <span class="p">:</span> <span class="s1">'bad response'</span>
+    <span class="no">Response</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Now the code is ready to be played with:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">StripeCall</span><span class="o">.</span><span class="p">(</span><span class="ss">number: </span><span class="s1">'valid'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">on_success</span> <span class="p">{</span> <span class="o">|</span><span class="n">response</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span> <span class="p">}</span>
+  <span class="p">.</span><span class="nf">on_error</span> <span class="p">{</span> <span class="o">|</span><span class="n">response</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span> <span class="p">}</span>
+<span class="c1"># =&gt; ok response</span>
+
+<span class="no">StripeCall</span><span class="o">.</span><span class="p">(</span><span class="ss">number: </span><span class="s1">'invalid'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">on_success</span> <span class="p">{</span> <span class="o">|</span><span class="n">response</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span> <span class="p">}</span>
+  <span class="p">.</span><span class="nf">on_error</span> <span class="p">{</span> <span class="o">|</span><span class="n">response</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span> <span class="p">}</span>
+<span class="c1"># =&gt; bad response</span>
+</code></pre></div></div>
+
+<p>Actually, the definition of blocks everywhere can be annoying. Therefore, is simplified as well:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">handle_success</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+  <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span>
+<span class="k">end</span>
+
+<span class="k">def</span> <span class="nf">handle_error</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+  <span class="nb">puts</span> <span class="n">response</span><span class="p">.</span><span class="nf">body</span>
+<span class="k">end</span>
+
+<span class="no">StripeCall</span><span class="o">.</span><span class="p">(</span><span class="ss">number: </span><span class="s1">'valid'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">on_success</span><span class="p">(</span><span class="o">&amp;</span><span class="nb">method</span><span class="p">(</span><span class="ss">:handle_success</span><span class="p">))</span>
+  <span class="p">.</span><span class="nf">on_error</span><span class="p">(</span><span class="o">&amp;</span><span class="nb">method</span><span class="p">(</span><span class="ss">:handle_error</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Now only 1 class intercase is needed to be memorized - it’s <code class="highlighter-rouge">StripeCall</code>. The lines number is reduced from 6 to 3 (the implementation of conditional branches is not taken into account). But the main strength of such a DSL is that the implementation is hidden and there could be raised and caught exceptions along the way. By catching them and processing in the base class we reduce even more repetitive code.</p>
+
+<p>For example, the call method of the base class could be implemented like this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">ApiCall</span>
+  <span class="o">...</span>
+  <span class="k">def</span> <span class="nf">call</span>
+    <span class="vi">@res</span> <span class="o">=</span> <span class="k">begin</span>
+             <span class="n">execute</span>
+           <span class="k">rescue</span> <span class="no">StripeError</span> <span class="o">=&gt;</span> <span class="n">e</span>
+             <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">success: </span><span class="kp">false</span><span class="p">)</span>
+           <span class="k">end</span>
+    <span class="nb">self</span>
+  <span class="k">end</span>
+  <span class="o">...</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h3 id="conclution">Conclution</h3>
+
+<p>A big project usually has a lot of code (surprise!). Every new line of code increases coupling and introduces complications. It gets harder to maintain and test it, especially when the code doesn’t follow <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a> paradigm, in other words, it’s repetitive. Keep your code clean and don’t hesitate to introduce your DSL to solve YOUR issues. And this way the code will be readable and close to the business domain, what is dreamed by every developer. Happy coding!</p>
+
+:ET

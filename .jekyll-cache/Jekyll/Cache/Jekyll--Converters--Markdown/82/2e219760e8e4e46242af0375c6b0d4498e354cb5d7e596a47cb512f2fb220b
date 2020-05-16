@@ -1,0 +1,88 @@
+I"�$<p>Have you ever write code on <strong>Ruby On Rails</strong> with this use cases?</p>
+
+<ol>
+  <li>Initialize <strong>object</strong> which will contain <strong>result</strong> of the method (<strong>the resulting object</strong>)</li>
+  <li>Change <strong>the resulting object</strong> with some operations and the last operation might be <strong>nil</strong></li>
+  <li>Retun <strong>the resulting object</strong> from the first step. You should do it because you have to return <strong>not</strong> result of last operation <strong>and</strong> object which you manipulated with, ie <strong>the resulting object</strong></li>
+</ol>
+
+<blockquote>
+  <p>There are a lot of ‘the resulting object’ references. Don’t they?</p>
+</blockquote>
+
+<p>If your answer is <em>yes</em> this post is especially for you.</p>
+
+<p>#How to use clean up the code?</p>
+
+<p>Assume that you have method like I have already written above:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">my_action</span>
+  <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item 1'</span>
+  <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item 2'</span>
+  <span class="c1">#…some code like two lines above</span>
+  <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item n'</span>
+  <span class="n">res</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The is a perfect method in Ruby On Rails - <strong>returning</strong>. According <strong>rdoc</strong> we can clean up our code like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">my_action</span>
+  <span class="n">returning</span> <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">do</span>
+    <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item 1'</span>
+    <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item 2'</span>
+    <span class="c1">#…some code like two lines above</span>
+    <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item n'</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>or like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">my_action</span>
+  <span class="n">returning</span> <span class="p">[]</span> <span class="k">do</span> <span class="o">|</span><span class="n">res</span><span class="o">|</span>
+    <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item 1'</span>
+    <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item 2'</span>
+    <span class="c1">#…some code like two lines above</span>
+    <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="s1">'item n'</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The result of method <strong>my_action</strong> will be modified array. It doesn’t matter which approach to use: first or second.
+Choose which one you would like. So this code looks a little bit better then repetitive code which was before.</p>
+
+<h2 id="fail">Fail</h2>
+
+<p>But there is a one <em>pitfall</em>. Let’s try to use it like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">Order</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="c1"># ...</span>
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">search</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">returning</span> <span class="n">orders</span> <span class="o">=</span> <span class="nb">self</span> <span class="k">do</span>
+      <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="p">.</span><span class="nf">scoped</span><span class="p">(</span><span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:service_type</span> <span class="o">=&gt;</span> <span class="n">params</span><span class="p">[</span><span class="ss">:service_type</span><span class="p">]})</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="ss">:service_type</span><span class="p">].</span><span class="nf">present?</span>
+      <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="p">.</span><span class="nf">scoped</span><span class="p">(</span><span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'orders.created_at &gt;= ?'</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_start</span><span class="p">]])</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_start</span><span class="p">].</span><span class="nf">present?</span>
+      <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="p">.</span><span class="nf">scoped</span><span class="p">(</span><span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'orders.created_at &lt;= ?'</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_end</span><span class="p">]])</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_end</span><span class="p">].</span><span class="nf">present?</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+  <span class="c1"># ...</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>You will wonder that it doesn’t work as code like in <em>my_action</em>! We have changed <strong>reference</strong> for local object <strong>orders</strong>. That’s why we will have unexpected result: <strong>self</strong> instead of scope object (assume we passed <strong>:service_type</strong> parameter for instance, ie we called method: <em>Order.search(:service_type =&gt; ‘test’)</em>). We can use method <strong>returning</strong> here, so right code should be this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># ...</span>
+<span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">search</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+  <span class="n">orders</span> <span class="o">=</span> <span class="nb">self</span>
+  <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="p">.</span><span class="nf">scoped</span><span class="p">(</span><span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:service_type</span> <span class="o">=&gt;</span> <span class="n">params</span><span class="p">[</span><span class="ss">:service_type</span><span class="p">]})</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="ss">:service_type</span><span class="p">].</span><span class="nf">present?</span>
+  <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="p">.</span><span class="nf">scoped</span><span class="p">(</span><span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'orders.created_at &gt;= ?'</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_start</span><span class="p">]])</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_start</span><span class="p">].</span><span class="nf">present?</span>
+  <span class="n">orders</span> <span class="o">=</span> <span class="n">orders</span><span class="p">.</span><span class="nf">scoped</span><span class="p">(</span><span class="ss">:conditions</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">'orders.created_at &lt;= ?'</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_end</span><span class="p">]])</span> <span class="k">if</span> <span class="n">params</span><span class="p">[</span><span class="ss">:date_range_end</span><span class="p">].</span><span class="nf">present?</span>
+  <span class="n">orders</span>
+<span class="k">end</span>
+<span class="c1"># ...</span></code></pre></figure>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>So the conclusion of this post is to use method <strong>returning</strong> if you have initialized one object and do some changes and then return it. But be attentive: <strong>If you change reference for returning object to new object you will have result with old one.</strong></p>
+
+<blockquote>
+  <p>Attention! Method returning provided ONLY Ruby On Rails, but NOT Ruby!</p>
+</blockquote>
+:ET

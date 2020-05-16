@@ -2,13 +2,19 @@
 // --------------------------------------------------
 body {
 	font-family: @base-font;
-	color: @text-color;
+	color: @black;
+	word-break: break-word;
 }
 
 // Headings
 // --------------------------------------------------
 h1, h2, h3, h4, h5, h6 {
 	font-family: @heading-font;
+}
+
+h2, h3, h4, h5, h6 {
+	margin-top: 2em;
+	letter-spacing: 0.05em;
 }
 
 // Links
@@ -88,9 +94,9 @@ figcaption {
 // --------------------------------------------------
 blockquote {
 	font-family: @alt-font;
-	font-style: italic;
+	margin-left: -20px;
 	padding-left: 20px;
-	border-left: 8px solid @black;
+	box-shadow: inset 3px 0 0 0 rgba(0, 0, 0, 0.84);
 }
 
 // Footnotes
@@ -120,4 +126,27 @@ li {
 pre {
 	.font(12);
 	overflow-x: auto;
+}
+
+
+// Post
+// --------------------------------------------------
+.entry-content {
+	li {
+		.font-rem(16)
+	}
+	h2 {
+		@media @medium {
+			font-size: 18px;
+		}
+	}
+	h3 {
+		font-size: large;
+		@media @medium {
+			font-size: larger;
+		}
+	}
+	h4 {
+		font-size: initial;
+	}
 }

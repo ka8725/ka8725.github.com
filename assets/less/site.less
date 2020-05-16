@@ -2,14 +2,14 @@
 // --------------------------------------------------
 
 ::-moz-selection { 
-	background-color: lighten(@base-color, 65%); 
-	color: @base-color; 
-	text-shadow: none; 
-}  	
+  background-color: lighten(@base-color, 65%); 
+  color: @base-color; 
+  text-shadow: none; 
+}    
 ::selection { 
-	background-color: lighten(@base-color, 65%); 
-	color: @base-color; 
-	text-shadow: none; 
+  background-color: lighten(@base-color, 65%); 
+  color: @base-color; 
+  text-shadow: none; 
 }
 
 // Webkit Custom Scrollbar
@@ -28,39 +28,39 @@
 ::-webkit-scrollbar-thumb {
     -webkit-border-radius: 10px;
     border-radius: 10px;
-    background: rgba(0,0,0,0.5); 
+    background: rgba(0,0,0,0.15); 
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-	background: rgba(0,0,0,0.2); 
+  background: rgba(0,0,0,0.2); 
 }
 
 // Global Classes
 // --------------------------------------------------
 
 .wrap {
-	margin: 0 auto;
+  margin: 0 auto;
 }
 .all-caps {
-	text-transform: uppercase;
+  text-transform: uppercase;
 }
 .pull-left {
-	float: left;
+  float: left;
 }
 .pull-right {
-	float:right;
+  float:right;
 }
 .unstyled-list {
-	list-style: none;
-	margin-left: 0;
-	padding-left: 0;
-	li {
-		list-style-type: none;
-	}
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+  li {
+    list-style-type: none;
+  }
 }
 
 // Global Transition
 // ---------------------------------------------------
 
 b, i, strong, em, blockquote, p, q, span, figure, img, h1, h2, header, input, a {
-	.transition(all .2s ease);
+  .transition(all .2s ease);
 }

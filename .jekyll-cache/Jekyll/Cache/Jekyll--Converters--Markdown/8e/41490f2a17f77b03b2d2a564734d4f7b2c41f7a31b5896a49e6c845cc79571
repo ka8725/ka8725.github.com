@@ -1,0 +1,182 @@
+I"�L<p>I could not find any worth solution how to test <a href="https://github.com/pluginaweek/state_machine">state machinee</a> with RSpec.
+Until now I met only one solution which is proposed by <a href="http://stackoverflow.com/questions/3047630/rails-how-to-test-state-machine">stackoverflow</a> habitants. But there are some disadvantages of this approach and in this post I will try to explain what are they and how
+to avoid them.</p>
+
+<h2 id="what-we-have">What we have</h2>
+
+<p>Assume that we have to simulate the following automatic gearbox shifting:</p>
+
+<p><img src="/images/gearshift.jpg" alt="Hyundai automatic gearshift" /></p>
+
+<p>This image will show which operations and states we have:</p>
+
+<p><img src="/images/state_machine.jpg" alt="Gearbox levels" /></p>
+
+<p>I use this <a href="https://github.com/pluginaweek/state_machine">state machine gem</a> and RSpec for tests. And this is how looks possible class
+with gearshift levels flow:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">GearBox</span>
+  <span class="n">state_machine</span> <span class="ss">:gear</span><span class="p">,</span> <span class="ss">:initial</span> <span class="o">=&gt;</span> <span class="ss">:P</span> <span class="k">do</span>
+    <span class="n">event</span> <span class="ss">:switch_to_r</span> <span class="k">do</span>
+      <span class="n">transition</span> <span class="p">[</span><span class="ss">:P</span><span class="p">,</span> <span class="ss">:N</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="ss">:R</span>
+    <span class="k">end</span>
+
+    <span class="n">event</span> <span class="ss">:switch_to_n</span> <span class="k">do</span>
+      <span class="n">transition</span> <span class="p">[</span><span class="ss">:R</span><span class="p">,</span> <span class="ss">:D</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="ss">:N</span>
+    <span class="k">end</span>
+
+    <span class="n">event</span> <span class="ss">:switch_to_d</span> <span class="k">do</span>
+      <span class="n">transition</span> <span class="ss">:N</span> <span class="o">=&gt;</span> <span class="ss">:D</span>
+    <span class="k">end</span>
+
+    <span class="n">event</span> <span class="ss">:switch_to_p</span> <span class="k">do</span>
+      <span class="n">transition</span> <span class="ss">:R</span> <span class="o">=&gt;</span> <span class="ss">:P</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<h2 id="headache">Headache</h2>
+
+<p><a href="http://stackoverflow.com/questions/3047630/rails-how-to-test-state-machine">Stackoverflowers proposes</a> to build object and then change state step by step with generated method-events. The possible
+tests for this situation would look like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">describe</span> <span class="no">Gearbox</span> <span class="k">do</span>
+  <span class="n">it</span> <span class="s1">'initial state should be P'</span> <span class="k">do</span>
+    <span class="n">should</span> <span class="n">be_p</span>
+  <span class="k">end</span>
+
+  <span class="n">it</span> <span class="s1">'#switch_to_r changes level to R from P and N'</span> <span class="k">do</span>
+    <span class="n">subject</span><span class="p">.</span><span class="nf">gear</span> <span class="o">=</span> <span class="s1">'P'</span>
+    <span class="n">expect</span> <span class="p">{</span> <span class="n">subject</span><span class="p">.</span><span class="nf">switch_to_r</span> <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="ss">:gear</span><span class="p">).</span><span class="nf">from</span><span class="p">(</span><span class="s1">'P'</span><span class="p">).</span><span class="nf">to</span><span class="p">(</span><span class="s1">'R'</span><span class="p">)</span>
+
+    <span class="n">subject</span><span class="p">.</span><span class="nf">gear</span> <span class="o">=</span> <span class="s1">'N'</span>
+    <span class="n">expect</span> <span class="p">{</span> <span class="n">subject</span><span class="p">.</span><span class="nf">switch_to_r</span> <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="ss">:gear</span><span class="p">).</span><span class="nf">from</span><span class="p">(</span><span class="s1">'N'</span><span class="p">).</span><span class="nf">to</span><span class="p">(</span><span class="s1">'R'</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">it</span> <span class="s1">'#switch_to_n changes level to N from R and D'</span> <span class="k">do</span>
+    <span class="n">subject</span><span class="p">.</span><span class="nf">gear</span> <span class="o">=</span> <span class="s1">'R'</span>
+    <span class="n">expect</span> <span class="p">{</span> <span class="n">subject</span><span class="p">.</span><span class="nf">switch_to_n</span> <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="ss">:gear</span><span class="p">).</span><span class="nf">from</span><span class="p">(</span><span class="s1">'R'</span><span class="p">).</span><span class="nf">to</span><span class="p">(</span><span class="s1">'N'</span><span class="p">)</span>
+
+    <span class="n">subject</span><span class="p">.</span><span class="nf">gear</span> <span class="o">=</span> <span class="s1">'D'</span>
+    <span class="n">expect</span> <span class="p">{</span> <span class="n">subject</span><span class="p">.</span><span class="nf">switch_to_n</span> <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="ss">:gear</span><span class="p">).</span><span class="nf">from</span><span class="p">(</span><span class="s1">'D'</span><span class="p">).</span><span class="nf">to</span><span class="p">(</span><span class="s1">'N'</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">it</span> <span class="s1">'#switch_to_d changes level to D from N'</span> <span class="k">do</span>
+    <span class="n">subject</span><span class="p">.</span><span class="nf">gear</span> <span class="o">=</span> <span class="s1">'N'</span>
+    <span class="n">expect</span> <span class="p">{</span> <span class="n">subject</span><span class="p">.</span><span class="nf">switch_to_d</span> <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="ss">:gear</span><span class="p">).</span><span class="nf">from</span><span class="p">(</span><span class="s1">'N'</span><span class="p">).</span><span class="nf">to</span><span class="p">(</span><span class="s1">'D'</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="n">it</span> <span class="s1">'#switch_to_p changes level to P from R'</span> <span class="k">do</span>
+    <span class="n">subject</span><span class="p">.</span><span class="nf">gear</span> <span class="o">=</span> <span class="s1">'R'</span>
+    <span class="n">expect</span> <span class="p">{</span> <span class="n">subject</span><span class="p">.</span><span class="nf">switch_to_p</span> <span class="p">}.</span><span class="nf">to</span> <span class="n">change</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="ss">:gear</span><span class="p">).</span><span class="nf">from</span><span class="p">(</span><span class="s1">'R'</span><span class="p">).</span><span class="nf">to</span><span class="p">(</span><span class="s1">'P'</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>No so much code, but it has some problems:</p>
+
+<ol>
+  <li>It’s not readable and it’s very easy to miss some typo because of a lot of calls method-events (switch_to_r, switch_to_d, and etc.).
+It looks like we test not state machine but some field which is changed by some method rather than test events and what they do</li>
+  <li>We have to worry about how the state machine works: we set <code class="highlighter-rouge">gear</code> to appropriate state for any test</li>
+  <li>If we change state name we will have to fix ALL these tests</li>
+  <li>If the <code class="highlighter-rouge">subject</code> doesn’t have appropriate state a test will be failed</li>
+</ol>
+
+<p>I used to this approach till now but every time I had issues with maintaining tests like above. Eventually I decided to invent some DSL which helps me to get rid of these problems forever. Hopefully I found solution and I’m going to share it with you in this post. Also I would like to know your opinion about it.</p>
+
+<h2 id="use-custom-matcher">Use custom matcher</h2>
+
+<p>I hope you know that RSpec has mechanism which allows to <a href="https://github.com/dchelimsky/rspec/wiki/Custom-Matchers">create your custom matchers</a>. I’m inspired how the <a href="https://github.com/thoughtbot/shoulda-matchers">should-matchers</a> is written and how it helps to test my Rails code. So I decided to create some matcher as <a href="https://github.com/thoughtbot/shoulda-matchers">shoulda-matchers</a> provides:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="no">RSpec</span><span class="o">::</span><span class="no">Matchers</span><span class="p">.</span><span class="nf">define</span> <span class="ss">:have_transition</span> <span class="k">do</span> <span class="o">|</span><span class="n">transition</span><span class="o">|</span>
+  <span class="n">match</span> <span class="k">do</span> <span class="o">|</span><span class="n">model</span><span class="o">|</span>
+    <span class="n">transition</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="nf">class</span><span class="p">.</span><span class="nf">state_machines</span><span class="p">[</span><span class="n">transition</span><span class="p">.</span><span class="nf">state_field</span><span class="p">].</span><span class="nf">events</span>
+    <span class="n">event</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="n">transition</span><span class="p">.</span><span class="nf">name</span><span class="p">]</span>
+
+    <span class="n">events</span><span class="p">.</span><span class="nf">valid_for</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="n">transition</span><span class="p">.</span><span class="nf">from</span><span class="p">,</span> <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="n">transition</span><span class="p">.</span><span class="nf">to</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="n">event</span><span class="p">]</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">OpenStruct</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">params</span><span class="p">.</span><span class="nf">is_a?</span><span class="p">(</span><span class="no">OpenStruct</span><span class="p">)</span> <span class="p">?</span> <span class="n">params</span> <span class="p">:</span> <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Let’s see how it can help us to test the given state flow:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">describe</span> <span class="no">GearBox</span> <span class="k">do</span>
+  <span class="n">context</span> <span class="s1">'#gear'</span>
+    <span class="n">let</span><span class="p">(</span><span class="ss">:from_p_to_r</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">({</span>
+        <span class="ss">:state_field</span> <span class="o">=&gt;</span> <span class="ss">:gear</span><span class="p">,</span>
+        <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="ss">:switch_to_r</span><span class="p">,</span>
+        <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="ss">:P</span><span class="p">,</span>
+        <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="ss">:R</span>
+      <span class="p">})</span>
+    <span class="k">end</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:from_n_to_r</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">({</span>
+        <span class="ss">:state_field</span> <span class="o">=&gt;</span> <span class="ss">:gear</span><span class="p">,</span>
+        <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="ss">:switch_to_r</span><span class="p">,</span>
+        <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="ss">:N</span><span class="p">,</span>
+        <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="ss">:R</span>
+      <span class="p">})</span>
+    <span class="k">end</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:from_r_to_n</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">({</span>
+        <span class="ss">:state_field</span> <span class="o">=&gt;</span> <span class="ss">:gear</span><span class="p">,</span>
+        <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="ss">:switch_to_n</span><span class="p">,</span>
+        <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="ss">:R</span><span class="p">,</span>
+        <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="ss">:N</span>
+      <span class="p">})</span>
+    <span class="k">end</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:from_d_to_n</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">({</span>
+        <span class="ss">:state_field</span> <span class="o">=&gt;</span> <span class="ss">:gear</span><span class="p">,</span>
+        <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="ss">:switch_to_n</span><span class="p">,</span>
+        <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="ss">:D</span><span class="p">,</span>
+        <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="ss">:N</span>
+      <span class="p">})</span>
+    <span class="k">end</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:from_n_to_d</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">({</span>
+        <span class="ss">:state_field</span> <span class="o">=&gt;</span> <span class="ss">:gear</span><span class="p">,</span>
+        <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="ss">:switch_to_d</span><span class="p">,</span>
+        <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="ss">:n</span><span class="p">,</span>
+        <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="ss">:d</span>
+      <span class="p">})</span>
+    <span class="k">end</span>
+
+    <span class="n">let</span><span class="p">(</span><span class="ss">:from_r_to_p</span><span class="p">)</span> <span class="k">do</span>
+      <span class="no">OpenStruct</span><span class="p">.</span><span class="nf">new</span><span class="p">({</span>
+        <span class="ss">:state_field</span> <span class="o">=&gt;</span> <span class="ss">:gear</span><span class="p">,</span>
+        <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="ss">:switch_to_p</span><span class="p">,</span>
+        <span class="ss">:from</span> <span class="o">=&gt;</span> <span class="ss">:R</span><span class="p">,</span>
+        <span class="ss">:to</span> <span class="o">=&gt;</span> <span class="ss">:P</span>
+      <span class="p">})</span>
+    <span class="k">end</span>
+
+    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">be_p</span> <span class="p">}</span> <span class="c1"># check initial gear</span>
+    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">have_transition</span> <span class="n">from_p_to_r</span> <span class="p">}</span>
+    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">have_transition</span> <span class="n">from_n_to_r</span> <span class="p">}</span>
+    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">have_transition</span> <span class="n">from_r_to_n</span> <span class="p">}</span>
+    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">have_transition</span> <span class="n">from_d_to_n</span> <span class="p">}</span>
+    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">have_transition</span> <span class="n">from_n_to_d</span> <span class="p">}</span>
+    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">have_transition</span> <span class="n">from_r_to_p</span> <span class="p">}</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Obviously that we have much more code, but it’s readable, maintainable, the tests says about what they do without any description. If we change state machine’s field all what we have to do is to change input data for tests. By the way, we can move our input data (I mean all let’s) to <a href="https://www.relishapp.com/rspec/rspec-core/docs/example-groups/shared-examples">shared example</a>. And then if we had many classes with similar state flow we would use this shared example there.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>With this approach I forgot my troubles with testing state machine and created reusable solution which I always will use in my code from now. I have an idea to create gem for this but I’m not sure that it will have any popularity. If you like this solution, please, let me know about it. Thank you for your attention!</p>
+
+<p>I’ve created <a href="https://gist.github.com/ka8725/6794542">gist</a> for this solution.</p>
+
+<p>UPDATE: I’ve invented much easier solution. It’s much easier and elegant. Check <a href="https://gist.github.com/ka8725/7943510">it out</a></p>
+:ET

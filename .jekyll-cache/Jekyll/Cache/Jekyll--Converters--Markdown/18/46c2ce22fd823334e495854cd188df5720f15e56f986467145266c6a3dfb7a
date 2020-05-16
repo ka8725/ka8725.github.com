@@ -1,0 +1,35 @@
+I"�
+<p>I think that many of you think that writing tests for custom rake tasks is a redundant thing.
+But as practice shows if you think so you are wrong.
+In this post I will show how to test <strong>custom rake tasks</strong>.</p>
+
+<h1 id="issue">Issue</h1>
+
+<p>Assuming that we have <strong>rake task</strong> for example <em>products:load</em>, and you can run it from the terminal by the following command: <code class="highlighter-rouge">rake products:load</code>.
+At first glance you could test it manually on running <code class="highlighter-rouge">spec</code>, or you could configure default rake which runs rspec and this rake task.
+But 1st approach has side effect - your rake task will always populate database with products in this case, we don’t want to do it, we just want to make sure that rake works.
+2nd approach looks like more robust, but if you use default rake task for other things it’s definitely not your choice. I prefer to test rakes by <strong>rspec</strong>.</p>
+
+<h1 id="solution">Solution</h1>
+
+<p>Check out <strong>rspec test</strong> below:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">'spec_helper'</span>
+<span class="nb">require</span> <span class="s1">'rake'</span>
+
+<span class="n">describe</span> <span class="s1">'db:seeds'</span> <span class="k">do</span>
+  <span class="n">before</span> <span class="p">{</span> <span class="no">MyApp</span><span class="o">::</span><span class="no">Application</span><span class="p">.</span><span class="nf">load_tasks</span> <span class="p">}</span>
+
+  <span class="n">it</span> <span class="p">{</span> <span class="n">expect</span> <span class="p">{</span> <span class="no">Rake</span><span class="o">::</span><span class="no">Task</span><span class="p">[</span><span class="s1">'products:load'</span><span class="p">].</span><span class="nf">invoke</span> <span class="p">}.</span><span class="nf">not_to</span> <span class="n">raise_exception</span> <span class="p">}</span>
+<span class="k">end</span></code></pre></figure>
+
+<p><strong>MyApp::Application</strong> is a my application name, you can get it from <code class="highlighter-rouge">config/application.rb</code>:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">module</span> <span class="nn">MyApp</span>
+  <span class="k">class</span> <span class="nc">Application</span> <span class="o">&lt;</span> <span class="no">Rails</span><span class="o">::</span><span class="no">Application</span>
+    <span class="o">...</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>I hope this code doesn’t require deeper explanation and other lines of code are clear for you.</p>
+:ET

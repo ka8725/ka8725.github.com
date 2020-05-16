@@ -1,0 +1,301 @@
+I"�v<p><strong>TL;DR:</strong> Follow the incremental approach below. Divide the entire problem into small sub-problems and deploy them one by one:</p>
+<ul>
+  <li>define the new DB structure</li>
+  <li>fill it in along with the old DB structure simultaneously</li>
+  <li>migrate the old data to the new one</li>
+  <li>define the new associations and make the code use them</li>
+  <li>drop the old DB structure and the code that’s not relevant anymore.</li>
+</ul>
+
+<p>In this article you will:</p>
+<ul>
+  <li>learn how to maintain a Rails application in production with <strong>zero downtime</strong></li>
+  <li>see how to make necessary changes on the current DB structure and deliver new features</li>
+  <li>figure out how to ship new features to production without outages, bugs, and downtimes</li>
+  <li>feel what’s <strong>Continuous Delivery</strong> by a case that happened with a Rails application in production.</li>
+</ul>
+
+<h3 id="problem">Problem</h3>
+
+<p>Picture a Rails application that’s deployed to production. And it serves requests from real users all around the clock. That is, a live Rails application performs <strong>24/7 for now and forever</strong>. Maintenance downtime is not desired and must be avoided as much as possible. This is the most important requirement a good business asks about, isn’t it?</p>
+
+<p>As time goes by, the business decides to make the following changes. There is a drop-down allows picking one choice on UI. But from now on it should have multiple choices. Speaking in ActiveRecord terms, there is a <strong>belongs to</strong>/<strong>has many</strong> association in the system that has to be changed to <strong>has and belongs to many</strong>.</p>
+
+<p>A graphical explanation of the problem:</p>
+
+<p><img src="/images/hbtm-ui.png" alt="From single drop-down to multiple check-boxes" /></p>
+
+<p>How to approach that? Well, someone might think it’s not a big deal for MVP, PoC, or a fresh startup without real users. And that’s true. In all these cases everything can be changed and re-deployed with the old data deleted at a time.</p>
+
+<p>But for a mature live application with zero downtime requirements, where any data loss or bugs are not acceptable, this exercise might be a big challenge.</p>
+
+<p>This post guides step by step making the transition above happen without any outages, breaks, data loss, or bugs. And it turns out the suggested idea follows <strong><a href="https://continuousdelivery.com/">Continuous Delivery</a></strong> approach So that it brings clarification on what that chicky term means.</p>
+
+<h3 id="starting-point">Starting point</h3>
+
+<p>The following example supposes to bring more clarity. It dives deep into the problem and allows to feel the describing solution. So that similar situations can benefit from the knowledge.</p>
+
+<p>Consider a <strong>real estate</strong> system that has <strong>properties</strong>. And <strong>managers</strong> that are responsible for them, i.e. add properties into the system, keep them up to date, make them inactive/active/searchable/etc. From Rails perspective that means there are <code class="highlighter-rouge">Property</code> and <code class="highlighter-rouge">Manager</code> models. They relate to each other as <code class="highlighter-rouge">Property</code> <em>belongs to</em> <code class="highlighter-rouge">Manager</code> and <code class="highlighter-rouge">Manager</code> <em>has many</em> <code class="highlighter-rouge">Property</code>:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Property</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">belongs_to</span> <span class="ss">:manager</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Manager</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_many</span> <span class="ss">:properties</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>In DB it looks like that:</p>
+
+<p><img src="/images/hbtm-db1.png" alt="Property belongs to manager in DB" /></p>
+
+<p>Nowadays, there are many technologies to implement UI. That’s why it’s barely possible to give a common recommendation on how to handle that part of the system. For simplicity, assume that UI is rendered by the traditional Rails approach on the server-side in “views”. The following assumptions and suggestions are based on this agreement.</p>
+
+<p>From the code point of view it means that somewhere there are calls:</p>
+<ul>
+  <li>on model, controller, or view layer that
+    <ul>
+      <li>read data <code class="highlighter-rouge">@property.manager</code>, <code class="highlighter-rouge">@property.manager_id</code>,  <code class="highlighter-rouge">@manager.properties</code>, <code class="highlighter-rouge">@manager.property_ids</code></li>
+      <li>write data <code class="highlighter-rouge">@property.manager_id=</code>, <code class="highlighter-rouge">@property.manager=</code>, <code class="highlighter-rouge">@manager.property_ids=</code>, <code class="highlighter-rouge">@manager.properties=</code></li>
+      <li>allow params <code class="highlighter-rouge">params.require(:property).permit(:manager_id)</code></li>
+    </ul>
+  </li>
+  <li>on view layer that
+    <ul>
+      <li>render HTML <code class="highlighter-rouge">= f.input :manager_id, ...</code>, <code class="highlighter-rouge">select_tag :manager_id, ...</code>, <code class="highlighter-rouge">f.input :propery_ids, ...</code>, etc.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Note, the methods above can be called explicitly. It’s possible to find them by “grepping” the code easily. Or they can be called implicitly. For example, with the mass assignment of parameters to the models. But nevertheless, whenever the <strong>property-manager</strong> relation needs to be addressed, the methods above are eventually called. And that in turn means, they form an <strong>interface</strong>. An <strong>API</strong> if you will.</p>
+
+<h3 id="goal">Goal</h3>
+
+<p>Our destination is the following code:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Property</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:managers</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Manager</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:properties</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>And its corresponding DB state:</p>
+
+<p><img src="/images/hbtm-db2.png" alt="Property has and belongs to managers in DB" /></p>
+
+<p>If the necessary changes take place at once it means the calls <code class="highlighter-rouge">@property.manager</code>, <code class="highlighter-rouge">@properly.manager_id</code>, <code class="highlighter-rouge">@properly.manager_id=</code>, <code class="highlighter-rouge">@property.manager=</code> are no longer possible. They are replaced with the respective calls <code class="highlighter-rouge">@property.managers</code>, <code class="highlighter-rouge">@properly.manager_ids</code>, <code class="highlighter-rouge">@properly.manager_ids=</code>, <code class="highlighter-rouge">@property.managers=</code>. In other words, they break the current interface - API mentioned earlier. And these changes at once are dangerous. They may impact the system. There may be a lot of changes that have to be deployed at a time. Eventually, that may lead to unexpected bugs or even outages. No one well-established business would accept that.</p>
+
+<h3 id="what-to-do">What to do</h3>
+
+<p>For that reason, it’s better to deliver the changes gradually. That would allow shipping many small pieces to production continuously not blocking the whole development process or the entire business uses the software. That would provide immediate feedback on whether the deployed small piece works or not. A small not working piece can be fixed or rolled back much easier and faster than a huge bunch of changes. That reduces risks. It makes the delivery process comfortable and safe for both sides: working business and software development. It’s a guaranteed nerves-free process.</p>
+
+<p>But first, these small self-sufficient pieces should be identified. That may seem hard and not obvious. In fact, this suspect is true. But once one feels how to do that on a particular example, like this one, similar cases should be easier to tackle.</p>
+
+<p>On the very first step think about the initial and the final stages. What’s the difference between them? Which places should be changed to move from the starting point to the final one? The previous sections have already figured out that. These are places to change:</p>
+
+<ul>
+  <li>
+    <p>DB structures. A new table <code class="highlighter-rouge">managers_properties</code> for the <strong>has and belongs to many</strong> association should be created and the old column <code class="highlighter-rouge">properties.manager_id</code> should be deleted.</p>
+  </li>
+  <li>
+    <p>Data. Remember, the old column has to be represented by another one <code class="highlighter-rouge">managers_properties.manager_id</code> in the new state of the system. So there should be a data migration fills in the new table with the old data. That allows not to lose data when the new data structure becomes actual.</p>
+  </li>
+  <li>
+    <p>Active record API. Mind the old association <code class="highlighter-rouge">@property.manager</code> gets renamed to <code class="highlighter-rouge">@property.managers</code> along with the bunch of automatically generated readers/writers methods. All the places that refer to these methods should be modified appropriately.</p>
+  </li>
+  <li>
+    <p>UI. The drop-down with a single choice should be replaced with a group of check-boxes that allow many managers selection (see the first picture of this article).</p>
+  </li>
+</ul>
+
+<h4 id="step-1-db-structure-changes">Step 1: DB structure changes</h4>
+
+<p>My suggestion is to start with the DB structure first if this step is present in the list of required changes. In our case, it’s there.</p>
+
+<p>Its implementation is not hard: just make a usual Rails migration creates the new table. It can be shipped without nerves at all.</p>
+
+<blockquote>
+  <p>Pay attention, as all further steps this is an easy change can hardly break something on production servers.</p>
+</blockquote>
+
+<p>The only caveat is not to forget necessary indexes, foreign keys, columns with correct types, and constraints. Otherwise, a new migration should be added and deployed again. That takes time. So it’s better to spend some time on analysis of the requirements. Try to anticipate possible usages of the new structures at this stage. The spent time defines a correct DB structure is a good investment as it will save time later.</p>
+
+<p>Let’s observe the following migration should satisfy all the needs:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">CreateHbtmTable</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">6.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">create_table</span> <span class="ss">:managers_properties</span><span class="p">,</span> <span class="ss">id: </span><span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">belongs_to</span> <span class="ss">:manager</span><span class="p">,</span> <span class="ss">foreign_key: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">index: </span><span class="kp">false</span><span class="p">,</span> <span class="ss">null: </span><span class="kp">false</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">belongs_to</span> <span class="ss">:property</span><span class="p">,</span> <span class="ss">foreign_key: </span><span class="kp">true</span><span class="p">,</span> <span class="ss">index: </span><span class="kp">false</span><span class="p">,</span> <span class="ss">null: </span><span class="kp">false</span>
+    <span class="k">end</span>
+
+    <span class="n">add_index</span> <span class="ss">:managers_properties</span><span class="p">,</span> <span class="p">[</span><span class="ss">:manager_id</span><span class="p">,</span> <span class="ss">:property_id</span><span class="p">],</span> <span class="ss">unique: </span><span class="kp">true</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Pay attention to the table name. It should contain names of the two joined tables by the underscore, pluralized, in the lexical order. Refer to the <a href="https://guides.rubyonrails.org/association_basics.html#creating-join-tables-for-has-and-belongs-to-many-associations">original documentation</a>, if there are questions.</p>
+
+<p>To keep the data integrity:</p>
+<ul>
+  <li>the columns <code class="highlighter-rouge">manager_id</code> and <code class="highlighter-rouge">property_id</code> are not nullable</li>
+  <li>there are the foreign keys constraints for them as they refer to other tables</li>
+  <li>there is the unique index for <code class="highlighter-rouge">manager_id + property_id</code>.</li>
+</ul>
+
+<p>A PostgreSQL select query uses a multicolumn index if any of the filtering fields are part of the index. In other words, the compound <code class="highlighter-rouge">manager_id + property_id</code> index will come into play for both ActiveRecord statements <code class="highlighter-rouge">.where(manager_id: ...)</code> and <code class="highlighter-rouge">.where(property_id: ...)</code>. That’s why there are no separate indexes for <code class="highlighter-rouge">property_id</code> and <code class="highlighter-rouge">manager_id</code>. This not only reduces the DB structure complexity but also saves space on the data store.</p>
+
+<blockquote>
+  <p>Keep in mind, this trick with complex indexes may not work for some older PostgreSQL versions or other databases, such as MySQL. That’s why this question should be verified in each particular case.</p>
+</blockquote>
+
+<h4 id="step-2-start-writing-into-the-new-db-structure">Step 2: start writing into the new DB structure</h4>
+
+<p>The previous step migration can be deployed without any problems. But the created table is not useful while nothing writes into it. While empty, there is no point to read from it. Let’s start writing then!</p>
+
+<p>We need to fill in the currently known data from the old <strong>belongs to</strong> association into the new table despite the fact it supposes to hold the new <strong>had and belongs to many</strong> association. This trick guarantees that switching to the new association doesn’t lose any data. In other words, the data represents the <strong>manager-property</strong> association should write into the old field <code class="highlighter-rouge">properties.manager_id</code> and into the new table <code class="highlighter-rouge">managers_properties</code> <strong>simultaneously</strong>.</p>
+
+<p>There are at least two ways how to do that in a Rails application: use ActiveRecord <a href="https://guides.rubyonrails.org/active_record_callbacks.html">callbacks</a> or DB <a href="https://www.postgresqltutorial.com/postgresql-triggers/">triggers</a>. Which one to choose is up to the code authors. Both solutions have pros and cons. But play well if properly implemented.</p>
+
+<p>Whatever way to choose, the following logic should be implemented:</p>
+<ul>
+  <li>if <code class="highlighter-rouge">property#manager_id</code> gets changed:
+    <ul>
+      <li>the <code class="highlighter-rouge">managers_properties</code> row having <code class="highlighter-rouge">property#id</code> and <code class="highlighter-rouge">property#manager_id_was</code> should be deleted</li>
+      <li>the new row with <code class="highlighter-rouge">property#id</code> and <code class="highlighter-rouge">property#manager_id</code> should be inserted if the new value for <code class="highlighter-rouge">property#manager_id</code> is not <code class="highlighter-rouge">nil</code></li>
+    </ul>
+  </li>
+  <li>if a property gets removed, the corresponding row in <code class="highlighter-rouge">managers_properties</code> should be removed</li>
+  <li>if a manager gets removed, the corresponding association <code class="highlighter-rouge">property#manager</code> should be nullified and the corresponding row in <code class="highlighter-rouge">managers_properties</code> should be removed too.</li>
+</ul>
+
+<p>If go with ActiveRecord callbacks, it may require many changes and much more effort to put. Callbacks are skipped in some cases. For example, <code class="highlighter-rouge">#update_column</code>, <code class="highlighter-rouge">#update_columns</code>, <code class="highlighter-rouge">.update_all</code> calls on ActiveRecord models don’t execute callbacks. Take into consideration that these methods can be called with meta-programming implicitly. And now the implementation doesn’t look easy at all. All the code should be read carefully. And all the places that call these and possibly other methods should take care of the simultaneous write. Additionally, if some new code is added afterward and misses that point there may be data inconsistency.</p>
+
+<p>That’s why it’s better to use DB triggers. Once they are written they work as designed without any caveats. No need to read the whole codebase searching the methods above and changing those lines. No need to implement some tricky code, etc. Check out the implementation for PostgreSQL:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AddTriggers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span><span class="p">[</span><span class="mf">6.0</span><span class="p">]</span>
+  <span class="k">def</span> <span class="nf">up</span>
+    <span class="n">execute</span> <span class="o">&lt;&lt;~</span><span class="no">SQL</span><span class="sh">
+      create extension if not exists plpgsql;
+      create function update_managers_properties() returns trigger
+      language plpgsql
+      as $$
+        begin
+          if coalesce(new.manager_id, 0) != coalesce(old.manager_id, 0) then
+            delete from managers_properties where manager_id = old.manager_id;
+            if coalesce(new.manager_id, 0) != 0 then
+              insert into managers_properties (manager_id, property_id) values (new.manager_id, new.id);
+            end if;
+          end if;
+          return null;
+        end
+      $$;
+
+      create trigger align_managers_properties after insert or update on properties
+        for each row execute procedure update_managers_properties();
+</span><span class="no">    SQL</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">down</span>
+    <span class="n">execute</span><span class="p">(</span><span class="s2">"drop function update_managers_properties() cascade"</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Just run this migration and from now on changes to the <strong>belongs to</strong> association will make appropriate changes in the <strong>many-to-many</strong> table automatically.</p>
+
+<p>It’s supposed the models code looks like that:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Property</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">belongs_to</span> <span class="ss">:manager</span><span class="p">,</span> <span class="ss">optional: </span><span class="kp">true</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Manager</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_many</span> <span class="ss">:properties</span><span class="p">,</span> <span class="ss">dependent: :nullify</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Thanks to Rails’ <code class="highlighter-rouge">dependent: :nullify</code> option above, whenever a manager gets removed it sets <code class="highlighter-rouge">manager_id</code> to <code class="highlighter-rouge">null</code> for all of the associated properties. That change to <code class="highlighter-rouge">null</code> executes the DB trigger. That in turn means, all the data integrity requirements above are satisfied.</p>
+
+<p>Now it’s time to deploy this migration to production.</p>
+
+<h4 id="step-3-migrate-the-old-data">Step 3: migrate the old data</h4>
+
+<p>But that’s not all when it comes to data. There is still old data on the <code class="highlighter-rouge">properties.manager_id</code> without related <code class="highlighter-rouge">managers_properties</code> row. This can be fixed with so-called “data migration”. In short, it’s just a code snippet that makes the job done. There are many ways to implement it. All of them can be found in another article <a href="/change-data-in-migrations-like-a-boss/">Change data in migrations like a boss</a>.</p>
+
+<p>Run the following SQL snippet against the production DB and that makes all that’s needed on this step:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">insert</span> <span class="k">into</span> <span class="n">managers_properties</span> <span class="p">(</span><span class="n">property_id</span><span class="p">,</span> <span class="n">manager_id</span><span class="p">)</span>
+  <span class="p">(</span><span class="k">select</span> <span class="n">id</span><span class="p">,</span> <span class="n">manager_id</span> <span class="k">from</span> <span class="n">properties</span> <span class="k">where</span> <span class="n">manager_id</span> <span class="k">is</span> <span class="k">not</span> <span class="k">null</span><span class="p">)</span>
+  <span class="k">on</span> <span class="n">conflict</span> <span class="k">do</span> <span class="k">nothing</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The snippet is idempotent, so that it can be run many times without any harm to data. Also, it doesn’t conflict with any other process is writing data into <code class="highlighter-rouge">managers_properties</code> at the same time due to whatever reason.</p>
+
+<h4 id="step-4-verify-data">Step 4: verify data</h4>
+
+<p>To prove the data is consistent, it would be good to allow the system to work for a while with the deployed steps above. Say, for one week. After that run this script against production DB:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="n">id</span><span class="p">,</span> <span class="n">manager_id</span> <span class="k">from</span> <span class="n">properties</span> <span class="k">where</span> <span class="n">manager_id</span> <span class="k">is</span> <span class="k">not</span> <span class="k">null</span>
+  <span class="k">except</span>
+  <span class="k">select</span> <span class="n">property_id</span><span class="p">,</span> <span class="n">manager_id</span> <span class="k">from</span> <span class="n">managers_properties</span><span class="p">;</span>
+<span class="k">select</span> <span class="n">property_id</span><span class="p">,</span> <span class="n">manager_id</span> <span class="k">from</span> <span class="n">managers_properties</span>
+  <span class="k">except</span>
+  <span class="k">select</span> <span class="n">id</span><span class="p">,</span> <span class="n">manager_id</span> <span class="k">from</span> <span class="n">properties</span> <span class="k">where</span> <span class="n">manager_id</span> <span class="k">is</span> <span class="k">not</span> <span class="k">null</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The first select statement checks whether all filled in <strong>property-manager</strong> relations have corresponding rows in <code class="highlighter-rouge">managers_properties</code> table. It should return no results. The second one checks if there are no “aliens” in the new table. The result should be empty as well. Both statements together guarantee that the old <strong>belongs to/has many</strong> DB data structure is in sync with the new one - <strong>has and belongs to many</strong>.</p>
+
+<h4 id="step-5-switch-to-hasand-belongs-to-many-association">Step 5: switch to has–and-belongs-to-many association</h4>
+
+<p>When the data integrity between the old and the new structures is proved, there is only one major step is left. This one relates to UI changes. It supposes to have fixes applied to the rest places of a Rails application: models, views, controllers. Probably, the easiest place will be model as it needs only the definition of the new relation:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Property</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:managers</span>
+<span class="k">end</span>
+
+<span class="k">class</span> <span class="nc">Manager</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="n">has_and_belongs_to_many</span> <span class="ss">:properties</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Changes to controllers may differ from project to project. But commonly the idea is to allow <code class="highlighter-rouge">manager_ids</code> instead of previous <code class="highlighter-rouge">manager_id</code> going through <code class="highlighter-rouge">params</code>. For example, if use <a href="https://edgeapi.rubyonrails.org/classes/ActionController/StrongParameters.html">Strong Parameters</a> the code <code class="highlighter-rouge">params.require(:property).permit(:manager_id)</code> should be changed to <code class="highlighter-rouge">params.require(:property).permit(manager_ids: [])</code>.</p>
+
+<p>On the view layer, the form updates managers for properties may look like this:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="nf">collection_check_boxes</span> <span class="ss">:manager_ids</span><span class="p">,</span> <span class="no">Manager</span><span class="p">.</span><span class="nf">all</span><span class="p">,</span> <span class="ss">:id</span><span class="p">,</span> <span class="ss">:id</span>
+</code></pre></div></div>
+
+<p>All of these changes may be deployed at once or incrementally. For example, the views that render read-only information of the association can be delivered first. After this, controllers and models can be prepared for the new associations along with <code class="highlighter-rouge">params</code> structure without dropping the old functionality yet. Next, the UI updates property managers can be changed.</p>
+
+<h4 id="step-6-cleanup">Step 6: cleanup</h4>
+
+<p>On the final step, the outdated code should be just dropped. It may include the following changes:</p>
+<ul>
+  <li>removal of the old <code class="highlighter-rouge">properties.manager_id</code> column. Keep in mind, it should be done in several steps: first, ignore the column on the code level, then delete the column from DB. More about this is <a href="https://blog.codeship.com/rails-migrations-zero-downtime/">here</a></li>
+  <li>removal of the old defined associations along with old <code class="highlighter-rouge">params</code> keys</li>
+  <li>drop the trigger along with its function</li>
+  <li>scripts/snippets/rake tasks that refer to the old associations yet should be updated or deleted.</li>
+</ul>
+
+<p>And that’s all steps needed to make the transition requested by the <strong>real estate business</strong> happen.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>We’ve seen how a DB change on a Rails application <strong>with production setup</strong> should be done. This is a multi-step and not fast process. It takes time to make the transition happen <strong>without bugs</strong> and <strong>downtimes</strong>. At first glance, the given task may seem too hard. But all the required steps are small and easy.</p>
+
+<p>The described technique is a very powerful tool confirmed by experience on live applications. The post shows the concrete example of how to change a single select to multiple choices on UI. But the idea applies to <strong>any</strong> transition requires changes in DB on a Rails application that has production setup with <strong>zero downtime</strong> <strong>24/7</strong> requirements.</p>
+
+<p>Unfortunately, it’s hard or even not possible to describe all the niceties of the whole process. There are still many aspects this article doesn’t show:</p>
+<ul>
+  <li>how to understand exact places in the code that require changes</li>
+  <li>how to handle the migration if UI is a separate single page application (<a href="https://en.wikipedia.org/wiki/Single-page_application">SPA</a>)</li>
+  <li>how to implement the parallel write into the old and the new DB structures if go with ActiveRecord callbacks. Is it worth at all? Partially, this question was elaborated in this article. But those brief explanations may seem not convincing enough.</li>
+</ul>
+
+<p>If you have any of those or other questions, don’t hesitate to <a href="/ruby-consulting/">ask me</a>. Thanks for your attention and happy bugless coding in production!</p>
+:ET

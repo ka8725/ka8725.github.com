@@ -1,0 +1,51 @@
+I"�<p>Have you ever written your own <strong>rake tasks</strong>? If you write them very often this post will be very useful for you. I won’t describe what is <strong>rake task</strong> here because there are a lot of information about it yet. I will tell you how to easy <em>generate</em> <strong>rake task</strong>.</p>
+
+<p><a onclick="_gaq.push(['_trackEvent', 'Reference', 'Packt', '#rake-task-management-essentials']);" href="http://goo.gl/0Bw6H4" target="_blank">
+  <img src="/images/rake_book.jpg" alt="Rake Task Management Essentials" align="right" vspace="5" hspace="5" width="120" />
+</a></p>
+
+<blockquote>
+  <p>Recently I have written a book about <strong>Rake</strong>. It’s called <strong>Rake Task Management Essentials</strong>. If you like this post’s content and interested in <strong>Rake</strong>, if you would like to know more about this great tool you can buy it <a href="http://goo.gl/0Bw6H4">here</a>. I promise that after reading the book you will understand main goals of <strong>Rake</strong>, how to use it in your development process, daily work or just for fun. You will understand how to refactor and speed up rake tasks. You will be introduced to all <strong>Rake</strong>’s features by straightforward and practical examples.</p>
+</blockquote>
+
+<p>Today I found interesting generator in <strong>Ruby On Rails</strong>. I have never read about it in any post, doc, book or tutorial, I have never seen it in any screencast, I’ve never heart about it from any podcast and I wondered that Google doesn’t tell me nothing about it. So I decided to write about it here.</p>
+
+<p>If you want to write your own <strong>rake task</strong> you have 2 ways to do it (I thought so before):</p>
+
+<ol>
+  <li>Write it from scratch</li>
+  <li>Copy-paste code from another ready <strong>rake task</strong> and change code to required</li>
+</ol>
+
+<p>But there is a 3rd way to do it. Just use this <strong>rake generator</strong>:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rails g task my_namespace my_task1 my_task2
+$ create lib/tasks/my_namespace.rake
+</code></pre></div></div>
+
+<p>It will generate scaffold for our new <strong>rake task</strong>:</p>
+<blockquote>
+  <p>lib/tasks/my_namespace.rake</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">namespace</span> <span class="ss">:my_namespace</span> <span class="k">do</span>
+  <span class="n">desc</span> <span class="s2">"TODO"</span>
+  <span class="n">task</span> <span class="ss">:my_task1</span> <span class="o">=&gt;</span> <span class="ss">:environment</span> <span class="k">do</span>
+  <span class="k">end</span>
+
+  <span class="n">desc</span> <span class="s2">"TODO"</span>
+  <span class="n">task</span> <span class="ss">:my_task2</span> <span class="o">=&gt;</span> <span class="ss">:environment</span> <span class="k">do</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>It is awesome! And now you can write here your code for new <strong>rake tasks</strong>.</p>
+
+<p>Let’s make sure these <strong>rake tasks</strong> are exist and we are able to use them:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rake -T | grep my_namespace
+rake my_namespace:my_task1  # TODO
+rake my_namespace:my_task2  # TODO
+</code></pre></div></div>
+
+<p>Perfect! As you can see it is very easy to write your own <strong>rake task</strong>. It is easier as you do it before. Thanks for reading!</p>
+:ET

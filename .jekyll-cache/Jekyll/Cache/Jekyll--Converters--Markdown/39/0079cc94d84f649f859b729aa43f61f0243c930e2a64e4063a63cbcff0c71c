@@ -1,0 +1,116 @@
+I"N.<p><strong>TL;DR:</strong> use SQL <code class="highlighter-rouge">end_date2 &gt;= start_date1 and end_date1 &gt;= start_date2</code>.</p>
+
+<h3 id="problem">Problem</h3>
+
+<p>Picture this. A real estate site’s guest wants to book a hotel for specific dates. The system should check whether these dates are available, i.e. if they are not overlapping with some other existing booking. Let’s say, software engineers have written this hypothetical site in Rails and have come up with <code class="highlighter-rouge">Booking</code> model. It represents <code class="highlighter-rouge">bookings</code> table with two columns: <code class="highlighter-rouge">start_date</code> and <code class="highlighter-rouge">end_date</code> of <code class="highlighter-rouge">date</code> type. Also suppose, there is a validation somewhere checking <code class="highlighter-rouge">start_date &lt;= end_date</code>. The solution below describes how to cope with this specific situation. Similar data models can follow it, though.</p>
+
+<h3 id="solution">Solution</h3>
+
+<p>Probably, the easiest solution of this problem could be handled with a Rails way. Just define a custom validation inside <code class="highlighter-rouge">Booking</code> model that performs every time when a new booking is created or existing one is updated:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Booking</span> <span class="o">&lt;</span> <span class="no">ApplicationRecord</span>
+  <span class="c1"># ... some code is skipped here for simplicity's sake</span>
+  <span class="n">validate</span> <span class="ss">:validate_other_booking_overlap</span>
+
+  <span class="k">def</span> <span class="nf">period</span>
+    <span class="n">start_date</span><span class="o">..</span><span class="n">end_date</span>
+  <span class="k">end</span>
+
+  <span class="kp">private</span>
+
+  <span class="k">def</span> <span class="nf">validate_other_booking_overlap</span>
+    <span class="n">other_bookings</span> <span class="o">=</span> <span class="no">Booking</span><span class="p">.</span><span class="nf">all</span>
+    <span class="n">is_overlapping</span> <span class="o">=</span> <span class="n">other_bookings</span><span class="p">.</span><span class="nf">any?</span> <span class="k">do</span> <span class="o">|</span><span class="n">other_booking</span><span class="o">|</span>
+      <span class="n">period</span><span class="p">.</span><span class="nf">overlaps?</span><span class="p">(</span><span class="n">other_booking</span><span class="p">.</span><span class="nf">period</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="n">errors</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="ss">:overlaps_with_other</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_overlapping</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>But unfortunately there is a performance bottleneck here. Keep in mind, all the bookings are fetched from the database first. Then they are deserialized into the <code class="highlighter-rouge">Booking</code> model instance. After that the period of each is checked against the creating/updating <code class="highlighter-rouge">Booking</code> instance. At first glance - such an easy code, but how many complicated things it actually does! It creates so many objects consuming a lot of memory on the machine running this code. That is actually the main reason of any software slowness. Yet, sometimes this attempt can be viable, i.e. when the number of objects fetched from DB is not high. Whether to go with it or not is up to the developer and should be picked wisely considering the possible drawback.</p>
+
+<p>If this approach doesn’t work a new one should be searched. What can be done to improve this? In order to answer this question the root cause of the problem should be understood. And it’s actually highlighted above - the number of allocated objects is huge. Hence, we need to reduce it. A possible way could be moving the loop into DB and luckily ActiveRecord accepts SQL. This is the code one might end up with using PostgreSQL:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">validate_other_booking_overlap</span>
+  <span class="n">sql</span> <span class="o">=</span> <span class="s2">"daterange(start_date, end_date, '[]') &amp;&amp; daterange(:start_date, :end_date, '[]')"</span>
+  <span class="n">is_overlapping</span> <span class="o">=</span> <span class="no">Booking</span><span class="p">.</span><span class="nf">where</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="ss">start_date: </span><span class="n">c</span><span class="p">.</span><span class="nf">start_date</span><span class="p">,</span> <span class="ss">end_date: </span><span class="n">c</span><span class="p">.</span><span class="nf">end_date</span><span class="p">).</span><span class="nf">exists?</span>
+  <span class="n">errors</span><span class="p">.</span><span class="nf">add</span><span class="p">(</span><span class="ss">:overlaps_with_other</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_overlapping</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>Read the statement <code class="highlighter-rouge">daterange(start_date, end_date, '[]')</code> as “create a range of dates from <code class="highlighter-rouge">start_date</code> to <code class="highlighter-rouge">end_date</code>, right and left edges inclusively”. The third argument <code class="highlighter-rouge">[]</code> points to the property of inclusiveness. More about this can be found <a href="https://www.postgresql.org/docs/9.3/rangetypes.html">here</a>.</p>
+</blockquote>
+
+<blockquote>
+  <p>The <code class="highlighter-rouge">&amp;&amp;</code> operator used here to check for ranges overlap. Check out the <a href="https://www.postgresql.org/docs/9.3/functions-range.html">documentation</a> if any questions arise.</p>
+</blockquote>
+
+<p>What’s the issue with this try? Well, this code is much more efficient compared to the first one. But still creates objects for the date ranges, however on DB level this time. Remember, unnecessary number of objects is a slow program cause. That’s why, if possible, a number of allocations should be reduced. This code is literally translated from the previous version accenting readability. Therefore, even after the into-SQL transformation it is more or less readable. But how to speed it up? This time the readability emphasis is the key. Often, to fix performance issues current solution may be rewritten in a more efficient way. But this usually sacrifices clarity. Trying this way one may end up the next piece of SQL:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sql</span> <span class="o">=</span> <span class="o">&lt;&lt;~</span><span class="no">SQL</span><span class="sh">
+  (
+    (start_date &lt;= :start_date and :start_date &lt;= end_date) or
+    (start_date &lt;= :end_date and :end_date &lt;= end_date)
+  ) or (
+    (:start_date &lt;= start_date and start_date &lt;= :end_date) or
+    (:start_dae &lt;= end_date and end_date &lt;= :end_date)
+  )
+</span><span class="no">SQL</span>
+</code></pre></div></div>
+<blockquote>
+  <p>The rest of the code is omitted because it remains the same. From now on, only the line changes from the validation method defining <code class="highlighter-rouge">sql</code> variable.</p>
+</blockquote>
+
+<p>It simply checks whether any edge of the first range is inside of the second one. Or whether any edge of the second range is inside of the first one. This choice allocates even less objects, so it must be faster than the previous one. But look at this - it’s a bit cumbersome. Can it be better? It turns out it can:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sql</span> <span class="o">=</span> <span class="s2">":end_date &gt;= start_date and end_date &gt;= :start_date"</span>
+</code></pre></div></div>
+
+<p>What is the logic behind this formula? Ranges overlap if and only if it’s not the case they overlap from the left and it’s not the case they overlap from the right. Or the following doesn’t happen:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                      start_date          end_date
+                          |--------------------|
+:start_date     :end_date
+|-------------------|
+</code></pre></div></div>
+
+<p>or</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>start_date          end_date
+    |--------------------|
+                           :start_date        :end_date
+                              |-------------------|
+</code></pre></div></div>
+
+<p>The proof of this is rather obvious: all possible situations could be drawn and checked. After that it would be clear that all other cases intersect.</p>
+
+<p>Transform this statement to boolean formula:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">not</span> <span class="p">(:</span><span class="n">end_date</span> <span class="o">&lt;</span> <span class="n">start_date</span> <span class="k">or</span> <span class="n">end_date</span> <span class="o">&lt;</span> <span class="p">:</span><span class="n">start_date</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Get rid of the leading negation and replace all statements inside the parentheses with their negations:</p>
+
+<p>=&gt;</p>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">not</span> <span class="p">(:</span><span class="n">end_date</span> <span class="o">&lt;</span> <span class="n">start_date</span><span class="p">)</span> <span class="k">and</span> <span class="k">not</span> <span class="p">(</span><span class="n">end_date</span> <span class="o">&lt;</span> <span class="p">:</span><span class="n">start_date</span><span class="p">)</span>
+</code></pre></div></div>
+<p>=&gt;</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>:end_date &gt;= start_date and end_date &gt;= :start_date
+</code></pre></div></div>
+
+<blockquote>
+  <p>If this explanation is not clear, please check <a href="https://stackoverflow.com/questions/3269434">it</a>.</p>
+</blockquote>
+
+<p>The final formula is derived. But are there any downsides? Well, it’s a matter of taste. On the one hand, it’s less readable than the Rails way solution. On the other hand, it’s the most efficient one we’ve come up with so far. If someone thinks this trick is not clear, there could be documentation provided. So everyone reading this code could understand what’s hidden behind it.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>This article provides a solution of a rather popular problem, in particular ranges of dates overlap. Sometimes it’s hard to tackle a specific problem balancing between comprehension and efficiency. This journey supposes to show it up and directs to a solution.</p>
+
+<p>Credit goes to the colleagues who reviewed my pull request solving a similar problem. The suggested final approach was not clear for me and even seemed not working. But a bit of thinking made me to change the opinion. That process of thinking and the proof were pretty interesting. It made me to write this down.</p>
+
+<p>Never give up finding a good solution to your problem. There is always an opportunity to improve. Happy coding!</p>
+:ET

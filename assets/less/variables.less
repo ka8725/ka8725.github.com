@@ -1,14 +1,32 @@
 // Typography
 // --------------------------------------------------
 
-@base-font: 'source-sans-pro', sans-serif;
+@font-face {
+  font-family: "Georgia";
+  src: url("../fonts/georgia.woff");
+}
+@font-face {
+  font-family: "Lucida Grande";
+  src: url("../fonts/LucidaGrande.woff");
+}
+@font-face {
+  font-family: "Lucida Grande Bold";
+  src: url("../fonts/LucidaGrandeBold.woff");
+}
+
+@base-font: Georgia, Times, "Times New Roman", serif;
 @heading-font: @base-font;
 @caption-font: @base-font;
 @code-font: 'source-code-pro', monospace;
-@alt-font: 'volkhov', serif;
+@alt-font: Georgia, Times, "Times New Roman", serif;
+@system-font: -apple-system, BlinkMacSystemFont,
+  "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+  "Helvetica Neue", sans-serif;
+@date-font: "Lucida Grande", Arial, sans-serif;
+@share-font: "Lucida Grande Bold", Arial, sans-serif;
 
 @doc-font-size: 16;
-@doc-line-height: 24;
+@doc-line-height: 20;
 
 
 // set-up the body font-size / line-height
@@ -22,10 +40,12 @@ body {
 
 @body-color      		: #ebebeb;
 @text-color      		: #222;
-@base-color 	 		: #343434;	  
-@comp-color 	 		: spin(@base-color, 180); 
+@base-color 	 		  : #343434;	  
+@comp-color 	 		  : spin(@base-color, 180); 
 @border-color    		: @base-color;
 @white           		: #fff;
-@black           		: #000;
+@black           		: rgba(0, 0, 0, 0.84);
 @accent-color    		: @black;
-@link-color 		    : #222;
+@link-color 		    : #000;
+@tags-color         : rgba(0, 0, 0, 0.54);
+@share-color        : rgba(0, 0, 0, 0.40);

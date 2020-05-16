@@ -1,0 +1,201 @@
+I"30<p>Imagine you have to write new migration with a lot of code and this migration should have a lot of code, code which you have already wrote in older migration and this required code is exactly up/down/change part of those migration. Another words you would like to run migration part (up, down or change) in the new migration. Pay attention - you have to write or copy paste a lot of code You have 2 variants how to overcome this issue:</p>
+
+<ol>
+  <li>The simplest and boring solution - it is copy and paste this code, or write it with scratch. This is not our case. Old code and new code will mix and you will have a huge amount of disgusting code - you won’t able to detect which is new code and which is old</li>
+  <li>Use oldest migration in DRY way. Just use those code as you use another class, for instance <code class="highlighter-rouge">User</code> model which you probably have</li>
+</ol>
+
+<h2 id="input-data">Input data</h2>
+
+<p>In one project I had to rollback my old migration which has a lot of code. Check out this code:</p>
+
+<blockquote>
+  <p>db/migrate/20121107173946_add_search_content_to_products.rb</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">AddSearchContentToProducts</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nf">up</span>
+    <span class="n">add_column</span> <span class="ss">:products</span><span class="p">,</span> <span class="ss">:tsvector_content_tsearch</span><span class="p">,</span> <span class="ss">:tsvector</span>
+    <span class="n">add_column</span> <span class="ss">:products</span><span class="p">,</span> <span class="ss">:tsvector_content_dmetaphone</span><span class="p">,</span> <span class="ss">:tsvector</span>
+
+    <span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">EOS</span><span class="sh">
+      CREATE INDEX products_tsvector_content_tsearch_idx ON products USING gin(tsvector_content_tsearch);
+      CREATE INDEX products_tsvector_content_dmetaphone_idx ON products USING gin(tsvector_content_dmetaphone);
+</span><span class="no">    EOS</span>
+
+    <span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">EOS</span><span class="sh">
+      CREATE OR REPLACE FUNCTION get_tsvector(c text, w "char", lang regconfig DEFAULT 'pg_catalog.russian') RETURNS tsvector LANGUAGE plpgsql AS $$
+      begin
+        return setweight(to_tsvector(lang, coalesce(c, '')), w);
+      end
+      $$;
+</span><span class="no">    EOS</span>
+
+    <span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">EOS</span><span class="sh">
+      CREATE OR REPLACE FUNCTION products_trigger() RETURNS trigger LANGUAGE plpgsql AS $$
+      declare
+        product_model record;
+        product_part record;
+        product_brand record;
+        product_seller record;
+
+      begin
+        select name, aliases, brand_id into product_model from models where id = new.model_id;
+        select name, aliases into product_brand from brands where id = product_model.brand_id;
+        select name, aliases into product_part from parts where id = new.part_id;
+        select email, name into product_seller from sellers where id = new.seller_id;
+
+        new.tsvector_content_tsearch :=
+          get_tsvector(new.note, 'C') ||
+
+          get_tsvector(product_model.name, 'A') ||
+          get_tsvector(product_model.aliases, 'A') ||
+
+          get_tsvector(product_part.name, 'A') ||
+          get_tsvector(product_part.aliases, 'A') ||
+
+          get_tsvector(product_brand.name, 'A') ||
+          get_tsvector(product_brand.aliases, 'A') ||
+
+          get_tsvector(product_seller.name, 'D') ||
+          get_tsvector(product_seller.email, 'D');
+
+        new.tsvector_content_dmetaphone :=
+          get_tsvector(new.note, 'C', 'simple') ||
+
+          get_tsvector(product_model.name, 'A', 'simple') ||
+          get_tsvector(product_model.aliases, 'A', 'simple') ||
+
+          get_tsvector(product_part.name, 'A', 'simple') ||
+          get_tsvector(product_part.aliases, 'A', 'simple') ||
+
+          get_tsvector(product_brand.name, 'A', 'simple') ||
+          get_tsvector(product_brand.aliases, 'A', 'simple') ||
+
+          get_tsvector(product_seller.name, 'D', 'simple') ||
+          get_tsvector(product_seller.email, 'D', 'simple');
+
+        return new;
+      end
+      $$;
+</span><span class="no">    EOS</span>
+
+    <span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">EOS</span><span class="sh">
+      CREATE TRIGGER products_content_to_search_trigger BEFORE INSERT OR UPDATE
+        ON products FOR EACH ROW EXECUTE PROCEDURE products_trigger();
+</span><span class="no">    EOS</span>
+
+    <span class="no">Product</span><span class="p">.</span><span class="nf">all</span><span class="p">.</span><span class="nf">each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:touch</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">down</span>
+    <span class="n">remove_column</span> <span class="ss">:products</span><span class="p">,</span> <span class="ss">:tsvector_content_tsearch</span>
+    <span class="n">remove_column</span> <span class="ss">:products</span><span class="p">,</span> <span class="ss">:tsvector_content_dmetaphone</span>
+
+    <span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">EOS</span><span class="sh">
+      DROP TRIGGER products_content_to_search_trigger ON products;
+      DROP FUNCTION products_trigger();
+      DROP FUNCTION get_tsvector(c text, w "char", lang regconfig);
+</span><span class="no">    EOS</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>As I have already said I would like to rollback it in my new migration on up.
+Write new migration and paste there this code is not right solution. I think you are agreed with me.</p>
+
+<h2 id="solution">Solution</h2>
+
+<p>I think the best solution will be to include this migration in my new migration then use this migration class as usual code (yes - migration is a class too and we are able to do it). So the final code below:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="no">File</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="no">Rails</span><span class="p">.</span><span class="nf">root</span><span class="p">,</span> <span class="s1">'db/migrate/20121107173946_add_search_content_to_products.rb'</span><span class="p">)</span> <span class="c1"># (1)</span>
+
+<span class="k">class</span> <span class="nc">ChangeSearchFunctions</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nf">up</span>
+    <span class="no">AddSearchContentToProducts</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">down</span> <span class="c1"># (2)</span>
+
+    <span class="n">add_column</span> <span class="ss">:products</span><span class="p">,</span> <span class="ss">:search_vector</span><span class="p">,</span> <span class="ss">:tsvector</span>
+
+    <span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">EOS</span><span class="sh">
+      CREATE INDEX products_search_vector_idx ON products USING gin(search_vector);
+
+      CREATE FUNCTION get_tsvector(c text, lang regconfig DEFAULT 'russian'::regconfig) RETURNS tsvector
+      LANGUAGE plpgsql
+      AS $$
+        begin
+          return to_tsvector(lang, coalesce(c, ''));
+        end
+        $$;
+
+      CREATE FUNCTION products_trigger() RETURNS trigger
+      LANGUAGE plpgsql
+      AS $$
+        declare
+          product_model record;
+          product_part record;
+          product_brand record;
+          product_seller record;
+
+        begin
+          select name, aliases, brand_id into product_model from models where id = new.model_id;
+          select name, aliases into product_brand from brands where id = product_model.brand_id;
+          select name, aliases into product_part from parts where id = new.part_id;
+          select email, name into product_seller from sellers where id = new.seller_id;
+
+          new.search_vector :=
+            get_tsvector(new.note) ||
+
+            get_tsvector(product_model.name) ||
+            get_tsvector(product_model.aliases) ||
+
+            get_tsvector(product_part.name) ||
+            get_tsvector(product_part.aliases) ||
+
+            get_tsvector(product_brand.name) ||
+            get_tsvector(product_brand.aliases) ||
+
+            get_tsvector(product_seller.name) ||
+            get_tsvector(product_seller.email);
+
+          return new;
+        end
+        $$;
+
+      CREATE TRIGGER products_content_to_search_trigger BEFORE INSERT OR UPDATE
+        ON products FOR EACH ROW EXECUTE PROCEDURE products_trigger();
+</span><span class="no">    EOS</span>
+    <span class="no">Product</span><span class="p">.</span><span class="nf">find_each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:touch</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">down</span>
+    <span class="n">remove_column</span> <span class="ss">:products</span><span class="p">,</span> <span class="ss">:search_vector</span>
+
+    <span class="n">execute</span> <span class="o">&lt;&lt;-</span><span class="no">EOS</span><span class="sh">
+      DROP TRIGGER products_content_to_search_trigger ON products;
+      DROP FUNCTION products_trigger();
+      DROP FUNCTION get_tsvector(c text, lang regconfig);
+</span><span class="no">    EOS</span>
+
+    <span class="no">AddSearchContentToProducts</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">up</span> <span class="c1"># (3)</span>
+    <span class="no">Product</span><span class="p">.</span><span class="nf">find_each</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:touch</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>See the first line (1): <code class="highlighter-rouge">require File.join(Rails.root, 'db/migrate/20121107173946_add_search_content_to_products.rb')</code>. With this line I include migration file and after this we are able to use old migration’s class. On the fifth line (2) we I just use it: <code class="highlighter-rouge">AddSearchContentToProducts.new.down</code> to rollback old migration. On down I have to up this migration, see mark (3): <code class="highlighter-rouge">AddSearchContentToProducts.new.up</code>.</p>
+
+<p>In this example I had to rewrite stored procedure for postgresql database and I’ve got clean and DRY solution as you can see. Imagine how many code I would have if I just pasted all entire migration in the new! I hope you will find this article useful and if you have issues like I had you won’t have problems now to solve them.</p>
+
+<p>UPDATE 26.06.2013: In Rails 4 new method is appeared which allows to revert all migrations. Check it out:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s1">'2012121212_example_migration'</span>
+
+<span class="k">class</span> <span class="nc">FixupExampleMigration</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="n">revert</span> <span class="no">ExampleMigration</span>
+
+    <span class="n">create_table</span><span class="p">(</span><span class="ss">:apples</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+      <span class="n">t</span><span class="p">.</span><span class="nf">string</span> <span class="ss">:variety</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+:ET

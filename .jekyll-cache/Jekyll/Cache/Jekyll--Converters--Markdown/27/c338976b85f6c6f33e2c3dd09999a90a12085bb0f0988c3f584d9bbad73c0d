@@ -1,0 +1,183 @@
+I"�G<p>Changing data in production is a common problem for Rails developers. Assume you have a Rails project. One day you decide to change the database schema and want to add some new column. Then you have to go through all existing records and change data to be actual according to this new schema. There are solutions to overcome this. But they have disadvantages. You will see them in this article. And finally, figure out how to avoid the issues with <code class="highlighter-rouge">migration_data</code> gem.</p>
+
+<h2 id="solutions-with-disadvantages">Solutions with disadvantages</h2>
+
+<p>There are many approaches to deal with data migrations in Rails application:</p>
+
+<ul>
+  <li>Use model classes in migrations carelessly</li>
+  <li>Redefine models in migrations</li>
+  <li>Write raw SQL in migrations</li>
+  <li>Use seeds</li>
+  <li>Other methods</li>
+</ul>
+
+<p>Now let’s look at all of them one by one and see what problems these solutions have.</p>
+
+<h3 id="use-model-classes-in-migrations-carelessly">Use model classes in migrations carelessly</h3>
+
+<p>Let’s say, we are going to add a column to <code class="highlighter-rouge">User</code> model and then update all users in our database. So the migration may look like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">AddStatusToUser</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nf">up</span>
+    <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:status</span><span class="p">,</span> <span class="ss">:string</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">find_each</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+      <span class="n">user</span><span class="p">.</span><span class="nf">status</span> <span class="o">=</span> <span class="s1">'active'</span>
+      <span class="n">user</span><span class="p">.</span><span class="nf">save!</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">down</span>
+    <span class="n">remove_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:status</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Today this migration works without problems. We are committing this code to our version control system (I hope it’s <code class="highlighter-rouge">git</code>). All our team members fetch this new code and run the migration. It works as expected - perfect! But tomorrow we decide to rename the <code class="highlighter-rouge">User</code> model to <code class="highlighter-rouge">Customer</code>. We create a new migration to rename the table, rename the <code class="highlighter-rouge">User</code> model to <code class="highlighter-rouge">Customer</code> and don’t touch the old migrations. Tests are working, new migration is working and everyone is happy. But what will be with this migration in one week when it gets run on the production server? It will fail because at that moment we won’t have <code class="highlighter-rouge">User</code> model already. We forgot to rename the <code class="highlighter-rouge">User</code> model in the old migration. It happens too often in a startup follows the agile development approach.</p>
+
+<p>Obviously, this solution is not recommended.</p>
+
+<h3 id="redefine-models-in-migrations">Redefine models in migrations</h3>
+
+<p>There is a similar solution to the previous one and it may be useful in some cases. Just define the <code class="highlighter-rouge">User</code> model in the migration:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">AddStatusToUser</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">up</span>
+    <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:status</span><span class="p">,</span> <span class="ss">:string</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">find_each</span> <span class="k">do</span> <span class="o">|</span><span class="n">user</span><span class="o">|</span>
+      <span class="n">user</span><span class="p">.</span><span class="nf">status</span> <span class="o">=</span> <span class="s1">'active'</span>
+      <span class="n">user</span><span class="p">.</span><span class="nf">save!</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">down</span>
+    <span class="n">remove_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:status</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Now when you rename the <code class="highlighter-rouge">User</code> model in the new migration this code won’t fail. For this example the solution is suitable. But the problems come when you have to define a polymorphic association in the migration:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">AddStatusToUser</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+    <span class="n">belongs_to</span> <span class="ss">:role</span><span class="p">,</span> <span class="ss">polymorphic: </span><span class="kp">true</span>
+  <span class="k">end</span>
+
+  <span class="k">class</span> <span class="nc">Role</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+    <span class="n">has_many</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">as: :role</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">up</span>
+    <span class="n">add_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:status</span><span class="p">,</span> <span class="ss">:string</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="no">Role</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'admin'</span><span class="p">)</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">nick: </span><span class="s1">'@ka8725'</span><span class="p">,</span> <span class="ss">role: </span><span class="n">role</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">down</span>
+    <span class="n">remove_column</span> <span class="ss">:users</span><span class="p">,</span> <span class="ss">:status</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The code will work without exception but it doesn’t set correct association, because the defined classes are under namespace <code class="highlighter-rouge">AddStatusToUser</code>. This is what happens in reality:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">role</span> <span class="o">=</span> <span class="no">AddStatusToUser</span><span class="o">::</span><span class="no">Role</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'admin'</span><span class="p">)</span>
+<span class="no">AddStatusToUser</span><span class="o">::</span><span class="no">User</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">nick: </span><span class="s1">'@ka8725'</span><span class="p">,</span> <span class="ss">role: </span><span class="n">role</span><span class="p">)</span></code></pre></figure>
+
+<p>A bug in production pops up after run of a migration like this. You connect to the server, open rails console, and see what’s the heck:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">user</span> <span class="o">=</span> <span class="no">User</span><span class="p">.</span><span class="nf">find_by</span><span class="p">(</span><span class="ss">nick: </span><span class="s1">'@ka8725'</span><span class="p">)</span>
+<span class="n">user</span><span class="p">.</span><span class="nf">role</span>       <span class="c1"># =&gt; nil</span>
+<span class="n">user</span><span class="p">.</span><span class="nf">role_type</span>  <span class="c1"># =&gt; AddStatusToUser::Role</span></code></pre></figure>
+
+<p>As you see the <code class="highlighter-rouge">role_type</code> is set incorrectly it should be <code class="highlighter-rouge">Role</code> without the namespace. That’s why this solution is bug-prone as well. It’s definitely not recommended. Nevertheless, it’s like a standard way to overcome the problem in Rails community.</p>
+
+<h3 id="writing-raw-sql-in-migrations">Writing raw SQL in migrations</h3>
+
+<p>To be honest, this solution doesn’t have disadvantages except one - you have to know SQL and sometimes very well. So it might require more time to write the code. Even if Rails community don’t prefer to write raw SQL I would recommend this approach. Once SQL skills are grasped you can cope with any data problems in production.</p>
+
+<p>Refer to <a href="http://guides.rubyonrails.org/migrations.html#when-helpers-aren-t-enough">official documentation</a> for examples of raw SQL in migrations.</p>
+
+<h3 id="use-seeds">Use seeds</h3>
+
+<p>Rails has useful approach to populate DB. You may write any code in the <code class="highlighter-rouge">db/seeds.rb</code> file and run <code class="highlighter-rouge">rake db:seed</code> command. This is a great solution to populate the database by some data at first start but then, when your project is released and you have to change the data on changing the database schema this approach is not handy anymore. Also writing the code in one file may lead to a mess. Of course, you may split the code into files and then load them in the <code class="highlighter-rouge">seeds.rb</code> file. But anyway, you have to worry about what to do on the second run, i.e. seeds usually are not idempotent. There is also gem which helps to structure you seeds data - <a href="https://github.com/james2m/seedbank">seedbank</a>. But again, this doesn’t solve anything, moreover, this solution is not for the problem at all. Don’t even try this approach, it just messes up two different concepts. I’ve provided this solution merely to notice it’s not acceptable and I saw examples of this.</p>
+
+<h3 id="other-methods">Other methods</h3>
+
+<p>No doubt, there are many other methods. For example, rake tasks migrate data. Or even writing code in production console after deploy (I hope you don’t do this). Below is an attempt to overcome the problem.</p>
+
+<h2 id="use-migration_data-gem">Use migration_data gem</h2>
+
+<p>I’ve formed a gem tries to solve these problems - <a href="https://github.com/ka8725/migration_data">migration_data</a>. The idea behind is very easy: how to ensure code doesn’t fail? Correct - with aid of tests. So, why not to write tests for data migrations?</p>
+
+<p>The gem allows defining a special method called <code class="highlighter-rouge">data</code> in schema migrations. Write the data migration code there. Keep in mind, this method runs only on migrate up, i.e. on <code class="highlighter-rouge">rake db:migrate</code>, but doesn’t run on <code class="highlighter-rouge">rake db:rollback</code>. Additionally, to keep the code in <code class="highlighter-rouge">data</code> method actual just write tests for it. That’s it.</p>
+
+<p>To have the ability testing migrations there is <code class="highlighter-rouge">require_migration</code> method loads migrations code easily.</p>
+
+<p>Check out a migration example below:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">class</span> <span class="nc">CreateUsers</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Migration</span>
+  <span class="k">def</span> <span class="nf">change</span>
+    <span class="c1"># Database schema changes as usual</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">data</span>
+    <span class="no">User</span><span class="p">.</span><span class="nf">create!</span><span class="p">(</span><span class="ss">name: </span><span class="s1">'Andrey'</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>And this is a test for the migration:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">'spec_helper'</span>
+<span class="nb">require</span> <span class="s1">'migration_data/testing'</span>
+<span class="n">require_migration</span> <span class="s1">'create_users'</span>
+
+<span class="n">desribe</span> <span class="no">CreateUsers</span> <span class="k">do</span>
+  <span class="n">describe</span> <span class="s1">'#data'</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s1">'works'</span> <span class="k">do</span>
+      <span class="n">expect</span> <span class="p">{</span> <span class="no">CreateUsers</span><span class="p">.</span><span class="nf">new</span><span class="p">.</span><span class="nf">data</span> <span class="p">}.</span><span class="nf">to_not</span> <span class="n">raise_exception</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>The test will fail on some unexpected changes in the code related to <code class="highlighter-rouge">User</code> model and you will be immediately informed that the migration is not actual anymore on your CI (you have one set up, right?).</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>The only solution to keep your migrations up to date with any code lives there is to write tests for them. But if you write the migration data code and code to change database schema simultaneously in <code class="highlighter-rouge">up</code>, <code class="highlighter-rouge">down</code> or <code class="highlighter-rouge">change</code> methods you won’t able to write tests for these migrations. Changing database schema in tests is not a good idea, isn’t it? So if you have these problems this gem is what you are looking for.</p>
+
+<h1 id="update-06112015">Update 06/11/2015:</h1>
+
+<p>Over time you may notice that it’s rather hard to maintain old migrations. Especially, it’s true when the code is changing a lot. At this point the best solution that I know is to just remove all the old migrations. After the removal we have to just insert current database structure into the last migration. This way we will have clean migrations history and it will be possible to run them on a new database.</p>
+
+<p>To perform the <strong>migrations squash</strong> I’ve added a rake task into <a href="https://github.com/ka8725/migration_data#clean-old-migration">the gem</a> today. The task name is <code class="highlighter-rouge">db:migrate:squash</code>. And finally, don’t forget to remove the migrations tests. Enjoy!</p>
+
+<p>One note for the rake task. You have to make sure all team members and deployment servers have already run all current migrations before the <strong>squashing</strong>. Otherwise, they can have collisions. This process can be automated later.</p>
+
+<h1 id="update-08122015">Update 08/12/2015</h1>
+
+<p>Once you can get the following state:</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">              Timeline
+                  |
+                  |
+                  |&lt;— change in the DB schema
+                  |
+                  |
+         Squash —&gt;|
+                  |
+                  |</code></pre></figure>
+
+<p>This happens when somebody does the squashing and some other person is creating a new migration. This way you can have inconsistency - the migration for change can try altering the not created yet tables (for example, it just adds a new column to the <code class="highlighter-rouge">users</code> table, but as it applied to the fresh DB accordingly to the DB history it unfortunately fails). In other words, make sure you don’t have a migration before the squashed one. The issue fix is pretty easy: you have to update timestamps for the migration change to be newer than the squash migration.</p>
+
+<h1 id="update-18012017">Update 18/01/2017</h1>
+
+<p>When you have to update a lot of data then the <code class="highlighter-rouge">migration_data</code> gem might be not a good choice. It takes time to process huge amount of data and the deployment process will be slowed down dramatically. It will increase downtime of your application that’s not acceptable for a production application with many online clients. So, if you have such type application then, please, don’t use this gem. There are may be used other techniques has already discussed in other great posts and gems:</p>
+
+<ul>
+  <li><a href="https://blog.codeship.com/rails-migrations-zero-downtime/">Rails Migrations with Zero Downtime</a></li>
+  <li><a href="https://robots.thoughtbot.com/data-migrations-in-rails">Data Migrations in Rails</a></li>
+  <li><a href="https://github.com/harrystech/seed_migration">Seed Migration</a></li>
+  <li><a href="https://github.com/ilyakatz/data-migrate">data-migrate</a></li>
+</ul>
+:ET

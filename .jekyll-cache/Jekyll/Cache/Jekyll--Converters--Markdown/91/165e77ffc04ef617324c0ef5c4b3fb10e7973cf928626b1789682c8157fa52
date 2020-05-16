@@ -1,0 +1,96 @@
+I"j'<p>Rails provides us great functionality for managing <strong>layouts</strong> in a web application.
+The <strong>layouts</strong> removes code duplication in view layer. You are able to slice all your application pages
+to blocks such as header, footer, sidebar, body and etc. This is an example of typical web application page, almost
+every site has these blocks. And as a rule the <em>body</em> block differs on each page. But sometimes we get into situation
+when there are several pages with similar elements. For instance, it may be a progress bar in a wizard form.
+If there are many steps in the wizard form then it gets annoying to copy and paste the progress bar’s code
+to the each step. Fortunately, Rails has functionality out of the box to solve this problem ideally.
+And this is an aim of this post. For the first glance the problem may seem to be common, but I personally
+didn’t find the solution in any book for Rails which I’d read. I’ve met it in the Rails documentation only.
+Because of this reason the post may be useful for every Rails developer.</p>
+
+<h1 id="the-problem">The problem</h1>
+
+<p>This is a prototype of a general web page:</p>
+
+<p><img src="/images/layout.jpg" alt="Typical layout of a web page" /></p>
+
+<p>Every Rails developer knows how to specify a layout for it. Let’s revise the knowledge.
+A generated Rails application has a default layout and
+it’s defined in the <em>app/views/layouts/application.html.erb</em>. On the screen above there is only one dynamic block - it’s
+the <strong>body</strong>, the <strong>footer</strong>, the <strong>header</strong> and the <strong>sidebar</strong> are common blocks for each page. So the code for the layout
+may look like this:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render</span> <span class="err">'</span><span class="na">shared</span><span class="err">/</span><span class="na">header</span><span class="err">'</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render</span> <span class="err">'</span><span class="na">shared</span><span class="err">/</span><span class="na">sidebar</span><span class="err">'</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">yield</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render</span> <span class="err">'</span><span class="na">shared</span><span class="err">/</span><span class="na">footer</span><span class="err">'</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre></figure>
+
+<p>The <strong>yield</strong> in the code above is the place in which any action template will be rendered.
+This is a default Rails behavior.</p>
+
+<p>But assume that you have to make a layout system in the <strong>body</strong> block. On the picture below you can see an example of
+such situation:</p>
+
+<p><img src="/images/steps.jpg" alt="Wizard form" /></p>
+
+<p>As you see each of these three steps includes common blocks: they are the progress bar, the “Submit” button and when
+you start to implement the steps you will see that it contains repetitive code. It may be, for example, form tags. This is
+the problem of nested layout. Of course we may copy paste the code of these separated by us blocks but this is not our way.</p>
+
+<h2 id="the-solution">The solution</h2>
+
+<p>As you guess, Rails provides functionality to solve the problem out of the box. The problem solved by using partials
+as layouts. <code class="highlighter-rouge">render</code> helper method accepts <code class="highlighter-rouge">:layout</code> option and there you can pass an path to the partial which will be
+the layout at the same time. Repeat it again, a <strong>partial is a layout at the same time</strong>.</p>
+
+<p>Define the partial which will be the layout for the wizard form. Path for the partial may look like this
+<em>app/views/wizard/_step.html.erb</em>:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render_progress_bar</span><span class="err">(</span><span class="na">current_step</span><span class="err">)</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%=</span> <span class="na">yield</span> <span class="err">%</span><span class="nt">&gt;</span></code></pre></figure>
+
+<p>Notice that it uses the same approach to get dynamic blocks, the <strong>yield</strong> doing here the same stuff. And now when you are on some step of the wizard form use <strong>render</strong> helper with <strong>:layout</strong> option and pass there the
+path to the partial. This is our 1st step which is placed in the following file <em>app/views/wizard/step1.html.erb</em>:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render</span> <span class="na">layout:</span> <span class="err">'</span><span class="na">step</span><span class="err">'</span> <span class="na">do</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form_for</span> <span class="na">resource</span><span class="err">,</span> <span class="na">url:</span> <span class="na">submit_path</span> <span class="na">do</span> <span class="err">|</span><span class="na">f</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">f</span><span class="err">.</span><span class="na">input</span> <span class="na">:some_field</span> <span class="err">%</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">f</span><span class="err">.</span><span class="na">submit</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span></code></pre></figure>
+
+<p>Now when the first action renders the application layout is applied firstly then rendering reaches this template and renders
+the <em>app/views/wizard/_step.html.erb</em> <em>partial as layout</em> firstly and passes the rendered form to the <em>yield</em> place (2nd line in the <em>app/views/wizard/_step.html.erb</em>).</p>
+
+<p>The problem is solved - we don’t have repetitive annoying code in each step template which renders the progress bar. But
+we still have repetitive code with creating forms with the <strong>form_for</strong> tag and the “Submit” button in the each template.
+We also can move this code to the partial-layout and pass the form variable <strong>f</strong> as an argument of the <strong>yield</strong>:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render_progress_bar</span><span class="err">(</span><span class="na">current_step</span><span class="err">)</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%=</span> <span class="na">form_for</span> <span class="na">resource</span><span class="err">,</span> <span class="na">url:</span> <span class="na">submit_path</span> <span class="na">do</span> <span class="err">|</span><span class="na">f</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">yield</span> <span class="na">f</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">f</span><span class="err">.</span><span class="na">submit</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span></code></pre></figure>
+
+<p>And now our template for the first step contains much less code:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;</span><span class="err">%=</span> <span class="na">render</span> <span class="na">layout:</span> <span class="err">'</span><span class="na">step</span><span class="err">'</span> <span class="na">do</span> <span class="err">|</span><span class="na">f</span><span class="err">|</span> <span class="err">%</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;</span><span class="err">%=</span> <span class="na">f</span><span class="err">.</span><span class="na">input</span> <span class="na">:some_field</span> <span class="err">%</span><span class="nt">&gt;</span>
+<span class="nt">&lt;</span><span class="err">%</span> <span class="na">end</span> <span class="err">%</span><span class="nt">&gt;</span></code></pre></figure>
+
+<p>In the templates of other steps we should change only the fields of their forms.</p>
+
+<p>If you want to know more about <strong>render</strong>’s opportunities, please, follow the <a href="http://guides.rubyonrails.org/layouts_and_rendering.html">official documentationn</a>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Nesting layouts reduces a lot of code duplication. Use the <strong>render layout</strong> approach described in this post and the coding
+will bring you more joy.</p>
+:ET

@@ -1,0 +1,14 @@
+I"Æ<p>Assume you have code in your project like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">form_for</span> <span class="ss">:company</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
+  <span class="n">f</span><span class="p">.</span><span class="nf">fields_for</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="n">f</span><span class="p">.</span><span class="nf">object</span><span class="p">.</span><span class="nf">user</span> <span class="o">||</span> <span class="n">f</span><span class="p">.</span><span class="nf">object</span><span class="p">.</span><span class="nf">build_user</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">ff</span><span class="o">|</span>
+    <span class="n">ff</span><span class="p">.</span><span class="nf">text_field</span> <span class="ss">:name</span></code></pre></figure>
+
+<p>With <a href="https://github.com/ka8725/get_or_build">get_or_build</a> gem you are able to translate this code to code like this:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">form_for</span> <span class="ss">:company</span> <span class="k">do</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
+  <span class="n">f</span><span class="p">.</span><span class="nf">fields_for</span><span class="p">(</span><span class="ss">:user</span><span class="p">,</span> <span class="ss">:build_association</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">ff</span><span class="o">|</span>
+    <span class="n">ff</span><span class="p">.</span><span class="nf">text_field</span> <span class="ss">:name</span></code></pre></figure>
+
+<p>Hope you will enjoy this gem! Thank you for your attention!</p>
+:ET

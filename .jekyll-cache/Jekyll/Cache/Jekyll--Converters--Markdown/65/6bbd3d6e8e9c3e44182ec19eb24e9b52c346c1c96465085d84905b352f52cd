@@ -1,0 +1,49 @@
+I"<p>Let’s assume that we have rails &gt;= 3 application. When you generate controller a lot of trash is appeared in your application. I mean here these things: helpers, assets (css and js), view tests. In 99% cases these files are waste and never used, so it’s reasonable to disable generating their. It’s very easy.</p>
+
+<h2 id="configure-your-application">Configure your application</h2>
+
+<p>Go to <em>config/application.rb</em> and paste there these lines:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">config</span><span class="p">.</span><span class="nf">generators</span> <span class="k">do</span> <span class="o">|</span><span class="n">g</span><span class="o">|</span>
+  <span class="n">g</span><span class="p">.</span><span class="nf">assets</span> <span class="o">=</span> <span class="kp">false</span>
+  <span class="n">g</span><span class="p">.</span><span class="nf">helper</span> <span class="o">=</span> <span class="kp">false</span>
+  <span class="n">g</span><span class="p">.</span><span class="nf">view_specs</span> <span class="o">=</span> <span class="kp">false</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>These magic lines of code will get rid of headache and you will forget about removing these trash manually forever!</p>
+
+<p>Also I recommend to don’t pass action names in rails controller generator because it inserts automatically routes which always are changed later.</p>
+
+<p>Say we have runned command <code class="highlighter-rouge">rails g controller users new edit</code> it will generate the following <em>trash</em>.</p>
+
+<p>Example of generated routes:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="n">get</span> <span class="s2">"users/new"</span>
+<span class="n">get</span> <span class="s2">"users/edit"</span></code></pre></figure>
+
+<p>It also generates tests which are never remained in this look. For my opinion it’s more useful to have pending tests than tests which do nothing.</p>
+
+<p>Example of generated tests for controller:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="nb">require</span> <span class="s1">'spec_helper'</span>
+
+<span class="n">describe</span> <span class="no">LessonsController</span> <span class="k">do</span>
+
+  <span class="n">describe</span> <span class="s2">"GET 'new'"</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s2">"returns http success"</span> <span class="k">do</span>
+      <span class="n">get</span> <span class="s1">'new'</span>
+      <span class="n">response</span><span class="p">.</span><span class="nf">should</span> <span class="n">be_success</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">describe</span> <span class="s2">"GET 'edit'"</span> <span class="k">do</span>
+    <span class="n">it</span> <span class="s2">"returns http success"</span> <span class="k">do</span>
+      <span class="n">get</span> <span class="s1">'edit'</span>
+      <span class="n">response</span><span class="p">.</span><span class="nf">should</span> <span class="n">be_success</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+<span class="k">end</span></code></pre></figure>
+
+<p>Thank you for your attention!</p>
+:ET
