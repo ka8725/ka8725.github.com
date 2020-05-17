@@ -280,6 +280,9 @@ span + .entry-title {
 	font-family: @system-font;
 	font-size: 14px;
 	letter-spacing: 0.02em;
+	&:hover {
+		text-decoration: underline;
+	}
 }
 .entry-content {
 	max-width: 690px;
@@ -350,7 +353,6 @@ span + .entry-title {
 	.entry-date {
 		.font-rem(14);
 		text-transform: uppercase;
-		display: none;
 		@media @medium {
 			display: inline;
 		}
