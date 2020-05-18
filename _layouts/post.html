@@ -28,7 +28,7 @@
               </span>
               <div class="entry-date date published">
                 <time datetime="{{ page.date | date_to_xmlschema }}">
-                  {{ page.date | date: "%B %d, %Y" }}
+                  {{ page.date | date: "%d %b %Y" }}
                 </time>
               </div>
               <div class="author-socials">
@@ -97,7 +97,7 @@
 </div><!-- /#main -->
 
 <div class="footer-wrapper">
-  <footer role="contentinfo">
+  <footer role="contentinfo" class="display-flex">
     {% include footer.html %}
   </footer>
 </div><!-- /.footer-wrapper -->

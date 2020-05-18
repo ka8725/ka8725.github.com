@@ -234,14 +234,14 @@ select:focus {
 // Jekyll Simple Search
 // -------------------------------------------------
 .dosearch {
-  padding: 6px 10px;
+  padding: 12px 14px;
   cursor: pointer;
   display: block;
-  color: @white;
-  .rounded(4px);
+  color: @black;
   &:hover {
 	.box-shadow(@shadow: inset 0 0 1px @white);
   	background-color: lighten(@black, 10);
+  	color: white;
   }
 }
 .search-form {
@@ -263,6 +263,7 @@ select:focus {
 		box-shadow: none;
 		border-radius: 0;
 		background-clip: padding-box;
+		font-family: @date-font;
 		.font-rem(32);
 		&:focus {
 			box-shadow: none;
