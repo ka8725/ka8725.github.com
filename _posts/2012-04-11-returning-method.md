@@ -4,6 +4,7 @@ title: "Returning method"
 description: "Ruby On Rails has beautiful method which can help you clean up your code. It is returning method"
 tags: [ruby, rails]
 share: true
+featured_post: false
 comments: true
 redirect_from:
   - /2012/04/11/returning-method/

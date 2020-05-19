@@ -4,6 +4,7 @@ title: "Improve code readability with closures in Ruby"
 modified: 2020-04-12 00:41:06 +0300
 description: "Reduce Ruby code complexity code with closures."
 tags: [ruby]
+featured_post: false
 comments: true
 share: true
 ---

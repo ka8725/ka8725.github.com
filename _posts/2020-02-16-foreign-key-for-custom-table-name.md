@@ -4,6 +4,7 @@ title: "Rails migration for belongs_to association with custom table name"
 modified: 2020-02-16 00:41:06 +0300
 description: "How to write a Rails migration for a belongs_to association which name does not correspond to the joined table name."
 tags: [ruby, rails, active_record, migrations]
+featured_post: false
 comments: true
 share: true
 ---

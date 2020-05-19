@@ -4,6 +4,7 @@ title: "Cascading selects with AJAX in Rails"
 description: "This post describes technique which allows to populate select which relates to chosen value by other select. For example there 2 selects on the page: country and state, when I choose country the state's select should be populated with states of chosen country"
 tags: [coffeescript, rails, ajax]
 share: true
+featured_post: false
 comments: true
 redirect_from:
   - /2013/09/05/cascading-selects-with-ajax-in-rails/

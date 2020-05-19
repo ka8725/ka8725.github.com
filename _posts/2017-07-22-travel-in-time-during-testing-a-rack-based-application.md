@@ -4,6 +4,7 @@ title: "Travel in time during testing a Rails application"
 modified: 2017-07-22 00:41:06 +0300
 description: "There will be explained how to test a Rails application when the current time change is needed every time. In other words how to travel in time and not corrupt your operating system."
 tags: [rails, time travel, testing]
+featured_post: false
 comments: true
 share: true
 ---

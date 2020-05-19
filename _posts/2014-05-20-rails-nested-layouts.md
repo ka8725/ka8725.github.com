@@ -4,6 +4,7 @@ title: "Nested layouts in Rails"
 description: "Use partials as layouts in Rails applications. It allows to nest layouts and get rid of code duplication
 in views."
 tags: [rails, layouts, render, partial]
+featured_post: false
 share: true
 comments: true
 redirect_from:

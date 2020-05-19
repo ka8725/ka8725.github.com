@@ -4,6 +4,7 @@ title: "Rescue exceptions DSL for plain Ruby objects with Rails"
 description: "A solution to consume rescue_from DSL in a Rails application.
               Likewise in Rails controllers we have a useful functionality to
               catch exceptions with rescue_from in order to change the default
+featured_post: false
               behavior, it's too easy to obtain it for any other type of a Ruby object in Rails applications."
 modified: 2017-01-19 22:53:20 +0100
 tags: [rails, rescue_from, exceptions, DSL]

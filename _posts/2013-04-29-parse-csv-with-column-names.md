@@ -4,6 +4,7 @@ title: "Parse CSV with column names"
 description: "There is a convenient and robust way in ruby to parse CSV rather than using column indexes. If you have in CSV header as a first row you can use it in your code"
 tags: [ruby]
 share: true
+featured_post: false
 comments: true
 redirect_from:
   - /2013/04/29/parse-csv-with-column-names/

@@ -35,8 +35,46 @@ task :new_post, :title do |t, args|
     post.puts "description: \"Some description goes here.\""
     post.puts "tags: [#{tags}]"
     post.puts "comments: true"
+    post.puts "featured_post: false"
     post.puts "share: true"
+    post.puts "featured_post: false"
     post.puts "---"
+  end
+end
+
+# usage rake featured_post
+desc "Set the featured post"
+task :featured_post do |t|  
+  title = get_stdin("Enter the whole title of post you want to be featured: ")
+  posts = Dir.children(posts_dir)
+
+  if posts.select { |file| file.include?(title.to_url) }.empty?
+    abort("rake aborted! The #{title} file doesn't exist")
+  end
+
+  posts.each do |file|
+    file = "#{posts_dir}/#{file}"
+    content = File.readlines(file)
+    if content[6].match("featured_post: true")
+      puts "Discard post: \"#{file}\" as featured"
+      content[6].gsub!("featured_post: true", "featured_post: false")
+      File.open(file, 'w+') do |f|
+        f.puts(content)
+      end
+    end
+  end
+
+  posts.each do |file|
+    file = "#{posts_dir}/#{file}"
+    content = File.readlines(file)
+    if file.match(title.to_url)
+      puts "Assign post: \"#{file}\" as featured"
+      content = File.readlines(file)
+      content[6].gsub!("featured_post: false", "featured_post: true")
+      File.open(file, 'w+') do |f|
+        f.puts(content)
+      end
+    end
   end
 end
 

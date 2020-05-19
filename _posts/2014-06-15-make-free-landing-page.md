@@ -4,6 +4,7 @@ title: "Make a free landing page"
 description: "This blog post describes how to make a startup landing page with minimum effort. All described tools to make the landing page are free. And as a special bonus you will see how to add a sign up form to the landing page to collect visitors' emails."
 tags: [github, mailchimp]
 share: true
+featured_post: false
 comments: true
 redirect_from:
   - /2014/06/15/make-free-landing-page/

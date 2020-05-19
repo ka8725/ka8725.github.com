@@ -4,6 +4,7 @@ title: "Dry-struct use cases"
 modified: 2019-12-27 00:41:06 +0300
 description: "This post describes dry-struct and dry-schema use cases, such as serialization/deserialization of data objects, form-objects params contract implementation, code documentation, etc."
 tags: [ruby, rails, dry-struct, dry-schema, dry-types]
+featured_post: false
 comments: true
 share: true
 ---

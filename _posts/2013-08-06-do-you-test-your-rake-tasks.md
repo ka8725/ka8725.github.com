@@ -4,6 +4,7 @@ title: "Do you test your rake tasks?"
 description: "This post explains how to test custom rake tasks in the Rails application"
 tags: [rails, rake, rspec]
 share: true
+featured_post: false
 comments: true
 redirect_from:
   - /2013/08/06/do-you-test-your-rake-tasks/

@@ -4,6 +4,7 @@ title: "From Single drop-down to Multiple check-boxes"
 modified: 2020-01-23 00:41:06 +0300
 description: "This post describes an incremental process how to move from a belongs_to/has_many to has_and_belongs_to_many association for a Rails application in live with zero downtime."
 tags: [postgresql, sql, ruby, rails, active_record]
+featured_post: false
 comments: true
 share: true
 ---

@@ -4,6 +4,7 @@ title: "Ruby hash styles formatting"
 description: "Advice how to improve code formatting of hash styles for Ruby/Ruby On Rails"
 tags: [ruby, rails, formatting]
 share: true
+featured_post: false
 comments: true
 redirect_from:
   - /2012/07/04/ruby-hash-styles-formatting.html
