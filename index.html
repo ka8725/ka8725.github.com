@@ -17,8 +17,10 @@ layout: page
   {% endfor %}
   <h2 class="recent-posts">Recent posts</h2>
   {% for post in site.posts limit:10 %}
-    <li class="main-list">
-      {% include card.html %}
-    </li>
+    {% unless post.featured_post %}
+      <li class="main-list">
+        {% include card.html %}
+      </li>
+    {% endunless %}
   {% endfor %}
 </ul>
