@@ -1,3 +1,14 @@
+.entry-content {
+	div.highlight, figure.highlight {
+		margin-top: 56px;
+		background-color: @background-color;
+		padding: 20px;
+		@media @medium {
+			margin-top: 34px;
+		}
+	}
+}
+
 .highlight {
 	.font(13);	
 	pre {
@@ -66,15 +77,3 @@
 	.vi { color: #008080 } /* Name.Variable.Instance */
 	.il { color: #009999 } /* Literal.Number.Integer.Long */
 }
-
-.entry-content {
-	div.highlight, figure.highlight {
-		margin-top: 56px;
-		background-color: @background-color;
-		padding: 20px;
-		@media @medium {
-			margin-top: 34px;
-		}
-	}
-}
-

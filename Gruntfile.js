@@ -65,7 +65,10 @@ module.exports = function(grunt) {
         files: [
           'assets/less/**/*.less'
         ],
-        tasks: ['recess']
+        tasks: ['recess'],
+        options: {
+          livereload: true
+        }
       },
       js: {
         files: [
