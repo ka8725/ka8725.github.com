@@ -16,23 +16,34 @@
   (function( $, window, undefined ) {
 
      var bs = {
-          close: $(".fa-times-circle"),
-          searchform: $(".search-form"),
-          canvas: $("body"),
-          dothis: $('.dosearch')
-      };
+          close:         $(".fa-times-circle"),
+          searchform:    $(".search-form"),
+          searchWrapper: $('.search-wrapper'),
+          canvas:        $("body"),
+          dothis:        $('.dosearch'),
+          document:      $(document),
+          closeSearch:   function() {
+            this.searchWrapper.removeAttr( 'style' );
+            this.searchform.toggleClass('active');
+            this.canvas.removeClass('search-overlay');
+          }
+        };
 
     bs.dothis.on('click', function() {
-      $('.search-wrapper').css({ display: "block" });
+      bs.searchWrapper.css({ display: "block" });
       bs.searchform.toggleClass('active');
       bs.searchform.find('input').focus();
       bs.canvas.toggleClass('search-overlay');
     });
 
-      bs.close.on('click', function() {
-        $('.search-wrapper').removeAttr( 'style' );
-        bs.searchform.toggleClass('active');
-        bs.canvas.removeClass('search-overlay');
+    bs.close.on('click', function() {
+      bs.closeSearch();
+    });
+
+    bs.document.keyup(function(e) {
+      if (e.key === "Escape") {
+        bs.closeSearch();
+      }
     });
   })( jQuery, window );
 </script>

@@ -67,7 +67,7 @@ module.exports = function(grunt) {
         ],
         tasks: ['recess'],
         options: {
-          livereload: true
+          livereload: true     // this option doesn't work yet
         }
       },
       js: {
