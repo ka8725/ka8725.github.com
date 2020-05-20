@@ -3,12 +3,12 @@ body {
 	padding: 0;
 	width: 100%;
 	background-color: @white;
-	border-top: 2px solid @black;
+	border-top: 3px solid @black;
 }
 
 p {
 	line-height: 32px;
-	margin-top: 2em;
+	margin-top: 1em;
 	font-size: 21px;
 	letter-spacing: -0.003em;
 	margin-bottom: -0.46em;
@@ -24,7 +24,7 @@ p {
     vertical-align: top;
     margin: 0 0 5px;
     padding: 4px 20px;
-    background-color: @black;
+    background-color: @black-nav;
     .rounded(0 0 10px 10px);
     .clearfix();
   }
@@ -34,8 +34,8 @@ p {
     float: left;
     list-style: none;
     text-align: center;
-    .font-rem(14);
-    text-transform: capitalize;
+    .font-rem(15);
+    text-transform: uppercase;
     color: @white;
     a:hover {
       .box-shadow(@shadow: inset 0 0 1px @white);
@@ -47,7 +47,7 @@ p {
     color: @white;
     .rounded(4px);
     &:hover {
-      background-color: lighten(@black, 10);
+      background-color: lighten(@black-nav, 10);
     }
   }
 }
@@ -85,8 +85,11 @@ p {
 	display: block;
 	vertical-align: top;
 	margin: 0;
-	padding: 4px 20px;
-	background-color: @black;
+	.font-rem(14);
+	text-transform: capitalize;
+	font-family: @date-font;
+	padding: 5px 20px;
+	background-color: @black-nav;
 	.rounded(0);
 	@media @changeNav {
 		display: none;
@@ -187,6 +190,7 @@ p {
 .entry-running {
 	display: flex;
 	justify-content: space-between;
+	margin-bottom: 25px;
 	@media @medium {
 		flex-direction: column-reverse;
 	}
@@ -218,16 +222,20 @@ span + .entry-title {
 }
 .entry-title {
 	font-family: @alt-font;
-	.font-rem(32);
+	font-size: 3rem;
 	font-weight: 400;
-	line-height: 48px;
+	line-height: 53px;
+	letter-spacing: 0.5px;
+	margin-bottom: 35px;
 	a {
 		color: @black;
 		text-decoration: underline;
 	}
 	@media @medium {
+		line-height: 33px;
 		max-width: 600px;
 		.font-rem(24);
+		font-size: 1.7rem;
 	}
 }
 .entry-wrapper {
@@ -236,7 +244,7 @@ span + .entry-title {
 	padding-left: 20px;
 	.clearfix();
 	@media @medium {
-		margin: 0 24px;
+		margin: 0 15px;
 		padding: 0;
 	}
 	@media @large {
@@ -289,21 +297,56 @@ span + .entry-title {
 	@media @large {
 		float: left;
 	}
+	li {
+		margin-left: -15px;
+		font-size: 21px;
+		line-height: 32px;
+    letter-spacing: -0.003em;
+	}
 	p > a,
 	li > a {
-		border-bottom: 1px solid lighten(@link-color, 50);
+		border-bottom: 1px dotted lighten(@link-color, 50);
 		&:hover {
 			border-bottom-style: solid;
 		}
 	}
+  h3 {
+  	font-size: 1.9em;
+  	margin-bottom: -10px;
+    margin-top: 25px;
+    font-weight: bold;
+  }
+  h4 {
+    font-size: 1.6em;
+    font-weight: bold;
+    margin: 30px 0 -5px;
+  }
 	@media @medium {
+		li {
+			margin-left: -20px;
+			font-size: 18px;
+		}
 		h1 {
-			line-height: 42px;
+			margin-bottom: 25px;
+		}
+		h2 {
+			
+	    font-weight: 500;
+		}
+		h2.recent-posts {
+	    font-size: 23px;
+		}
+		h3 {
+			font-size: 1.7em;
+		}
+		h4 {
+			
+			margin: 25px 0 -10px;
 		}
 		p {
 			font-size: 18px;
 	    line-height: 30px;
-	    margin-top: 1.56em;
+	    margin-top: 1.3em;
 		}
 	}
 }
@@ -337,19 +380,30 @@ span + .entry-title {
 	}
 }
 // Post index layout
-.slogan {
+h2.slogan {
 	margin-top: -1.05em;
 	font-family: @system-font;
-	font-size: 1.6em !important;
+	font-size: 1.6em;
+	@media @medium {
+		font-size: 1.3em;
+	}
 }
 .entry-title.home-page {
 	font-family: @system-font;
 	font-size: 3rem;
-	margin-top: 0px;
+  margin-bottom: 48px;
+	@media @medium {
+		font-size: 2.3em;
+		margin-top: 20px;
+		margin-bottom: 36px;
+		line-height: 1em;
+	}
 }
 .entry-tags.static-tags {
 	margin: 0 0 44px;
-
+	@media @medium {
+		margin: 0 0 33px;
+	}
 }
 .post-list {
 	font-family: @system-font;
@@ -360,7 +414,7 @@ span + .entry-title {
 		padding: 8px 0;
     border-bottom: 1px solid lighten(@black,80);
     border-bottom: 1px solid fade(@black,10);
-    .clearfix();	
+    .clearfix();
 	}
 	li > a {
 		border-bottom-width: 0;
@@ -380,7 +434,14 @@ span + .entry-title {
 		}
 	}
 	li.main-list.featured-post {
-		margin: 35px 0;
+		margin: 40px 0;
+		background-color: #63FFC7;
+		@media @medium {
+			margin: 25px 0;
+		}
+	}
+	li.articles-index {
+		margin-left: 0;
 	}
 	h2 {
 		margin: 5px 0;
@@ -404,12 +465,10 @@ span + .entry-title {
 	.entry-tags {
 		margin-top: 0;
 		display: flex;
-		div {
-			margin-top: 10px;
-		}
 	}
 	.entry-date {
 		.font-rem(14);
+		white-space: nowrap;
 		text-transform: capitalize;
 		@media @medium {
 			display: inline;
@@ -473,7 +532,7 @@ span + .entry-title {
 		margin: 0 auto;
 		justify-content: space-between;
 		@media @medium {
-			margin: 0 24px;
+			margin: 0 15px;
 		}
 	}
 }
@@ -503,6 +562,7 @@ span + .entry-title {
 	font-size: 1.6em;
 }
 .social-icons {
+	white-space: nowrap;
 	font-size: 1.2em;
 	transform: translateY(-3px);
 	a {

@@ -12,9 +12,7 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: 400;
 }
 
-h2, h3, h4, h5, h6 {
-	margin-top: 2em;
-}
+
 
 // Links
 // --------------------------------------------------
@@ -120,32 +118,12 @@ li {
 		border: 1px solid lighten(@black, 90);
 		background-color: lighten(@black, 95);
 		.rounded(3px);
+		@media @medium {
+			font-size: 0.75rem;
+		}
 	}
 }
 pre {
 	.font(12);
 	overflow-x: auto;
-}
-
-
-// Post
-// --------------------------------------------------
-.entry-content {
-	li {
-		.font-rem(16)
-	}
-	h2 {
-		@media @medium {
-			font-size: 18px;
-		}
-	}
-	h3 {
-		font-size: large;
-		@media @medium {
-			font-size: larger;
-		}
-	}
-	h4 {
-		font-size: initial;
-	}
 }

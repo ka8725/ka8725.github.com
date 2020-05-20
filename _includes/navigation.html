@@ -10,8 +10,8 @@
 				{% endif %}
 			</li>
 	        {% endfor %}
-	        <li><a href="/atom.xml" title="Atom/RSS feed">Feed</a></li>
-	        {% if site.search %}<li class="dosearch">Search</li>{% endif %}
+	        <li class="feed"><a href="/atom.xml" title="Atom/RSS feed"><i class="fas fa-rss" style="color: white;"></i> Feed</a></li>
+	        {% if site.search %}<li class="dosearch"><i class="fas fa-search" style="color: white;"></i> Search</li>{% endif %}
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
