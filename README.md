@@ -1,3 +1,12 @@
-This is my [blog](http://railsguides.net) and that's it.
+These are sources of the [blog](http://railsguides.net).
 
-To make any post as featured please write in console "rake featured_post". After that write the title of the post you want to be featured.
+### Usage
+
+Use `rake featured_post` to change featured post.
+
+### Development
+
+Install grunt: `npm install -g grunt`
+Install dependencies: `npm install`
+Build assets: `grunt recess`
+Start web server: `jekyll serve`
