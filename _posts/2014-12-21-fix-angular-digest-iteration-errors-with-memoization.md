@@ -4,7 +4,6 @@ title: "Fix Angular's digest iterations errors with memoization"
 description: "Memoize your methods in Javascript to avoid performance problems in Angular and errors saying that 10 digest iterations reached."
 tags: [angular, javascript, errors]
 share: true
-featured_post: false
 comments: true
 ---
 Sometimes I have failed Angular code with the following exception message: **Error: 10 $digest() iterations reached. Aborting!** and I had no idea what is going on there while didn't get an explanation how Angular's bindings work. In this article I will share an idea how to avoid the problem and how to get better performance in Angular applications with memoization technique.

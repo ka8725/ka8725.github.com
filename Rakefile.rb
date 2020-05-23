@@ -57,7 +57,7 @@ task :featured_post do |t|
     content = File.readlines(file)
     if content[6].match("featured_post: true")
       puts "Discard post: \"#{file}\" as featured"
-      content[6].gsub!("featured_post: true", "featured_post: false")
+      content.delete_at(6)
       File.open(file, 'w+') do |f|
         f.puts(content)
       end
@@ -70,7 +70,7 @@ task :featured_post do |t|
     if file.match(title.to_url)
       puts "Assign post: \"#{file}\" as featured"
       content = File.readlines(file)
-      content[6].gsub!("featured_post: false", "featured_post: true")
+      content.insert(6, "featured_post: true")
       File.open(file, 'w+') do |f|
         f.puts(content)
       end

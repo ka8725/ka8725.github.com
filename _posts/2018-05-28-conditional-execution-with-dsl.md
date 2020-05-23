@@ -4,7 +4,6 @@ title: "Conditional execution with DSL in Ruby"
 modified: 2018-05-28 00:41:06 +0300
 description: "This is a howto describing an alternative solution for if-clause in Ruby."
 tags: [ruby, dsl, if, clause, condition]
-featured_post: false
 comments: true
 share: true
 ---

@@ -4,7 +4,6 @@ title: "Enums as constants in Ruby DSL"
 modified: 2020-03-23 00:41:06 +0300
 description: "The post provides a DSL allows enums definition as constants."
 tags: [ruby, enums, DSL]
-featured_post: false
 comments: true
 share: true
 ---

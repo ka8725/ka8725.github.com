@@ -4,7 +4,6 @@ title: "How to test state machine in Ruby"
 description: "I've invented approach which rids of headache of testing state machine in Ruby.
 This solution is only for RSpec now, but approach can be used for test unit as well."
 tags: [rspec, ruby]
-featured_post: false
 share: true
 comments: true
 redirect_from:

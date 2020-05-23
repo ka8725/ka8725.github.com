@@ -4,7 +4,6 @@ title: "How to find the method definition in Ruby"
 description: "This post describes how to get location (file and line) where method is defined. When it's impossible and what to do to avoid losing location of method definition."
 tags: [ruby]
 share: true
-featured_post: false
 comments: true
 redirect_from:
   - /2013/09/19/find-method-source-location/

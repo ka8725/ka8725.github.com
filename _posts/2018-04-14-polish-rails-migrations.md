@@ -4,7 +4,6 @@ title: "Polish Rails migrations"
 modified: 2018-04-14 00:41:06 +0300
 description: "Sometimes, it's needed to re-run a new migration in a new pull request back and forth several times after code changes, rebasing and etc. The process gets annoying when there are many migrations in the PR and that one, that's being changed, is somewhere in the middle of the history. In this post there is a solution how to relieve the pain."
 tags: [rails, migrations]
-featured_post: false
 comments: true
 share: true
 ---

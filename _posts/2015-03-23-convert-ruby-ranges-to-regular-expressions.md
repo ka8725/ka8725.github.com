@@ -4,7 +4,6 @@ title: "Convert Ruby ranges to regular expressions"
 description: "In this post I will share the gem which allows to convert Ruby ranges to regular expressions."
 tags: [ruby, gem]
 share: true
-featured_post: false
 comments: true
 ---
 Recently I noticed that there is no a Rubyß library that allows to convert Ruby ranges to regular expressions. That's why I decided to write it by myself and this post is just a sharing the gem's link and a few examples how to use the gem.

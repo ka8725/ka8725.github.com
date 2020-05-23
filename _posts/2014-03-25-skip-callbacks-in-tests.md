@@ -4,7 +4,6 @@ title: "Skip callbacks in tests"
 description: "Simple solution to skip callbacks in tests if they should not be run there. The solution is for Rails ActiveRecord."
 tags: [rails, callbacks]
 share: true
-featured_post: false
 comments: true
 redirect_from:
   - /2014/03/25/skip-callbacks-in-tests/

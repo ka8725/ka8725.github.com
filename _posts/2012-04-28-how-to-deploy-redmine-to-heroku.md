@@ -4,7 +4,6 @@ title: "How to deploy Redmine to Heroku"
 description: "This post describes how to deploy free bugtracker Redmine 2 to free Hosting - Heroku"
 tags: [heroku, redmine, rails, hosting]
 share: true
-featured_post: false
 comments: true
 redirect_from:
   - /2012/04/28/how-to-deploy-redmine-to-heroku/

@@ -4,7 +4,6 @@ title: "Efficient algorithm to check dates overlap"
 modified: 2019-04-07 00:41:06 +0300
 description: "Do you need an efficient algorithm that checks a date range overlapping with some denoted set of date ranges? This article explains how to solve this problem with a subtle approach."
 tags: [postgresql, sql, ruby, rails, active_record]
-featured_post: false
 comments: true
 share: true
 ---

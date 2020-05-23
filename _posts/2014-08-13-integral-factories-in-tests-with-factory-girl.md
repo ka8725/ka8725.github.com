@@ -4,7 +4,6 @@ title: "Integral factories in tests with FactoryGirl"
 description: "Keep your FactoryGirl's factories clean and integral with built-in features. This article describes the features and gives advices how to not stuck with an issue when you have inconsistent environment in the tests."
 tags: [rails, factory_girl, rspec]
 share: true
-featured_post: false
 comments: true
 ---
 

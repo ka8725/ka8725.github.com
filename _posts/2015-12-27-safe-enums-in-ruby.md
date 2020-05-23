@@ -4,7 +4,6 @@ title: "Safe enums in Ruby"
 description: "Safe enums implementation in Ruby. Why and what for? Read this post about the
               mezuka/enum gem."
 modified: 2015-12-27 17:03:55 +0300
-featured_post: false
 tags: [ruby, gem]
 comments: true
 share: true

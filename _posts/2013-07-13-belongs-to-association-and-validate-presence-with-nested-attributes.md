@@ -4,7 +4,6 @@ title: "Rule #2 to validate belongs_to association for presence"
 description: "If you have troubles with validations for belongs_to association presence when nested params went for form? I had the same problem recently and in this post I will share idea with you how to challenge it"
 tags: [rails, belongs_to, validator, nested_form]
 share: true
-featured_post: false
 comments: true
 redirect_from:
   - /2013/07/13/belongs-to-association-and-validate-presence-with-nested-attributes/

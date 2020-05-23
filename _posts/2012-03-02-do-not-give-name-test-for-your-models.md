@@ -4,7 +4,6 @@ title: "Do not give name Test for your models"
 description: "Ruby on Rails guides for strange situation with name Test for models. There are many reasons to do not give name Test for your models in Ruby On Rails. Validates uniqueness in scope test_id does not work. There is a already Test module in Ruby On Rails"
 tags: [ruby, rails, active record, reserved_words]
 share: true
-featured_post: false
 comments: true
 redirect_from:
   - /2012/03/02/do-not-give-name-test-for-your-models/

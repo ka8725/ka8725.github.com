@@ -4,7 +4,6 @@ title: "Stub Rails ActiveRecord associations in your tests"
 modified: 2018-11-27 00:41:06 +0300
 description: "Explains a technique that allows stubbing ActiveRecord associations easily so that your tests are getting faster."
 tags: [rails, active_record, rspec]
-featured_post: false
 comments: true
 share: true
 ---

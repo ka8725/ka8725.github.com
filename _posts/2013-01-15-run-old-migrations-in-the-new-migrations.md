@@ -4,7 +4,6 @@ title: "Run old migrations in the new migrations"
 description: "This post describes steps of using old migrations in the new migrations which you have just created and need to write code which you have already wrote in the older migrations."
 tags: [rails, active_record, migrations]
 share: true
-featured_post: false
 comments: true
 redirect_from:
   - /2013/01/15/run-old-migrations-in-the-new-migrations/
