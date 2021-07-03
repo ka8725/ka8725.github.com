@@ -49,6 +49,10 @@
 </script>
 {% endif %}
 {% include analytics.html %}
-{% if page.comments %}{% include disqus_comments.html %}{% endif %}
+{% if page.comments && site.disqus_shortname %}{% include disqus_comments.html %}{% endif %}
 <!-- Load Modernizr -->
 <script src="/assets/js/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+<!--  disable google ads
+<script data-ad-client="ca-pub-1211604152094627" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+-->
