@@ -17,7 +17,7 @@ In this post, I'm trying to reveal these questions and answers for people alread
 
 ### Questions and answers
 
-#### 1. Andrey, I've heard you have experience with GraphQL. But what is your attitude to it? I prefer JSON API and don't see GraphQL benefits.
+#### 1. Andrei, I've heard you have experience with GraphQL. But what is your attitude to it? I prefer JSON API and don't see GraphQL benefits.
 
 Well, first of all before comparing them one should understand that JSON is just a format that specifies data. And usually this data is supposed to go from one "program/service/server/process/whatever" to another "program/service/server/process/whatever". Let's agree on "program/service/server/process/whatever" is a black-boxed service that can be either back-end or front-end process and from now on we call it just **process**.
 

@@ -4,8 +4,8 @@ permalink: /about-author/
 title : About the author of RailsGuides
 ---
 
-<img src="/images/my_face.jpg" alt="Andrey Koleshko" align="left" vspace="5" hspace="5" width="100"/>
-My name is Andrey Koleshko. I live in Belarus, Minsk. I've been working with **Ruby On Rails** framework since 2009.
+<img src="/images/my_face.jpg" alt="Andrei Kaleshka" align="left" vspace="5" hspace="5" width="100"/>
+My name is Andrei Kaleshka. I live in Belarus, Minsk. I've been working with **Ruby On Rails** framework since 2009.
 During this period of time I was working on a lot of Rails projects.
 The list contains different types of projects including **SaaS** applications, **CMS** systems, **billing** systems, **REST API** and so on.
 

@@ -144,7 +144,7 @@ class CreateUsers < ActiveRecord::Migration
   end
 
   def data
-    User.create!(name: 'Andrey')
+    User.create!(name: 'Andrei')
   end
 end
 {% endhighlight %}

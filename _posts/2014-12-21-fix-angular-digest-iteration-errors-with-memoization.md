@@ -22,7 +22,7 @@ var app = angular.module('plunker', []);
 app.controller('MainCtrl', function($scope) {
   var data = [
     {firstName: 'John', lastName: 'Smith'},
-    {firstName: 'Andrey', lastName: 'Koleshko'}
+    {firstName: 'Andrei', lastName: 'Kaleshka'}
   ];
 
   $scope.getUsers = function() {
@@ -46,8 +46,8 @@ app.controller('MainCtrl', function($scope) {
 The issue happens because the `getUsers()` returns different result every call despite of the fact that properties of the array items are the same:
 
 {% highlight javascript %}
-var res1 = [{fullName: 'John Smith'}, {fullName: 'Andrey Koleshko'}];
-var res2 = [{fullName: 'John Smith'}, {fullName: 'Andrey Koleshko'}];
+var res1 = [{fullName: 'John Smith'}, {fullName: 'Andrei Kaleshka'}];
+var res2 = [{fullName: 'John Smith'}, {fullName: 'Andrei Kaleshka'}];
 res1 === res2; // false
 {% endhighlight %}
 
@@ -63,7 +63,7 @@ var app = angular.module('plunker', []);
 app.controller('MainCtrl', function($scope) {
   var data = [
     {firstName: 'John', lastName: 'Smith'},
-    {firstName: 'Andrey', lastName: 'Koleshko'}
+    {firstName: 'Andrei', lastName: 'Kaleshka'}
   ];
 
   $scope.getUsers = _.memoize(function() {
