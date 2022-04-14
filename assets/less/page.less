@@ -20,7 +20,6 @@ p {
   text-align: center;
   .clearfix();
   ul {
-    display: inline-block;
     vertical-align: top;
     margin: 0 0 5px;
     padding: 4px 20px;
@@ -250,6 +249,9 @@ span + .entry-title {
 	@media @large {
 		max-width: 690px;
 	}
+	@media @largest {
+		max-width: 1000px;
+	}
 }
 .entry-meta {
 	max-width: 690px;
@@ -297,6 +299,9 @@ span + .entry-title {
 	@media @large {
 		float: left;
 	}
+	@media @largest {
+		max-width: 1000px;
+	}
 	li {
 		margin-left: -15px;
 		font-size: 21px;
@@ -330,7 +335,7 @@ span + .entry-title {
 			margin-bottom: 25px;
 		}
 		h2 {
-			
+
 	    font-weight: 500;
 		}
 		h2.recent-posts {
@@ -340,7 +345,7 @@ span + .entry-title {
 			font-size: 1.7em;
 		}
 		h4 {
-			
+
 			margin: 25px 0 -10px;
 		}
 		p {
@@ -550,7 +555,7 @@ h2.slogan {
 	a {
 		color: @black;
 		&:hover { color: #000000; }
-		&:visited {	color:@black;	}	
+		&:visited {	color:@black;	}
 	}
 }
 .social-author {
