@@ -158,3 +158,9 @@ Not a very elegant solution, but it works well.
 See a working Rails app as an example [here](https://github.com/railsguides/smart-assocs).
 
 While working on an issue try to fix it "locally". That allows us find a solution that avoids unnecessary global changes, regression, and bugs. Happy coding!
+
+
+### Update 28 Apr 2022
+
+I've got several feedbacks suggesting to use [ActiveSupport::CurrentAttributes](https://api.rubyonrails.org/classes/ActiveSupport/CurrentAttributes.html)
+instead of `Thread.current`. Can't disagree with that, it looks much safer and cleaner. Thanks to everyone who suggested that.
