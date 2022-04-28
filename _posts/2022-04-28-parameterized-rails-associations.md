@@ -9,7 +9,7 @@ share: true
 ---
 
 This post shows how to define associations dependent on some global object such as current user
-(also we can call these things as **multi-tenant associations**).
+(also we can call these things **multi-tenant associations**).
 
 ### Problem
 
@@ -37,19 +37,19 @@ Somewhere in controllers there is a code that optimizes N+1 problem:
 ```
 
 But the `songs` association defined on the `Artist` is not aware of our requirement that
-it needs to list only published songs for not logged in users. So it would always return all songs.
+it needs to list only published songs for not logged-in users. So it would always return all songs.
 
 See how to fix that without changing the association name below.
 
 > Keeping the association name is an important requirement. It doesn't need to change the code
 everywhere where the existing application has `.includes(:song)`.
-That way, it eliminates regression and possible bugs from the forgotten places.
+That way, it eliminates regression and possible bugs from forgotten places.
 
 ### Solution
 
 ActiveRecord doesn't have any functionality that would allow to parameterize associations. Fortunately,
-it allows to specify an optional lambda that can reduce scope of returning objects. Sounds like exactly what we need.
-Unfortunately, it's not aware of the fact if current user is present (or user is authenticated).
+it allows specifying an optional lambda that can reduce the scope of returning objects. Sounds like exactly what we need.
+Unfortunately, it's not aware of the fact if the current user is present (authenticated).
 But we can define a global thread-safe variable and use it there.
 
 The global variable can be set by `ApplicationRecord` within `around_filter`:
@@ -78,14 +78,14 @@ end
 ```
 
 The application starts working according to the new requirement that anonymous can see only published songs.
-The other places over the app remain the same and don't require any changes, even though.
+Note, that the other places over the app remain the same and don't need any changes.
 
-This is the whole solution. It's as simple as that.
+That's whole solution. It's as simple as that.
 
-Now, let's check it out:
+Let's check it in action:
 
 ```ruby
-irb(main):001:0> Artist.all.includes(:songs).map(&:songs)
+irb(main):001:0> Artist.includes(:songs).map(&:songs)
    (0.9ms)  SELECT sqlite_version(*)
   Artist Load (0.5ms)  SELECT "artists".* FROM "artists"
   Song Load (0.7ms)  SELECT "songs".* FROM "songs" WHERE "songs"."status" = ? AND "songs"."artist_id" IN (?, ?)  [["status", "published"], ["artist_id", 1], ["artist_id", 2]]
@@ -94,13 +94,13 @@ irb(main):001:0> Artist.all.includes(:songs).map(&:songs)
  [#<Song:0x000000011008be28 id: 3, status: "published", artist_id: 2, ...]]
 ```
 
-Since, it has no set `Thread.current[:current_user]` we assume it's an anonymous user request. And as you see it returns only published songs.
+It has no set `Thread.current[:current_user]` - assuming it's an anonymous user request. That's why the result has only published songs.
 
-Now, let's specify `Thread.current[:current_user]`. Doing that in the console we kinda simulate running the code above in controller.
+On the next test we specify `Thread.current[:current_user]` - doing that in the console we kinda simulate running the around filter above in the controller.
 
 ```ruby
 irb(main):002:0> Thread.current[:current_user] = User.first
-irb(main):003:0> Artist.all.includes(:songs).map(&:songs)
+irb(main):003:0> Artist.includes(:songs).map(&:songs)
   Artist Load (0.2ms)  SELECT "artists".* FROM "artists"
   Song Load (0.4ms)  SELECT "songs".* FROM "songs" WHERE "songs"."artist_id" IN (?, ?)  [["artist_id", 1], ["artist_id", 2]]
 =>
@@ -157,4 +157,4 @@ Not a very elegant solution, but it works well.
 
 See a working Rails app as an example [here](https://github.com/railsguides/smart-assocs).
 
-While working on a issue try to fix it "locally". That allows to come up with a solution that avoids unnecessary global changes, regression, and bugs. Happy coding!
+While working on an issue try to fix it "locally". That allows us find a solution that avoids unnecessary global changes, regression, and bugs. Happy coding!
