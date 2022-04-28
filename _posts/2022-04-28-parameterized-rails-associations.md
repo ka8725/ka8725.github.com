@@ -116,7 +116,11 @@ The association became really smart and very flexible.
 
 ### Drawbacks
 
-The project I applied this solution uses [database cleaner](https://github.com/DatabaseCleaner/database_cleaner) gem in tests.
+1. This solution works until you face the case when the association should behave differently all over the app.
+It's when one place needs the result reduced and at the same time, another place needs all items within the result.
+In this case, the solution should be advanced (yes, it's possible to make it even smarter) or replaced by something else.
+
+2. The project I applied this solution uses [database cleaner](https://github.com/DatabaseCleaner/database_cleaner) gem in tests.
 Even though, the following RSpec example looks ok it would break this gem work:
 
 ```ruby
