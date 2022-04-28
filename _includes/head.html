@@ -3,22 +3,14 @@
 <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
 {% if page.tags %}<meta name="keywords" content="{{ page.tags | join: ', ' }}">{% endif %}
 
-{% if site.owner.twitter %}<!-- Twitter Cards -->
-{% if page.image.feature %}<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="/images/{{ page.image.feature }}">
-{% else %}<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="{% if page.image.thumb %}/images/{{ page.image.thumb }}{% else %}/images/{{ site.logo }}{% endif %}">{% endif %}
 <meta name="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
 <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
 <meta name="twitter:site" content="@{{ site.owner.twitter }}">
-{% if page.author.twitter %}<meta name="twitter:creator" content="@{{ page.author.twitter }}">{% endif %}
-{% endif %}
+<meta name="twitter:creator" content="@{{ site.owner.twitter }}">
 
-<meta property="og:image" content="/images/post.png"/>
-<meta property="og:image:width" content="900"/>
-<meta property="og:image:height" content="648"/>
-<meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="/images/post.png"/>
+<meta property="og:image" content="{{ site.url }}/images/post.jpg"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:image" content="{{ site.url }}/images/post.jpg"/>
 
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
