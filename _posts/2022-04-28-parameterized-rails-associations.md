@@ -168,3 +168,20 @@ While working on an issue try to fix it "locally". That allows us find a solutio
 
 I've got several feedbacks suggesting to use [ActiveSupport::CurrentAttributes](https://api.rubyonrails.org/classes/ActiveSupport/CurrentAttributes.html)
 instead of `Thread.current`. Can't disagree with that, it looks much safer and cleaner. Thanks to everyone who suggested that.
+
+
+### Update 1 May 2022
+
+Got an interesting and very useful response on [reddit](https://www.reddit.com/r/rails/comments/udr0ne/comment/i6kw9vg/?utm_source=reddit&utm_medium=web2x&context=3).
+Reposting it here.
+
+Sequel has this functionality out of box:
+
+```ruby
+class Artist < Sequel::Model
+  one_to_many :songs
+end
+
+# somewhere in the controller
+Artist.eager(songs: -> (ds) { current_user ? ds : ds.where(status: :published) })
+```
