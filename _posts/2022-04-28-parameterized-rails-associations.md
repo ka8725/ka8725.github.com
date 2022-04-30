@@ -185,3 +185,5 @@ end
 # somewhere in the controller
 Artist.eager(songs: -> (ds) { current_user ? ds : ds.where(status: :published) })
 ```
+
+[I've submitted a feature request to Rails](https://discuss.rubyonrails.org/t/dynamic-eager-loading-associations/80569).
