@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "Financial plan on PostgreSQL and Rails"
+title: "Financial plan on PostgreSQL"
 modified: 2022-05-03 00:41:06 +0300
-description: "See how to build a financial plan on pure SQL using PostgreSQL and later use it in Rails."
+description: "See how to build a financial plan on pure SQL using PostgreSQL database. Advance your SQL skills on the practical example."
 tags: [postgresql, sql]
 comments: true
 share: true
