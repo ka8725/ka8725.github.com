@@ -433,3 +433,9 @@ Note, how it's possible to give complex names to column aliases using quotes `"`
 
 That's the complete financial plan. The Accumulative Profit column allows understanding when we can afford to buy something expensive.
 Say, if we want to buy a car that costs $10,000 we can do that only in month 8. Only on that month we have cash more than $10,000 that's equal to $11,000.
+
+### Conclusion
+
+The post showed how it's easy to use just only SQL in order to solve tasks related to business.
+Views is a very useful concept that allows dividing a task into subtasks.
+That allows solving a task with any complexity.
