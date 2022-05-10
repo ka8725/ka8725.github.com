@@ -452,7 +452,7 @@ But `profit` is a dynamic value calculated on the fly using another `sum` functi
 To unblock this constraint, we create another view from the current result:
 
 ```sql
-create view monthy_profits as (
+create view monthly_profits as (
   select
     month,
     monthly_expenses.amount + quarterly_expenses.amount as expenses,
@@ -471,7 +471,7 @@ create view monthy_profits as (
 Now, we can easily select the result:
 
 ```sql
-select * from monthy_profits;
+select * from monthly_profits;
  month │ expenses │ incomes │ profit
 ═══════╪══════════╪═════════╪════════
      1 │      500 │    2000 │   1500
@@ -492,7 +492,7 @@ select * from monthy_profits;
 And finally, add the accumulative profit column:
 
 ```sql
-select month "Month", expenses "Expenses", incomes "Income", profit "Profit", sum(profit) over (order by month) "Accumulative Profit" from monthy_profits;
+select month "Month", expenses "Expenses", incomes "Income", profit "Profit", sum(profit) over (order by month) "Accumulative Profit" from monthly_profits;
  Month │ Expenses │ Income │ Profit │ Accumulative Profit
 ═══════╪══════════╪════════╪════════╪═════════════════════
      1 │      500 │   2000 │   1500 │                1500
