@@ -27,8 +27,11 @@ p {
     .rounded(0 0 10px 10px);
 		.clearfix();
 		display: flex;
+		@media @medium {
+			display: block;
+		}
 		justify-content: center;
-  }
+	}
   li {
     font-family: @date-font;
     display: block;
