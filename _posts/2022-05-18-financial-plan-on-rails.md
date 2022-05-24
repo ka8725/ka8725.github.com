@@ -1,0 +1,49 @@
+---
+layout: post
+title: "Financial plan on Rails"
+modified: 2022-05-18 00:41:06 +0300
+description: "How to create a financial planning application on Rails."
+tags: [rails]
+comments: true
+share: true
+---
+
+My previous post [Financial plan on PostgreSQL](/financial-plan-on-postgresql/) shows how to
+build a primitive software that helps with financial planning. Unfortunately, not everyone can use it,
+because it needs SQL knowledge. In this post you will see how to reuse those post results in order to
+make a user-friendly web application built on [Rails](https://rubyonrails.org/).
+
+### Tools
+
+[Rails](https://rubyonrails.org/) is a very handy web development framework that saves a ton of time to build
+a Proof of concept ([PoC](https://en.wikipedia.org/wiki/Proof_of_concept)),
+a Minimum viable product ([MVP](https://en.wikipedia.org/wiki/Minimum_viable_product)), a pet project,
+that later can be extended dreadfully. Eventually, a Rails project can turn into a unicorn such as [Shopify](https://www.shopify.com/) or [Twitter](https://twitter.com/).
+
+Furthermore, with additions like [ActiveAdmin](https://activeadmin.info/) we can build a web application in a moment with no front-end code writing.
+That's too beneficial since building user interface (UI) takes much time. But for a starting project (PoC, MPV) UI is not very critical.
+
+To minimize development time as much as possible we take Rails and ActiveAdmin. In the end, we will have a ready to use web application that's ready to any changes in the future.
+
+### Requirements
+
+A usual app usage will look like that:
+1. Create a plan with some name.
+2. Add incomes and expenses to it.
+3. Observe the calculated plan within a table.
+
+Later the expenses and incomes can be adjusted or added even more. The results should be recalculated immediately.
+
+### Implementation
+
+According to the requirements, the application should have the following entities: `Plan` and `Income` with `Expense` belonging to the `Plan`.
+
+From a bird point of view we should do these steps:
+
+1. Define these entities on a [fresh Rails app](https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application) with several [Rails generator](https://guides.rubyonrails.org/command_line.html#bin-rails-generate)'s commands.
+1. Create thew view with results from the [Financial plan on PostgreSQL](/financial-plan-on-postgresql/) post
+1. Create a model that takes data from this view. I prefer [Scenic](https://github.com/scenic-views/scenic) gem for that. In short, it's very handy, especially when it comes to amend them in the future.
+1. [Install the ActiveAdmin gem](https://activeadmin.info/0-installation.html) into the project and configure it to use the defined models above so that user can create plan, add incomes and expenses, and finally see the results.
+1. Deploy the code onto hosting so that the app can be used by everyone. I prefer [Heroku](https://heroku.com/) for that: it's free for small projects that serve not many users at a time.
+
+The final code lives here and this is the live app.
