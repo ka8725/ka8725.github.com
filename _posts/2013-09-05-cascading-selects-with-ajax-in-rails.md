@@ -147,6 +147,6 @@ And the last thing which I should focus on is a form:
 {% endhighlight %}
 
 
-Check out the [code on github](https://github.com/railsguides/dynamic-selectable-demo) and the live [demo here](http://afternoon-lake-2182.herokuapp.com/events/new).
+Check out the [code on github](https://github.com/widefix/dynamic-selectable-demo) and the live [demo here](http://afternoon-lake-2182.herokuapp.com/events/new).
 
 If you have any proposals concerning this solution or if you have spotted any typo, bug, inconsistency or lacks feel free to contact with me.

@@ -159,7 +159,7 @@ Not a very elegant solution, but it works well.
 
 ### Conclusion
 
-See a working Rails app as an example [here](https://github.com/railsguides/smart-assocs).
+See a working Rails app as an example [here](https://github.com/widefix/smart-assocs).
 
 While working on an issue try to fix it "locally". That allows us find a solution that avoids unnecessary global changes, regression, and bugs. Happy coding!
 
