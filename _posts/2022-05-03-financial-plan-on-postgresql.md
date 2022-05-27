@@ -18,7 +18,7 @@ Along the way, the post teaches useful PostgreSQL-specific and common SQL concep
 A financial plan is an easy but, same time, comprehensive concept.
 Definition of this thing merits a separate post or even a book.
 But this post, for simplicity and the purpose of the tech aspects demonstrating, doesn't go too far.
-Let's agree on the following definition. A financial plan is a concept that builds an accumulative profit based on coming in and going out cash flows.
+Let's agree on the following definition. A financial plan is a concept that builds an cumulative profit based on coming in and going out cash flows.
 
 The system takes an income (that can be a monthly salary, paid dividends, etc.) and expenses (taxes, utility bills, expenses for food, etc.).
 Then, using that data, it calculates profit for each month during a year and accumulates to the total. It results in a table that's understandable for everyone.
@@ -59,7 +59,7 @@ And there are two expenses: $500 monthly, e.g. utility bills and $1,000 quarterl
 
 ### The plan as a table
 
-Generating the plan can be done within one SQL query that generates a table with columns: Month, Income, Expenses, Profit, Accumulative Profit.
+Generating the plan can be done within one SQL query that generates a table with columns: Month, Income, Expenses, Profit, Cumulative Profit.
 A row represents calculations for a specific month. There are as many rows as months - 12.
 
 To generate 12 rows that represent a month number we can use a series:
@@ -379,7 +379,7 @@ select
 (12 rows)
 ```
 
-We are too close to our expected resulting table. Remember, the desired columns of the table are Month, Income, Expenses, Profit, Accumulative Profit.
+We are too close to our expected resulting table. Remember, the desired columns of the table are Month, Income, Expenses, Profit, Cumulative Profit.
 Let's remove those temp columns monthly_expenses, quarterly_expenses, monthly_incomes, quarterly_incomes.
 They are good for details and for debugging. But we are sure it has no mistakes now. So we simplify it:
 
@@ -444,7 +444,7 @@ select
 (12 rows)
 ```
 
-To get the accumulative profit column that summarizes the current row profit with the previous one we should use a **window function**.
+To get the cumulative profit column that summarizes the current row profit with the previous one we should use a **window function**.
 That's another concept of PostgreSQL that can capture the current row and apply an aggregate function on the other rows of the selecting result.
 In our case, we want to summarize the current row profit with the previous one. The piece of SQL is pretty easy: `sum(profit) over (order by month)`.
 But `profit` is a dynamic value calculated on the fly using another `sum` function. PostgreSQL doesn't allow to nest them.
@@ -489,11 +489,11 @@ select * from monthly_profits;
 (12 rows)
 ```
 
-And finally, add the accumulative profit column:
+And finally, add the cumulative profit column:
 
 ```sql
-select month "Month", expenses "Expenses", incomes "Income", profit "Profit", sum(profit) over (order by month) "Accumulative Profit" from monthly_profits;
- Month │ Expenses │ Income │ Profit │ Accumulative Profit
+select month "Month", expenses "Expenses", incomes "Income", profit "Profit", sum(profit) over (order by month) "Cumulative Profit" from monthly_profits;
+ Month │ Expenses │ Income │ Profit │ Cumulative Profit
 ═══════╪══════════╪════════╪════════╪═════════════════════
      1 │      500 │   2000 │   1500 │                1500
      2 │      500 │   2000 │   1500 │                3000
@@ -512,7 +512,7 @@ select month "Month", expenses "Expenses", incomes "Income", profit "Profit", su
 
 See how to give complex names to column aliases using quotes `"`. Also, we omit `as` keyword as it reads well now with these quotes.
 
-That's the complete financial plan. The Accumulative Profit column allows understand when we can afford to buy something expensive.
+That's the complete financial plan. The Cumulative Profit column allows understand when we can afford to buy something expensive.
 Say, if we want to buy a car that costs $10,000 we can do that only in month 8. We have cash of more than $10,000 on that month equals  $11,000.
 
 In the last month of the year, we will have $16,000 on hand unless spending money on things outside the plan.
