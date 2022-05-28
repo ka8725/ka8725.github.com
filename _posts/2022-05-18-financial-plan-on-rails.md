@@ -41,9 +41,12 @@ According to the requirements, the application should have the following entitie
 From a bird point of view we should do these steps:
 
 1. Define these entities on a [fresh Rails app](https://guides.rubyonrails.org/getting_started.html#creating-the-blog-application) with several [Rails generator](https://guides.rubyonrails.org/command_line.html#bin-rails-generate)'s commands.
-1. Create thew view with results from the [Financial plan on PostgreSQL](/financial-plan-on-postgresql/) post
-1. Create a model that takes data from this view. I prefer [Scenic](https://github.com/scenic-views/scenic) gem for that. In short, it's very handy, especially when it comes to amend them in the future.
-1. [Install the ActiveAdmin gem](https://activeadmin.info/0-installation.html) into the project and configure it to use the defined models above so that user can create plan, add incomes and expenses, and finally see the results.
+1. Create thew view with results from the [Financial plan on PostgreSQL](/financial-plan-on-postgresql/) post. I prefer [Scenic](https://github.com/scenic-views/scenic) gem for that. In short, it's very handy, especially when it comes to amend views in the future.
+1. Create a model that uses the views as a data source. Note, normally a Rails model takes data from a table, but here I'm going to use the view (a virtual table) to feed the model.
+1. Install the [ActiveAdmin](https://activeadmin.info/0-installation.html) gem into the project and configure it to use the defined models above so that user can create plan, add incomes and expenses, and finally see the results.
 1. Deploy the code onto hosting so that the app can be used by everyone. I prefer [Heroku](https://heroku.com/) for that: it's free for small projects that serve not many users at a time.
 
 The final code lives here and this is the live app.
+
+TOOD: Demo of the app usage.
+TODO: what could be done next. Specific data expenses, income.
