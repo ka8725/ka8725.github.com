@@ -46,7 +46,7 @@ In short, we should do these steps:
 1. Install the [ActiveAdmin](https://activeadmin.info/0-installation.html) gem into the project and configure it to use the defined models above so that users can create a plan, add incomes and expenses, and finally see the results.
 1. Deploy the code onto hosting so that the app can be used by everyone. I prefer [Heroku](https://heroku.com/) for that: it's free for small projects that serve not many users at a time.
 
-The final code lives here and this is the [live app](https://dry-wave-47133.herokuapp.com/).
+The final code lives [here](https://github.com/widefix/financial-plan) and this is the [live app](https://dry-wave-47133.herokuapp.com/).
 
 Further, the app can be easily extended. For example, it can take into account one-off expenses and incomes.
 
