@@ -6,12 +6,17 @@ description: "How to create a financial planning application on Rails."
 tags: [rails]
 comments: true
 share: true
+image: financial-plan-rails.jpg
 ---
 
 My previous post [Financial plan on PostgreSQL](/financial-plan-on-postgresql/) shows how to
 build primitive software that helps with financial planning. Unfortunately, not everyone can use it,
 because it needs SQL knowledge. In this post, you will see how to reuse those post results to
 make a user-friendly web application built on [Rails](https://rubyonrails.org/).
+
+That's the application in action we are going to make in a moment:
+
+![Financial plan ActiveAdmin](/images/financial-plan-rails.gif)
 
 ### Tools
 
@@ -57,4 +62,3 @@ ActiveAdmin configuration also took some time. And finally, Heroku provides the 
 For sure, all of that is not for free: it requires special knowledge and experience working with the gems and the taken approach.
 
 In this article, you saw how to transform a raw idea that's implemented on pure SQL into a Web application.
-
