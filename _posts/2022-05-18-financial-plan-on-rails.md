@@ -62,3 +62,11 @@ ActiveAdmin configuration also took some time. And finally, Heroku provides the 
 For sure, all of that is not for free: it requires special knowledge and experience working with the gems and the taken approach.
 
 In this article, you saw how to transform a raw idea that's implemented on pure SQL into a Web application.
+
+
+### Conclusion
+
+This post demonstrates how a primitive subtask solution (financial plan on PostgreSQL) can be reused
+by a more complicated and important task that's a ready Web application.
+
+Nowadays, the mix of technologies around Ruby allows to build mature soft fast.
