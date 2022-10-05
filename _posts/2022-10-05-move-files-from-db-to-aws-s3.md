@@ -6,7 +6,7 @@ description: "A practical example of how to move large amount of files from DB t
 tags: [ruby, aws, s3]
 comments: true
 share: true
-image:
+image: storage.jpg
 ---
 
 From the beginning, a Rails application stored uploaded files inside PostgreSQL DB using
