@@ -52,6 +52,11 @@ tab1$ heroku run:detached BATCH=1 MAX_BATCHES=1 rake copy_attachments_to_s3
 
 Finally, all files were copied to S3 and we are ready to clean our DB. The whole migration took 5 hours.
 
+Stopping and running scripts again could cause duplicated files copied to S3.
+So, in the end, a Python script checked if there are no duplicated files.
+The script was stolen somewhere from the Internet and was slightly modified.
+It's not in Ruby because it was faster to get something ready rather than write it from scratch.
+
 ### Takeaways
 
 - Storing files within DB is not a bad approach for a start, but be prepared for the future.
@@ -73,3 +78,9 @@ The refile gem adapter that allows switching between S3 and DB storage:
 <br />
 
 <script src="https://gist.github.com/ka8725/633b50d5e881c32cd4238493e9f44064.js"></script>
+
+The Python script to check if there are no duplicated files:
+
+<br />
+
+<script src="https://gist.github.com/ka8725/6108daa7f59d3e67418ca0da691f9ed5.js"></script>
