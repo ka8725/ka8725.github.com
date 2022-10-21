@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/date-ranges-overlap
 layout: post
 title: "Efficient algorithm to check dates overlap"
 modified: 2019-04-07 00:41:06 +0300

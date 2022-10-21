@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/ruby-hash-styles-formatting.html
 layout: post
 title: "Ruby hash styles formatting"
 description: "Advice how to improve code formatting of hash styles for Ruby/Ruby On Rails"

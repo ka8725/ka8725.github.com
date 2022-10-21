@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/rerun-stale-migration
 layout: post
 title: "Rerun stale migration in Rails"
 modified: 2022-05-06 00:41:06 +0300

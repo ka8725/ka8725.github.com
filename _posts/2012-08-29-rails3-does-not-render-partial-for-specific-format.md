@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/rails3-does-not-render-partial-for-specific-format
 layout: post
 title: "Rails 3 does not render partial for specific format - resolving issue"
 description: "There is a problem in Rails 3: if you would like to render for example html format for partial in ajax request you won't manage it in Rails 3. In this post I will describe how to avoid this problem"

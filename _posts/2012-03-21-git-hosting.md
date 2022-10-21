@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/git-hosting
 layout: post
 title: "Git hosting"
 description: "Are you looking for free git hosting? Or, may be, do you want to find mercurial hosting? Do you want to find unfuddle VCS unlike github.com? If you answer yes at least for one of these questions this post will be useful for you. You are welcome!"

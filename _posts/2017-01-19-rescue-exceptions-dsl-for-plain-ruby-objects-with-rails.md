@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/rescue-exceptions-dsl-for-plain-ruby-objects-with-rails
 layout: post
 title: "Rescue exceptions DSL for plain Ruby objects with Rails"
 description: "A solution to consume rescue_from DSL in a Rails application.

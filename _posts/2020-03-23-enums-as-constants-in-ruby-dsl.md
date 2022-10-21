@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/enums-as-constants-in-ruby-dsl
 layout: post
 title: "Enums as constants in Ruby DSL"
 modified: 2020-03-23 00:41:06 +0300

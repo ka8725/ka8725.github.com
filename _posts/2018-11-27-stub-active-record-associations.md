@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/stub-active-record-associations
 layout: post
 title: "Stub Rails ActiveRecord associations in your tests"
 modified: 2018-11-27 00:41:06 +0300

@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/foreign-key-for-custom-table-name
 layout: post
 title: "Rails migration for belongs_to association with custom table name"
 modified: 2020-02-16 00:41:06 +0300

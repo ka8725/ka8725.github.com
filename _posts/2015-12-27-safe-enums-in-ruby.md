@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/safe-enums-in-ruby
 layout: post
 title: "Safe enums in Ruby"
 description: "Safe enums implementation in Ruby. Why and what for? Read this post about the
