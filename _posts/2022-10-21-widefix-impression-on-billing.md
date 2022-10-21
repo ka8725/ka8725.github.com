@@ -6,7 +6,6 @@ description: "We focus on making billing easier by building online payment solut
 tags: [widefix, billing]
 comments: true
 share: true
-image: clutch_review.png
 ---
 
 When people talk about web development, the topic is often websites. But the industry is so much wider than that and can be applied to so many more industries. Our services are a great example for this. We focus on making billing easier by building online payment solutions for companies.
