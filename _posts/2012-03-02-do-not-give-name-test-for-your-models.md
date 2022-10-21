@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/do-not-give-name-test-for-your-models
 layout: post
 title: "Do not give name Test for your models"
 description: "Ruby on Rails guides for strange situation with name Test for models. There are many reasons to do not give name Test for your models in Ruby On Rails. Validates uniqueness in scope test_id does not work. There is a already Test module in Ruby On Rails"

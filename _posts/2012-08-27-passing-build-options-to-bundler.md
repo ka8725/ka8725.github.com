@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/passing-build-options-to-bundler
 layout: post
 title: "Passing build options to bundler"
 description: "When you have to pass build options to bundler using bundler-config will solve your problems with very easy way."

@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/do-you-test-your-rake-tasks
 layout: post
 title: "Do you test your rake tasks?"
 description: "This post explains how to test custom rake tasks in the Rails application"

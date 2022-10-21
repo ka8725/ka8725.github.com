@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/side-effect-of-boolean-parameters-in-ruby
 layout: post
 title: "A side effect of boolean parameters in Ruby"
 description: "This post describes side effect of having boolean arguments in Ruby methods. It shows how it can be elegant and confusion at the same time"

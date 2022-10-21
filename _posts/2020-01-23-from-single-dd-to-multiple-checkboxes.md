@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/from-single-dd-to-multiple-checkboxes
 layout: post
 title: "From Single drop-down to Multiple check-boxes"
 modified: 2020-01-23 00:41:06 +0300

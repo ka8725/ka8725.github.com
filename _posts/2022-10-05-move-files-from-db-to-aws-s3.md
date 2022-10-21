@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/move-files-from-db-to-aws-s3
 layout: post
 title: "Move 35Gb files from DB to AWS S3"
 modified: 2022-10-05 00:41:06 +0300

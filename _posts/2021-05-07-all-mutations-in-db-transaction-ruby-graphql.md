@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/all-mutations-in-db-transaction-ruby-graphql
 layout: post
 title: "Easy solution to run all mutations in DB transactions"
 modified: 2021-05-17 00:41:06 +0300

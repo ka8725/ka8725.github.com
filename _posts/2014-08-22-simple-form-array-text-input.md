@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/simple-form-array-text-input
 layout: post
 title: "Simple form array text input"
 description: "Use simple_form to generate array of text fields. Add custom input for the PostgreSQL array in Rails."

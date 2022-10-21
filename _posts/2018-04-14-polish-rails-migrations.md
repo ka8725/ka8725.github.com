@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/polish-rails-migrations
 layout: post
 title: "Polish Rails migrations"
 modified: 2018-04-14 00:41:06 +0300

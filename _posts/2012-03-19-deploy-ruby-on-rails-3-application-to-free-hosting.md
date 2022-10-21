@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/deploy-ruby-on-rails-3-application-to-free-hosting
 layout: post
 title: "Deploy Ruby On Rails 3 application to free hosting"
 description: "This is article from series of Ruby On Rails guides. Here you can find information how to deploy Rails 3 application to free rails hosting. There is a beautiful free reseller hosting which provides deploy ruby applications."

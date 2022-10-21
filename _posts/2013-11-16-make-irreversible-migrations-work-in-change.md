@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/make-irreversible-migrations-work-in-change
 layout: post
 title: "Make irreversible migration work on change of migration"
 description: "Rails raises ActiveRecord::IrreversibleMigration when it

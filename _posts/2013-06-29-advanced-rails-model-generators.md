@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/advanced-rails-model-generators
 layout: post
 title: "Advanced Rails model generators"
 description: "Check out how the rails generators are awesome. In this post you will read how to use rails model generators for 100%"

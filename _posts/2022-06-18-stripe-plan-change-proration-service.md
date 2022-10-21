@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/stripe-plan-change-proration-service
 layout: post
 title: "Stripe plan change proration service"
 modified: 2022-06-18 00:41:06 +0300

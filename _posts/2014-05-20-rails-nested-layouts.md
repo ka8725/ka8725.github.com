@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/rails-nested-layouts
 layout: post
 title: "Nested layouts in Rails"
 description: "Use partials as layouts in Rails applications. It allows to nest layouts and get rid of code duplication

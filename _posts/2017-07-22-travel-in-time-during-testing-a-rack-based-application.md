@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/travel-in-time-during-testing-a-rack-based-application
 layout: post
 title: "Travel in time during testing a Rails application"
 modified: 2017-07-22 00:41:06 +0300

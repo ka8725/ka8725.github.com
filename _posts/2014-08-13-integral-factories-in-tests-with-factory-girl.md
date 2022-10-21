@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/integral-factories-in-tests-with-factory-girl
 layout: post
 title: "Integral factories in tests with FactoryGirl"
 description: "Keep your FactoryGirl's factories clean and integral with built-in features. This article describes the features and gives advices how to not stuck with an issue when you have inconsistent environment in the tests."

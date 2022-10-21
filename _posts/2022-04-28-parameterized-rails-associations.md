@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/parameterized-rails-associations
 layout: post
 title: "Parameterized Rails associations"
 modified: 2022-04-28 00:41:06 +0300

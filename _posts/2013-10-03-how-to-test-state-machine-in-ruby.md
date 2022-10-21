@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/how-to-test-state-machine-in-ruby
 layout: post
 title: "How to test state machine in Ruby"
 description: "I've invented approach which rids of headache of testing state machine in Ruby.

@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/how-to-generate-rake-task
 layout: post
 title: "How to generate rake task"
 description: "Ruby on Rails guides for generate rake task. If you want to write new rake task you can use rails generate task generator. It is Ruby On Rails generator which generates scaffold for the rake task"

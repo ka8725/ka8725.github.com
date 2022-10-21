@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/widefix-impression-on-billing
 layout: post
 title: "WideFix Is Leaving The Quite The Impression on The Web Development Industry"
 modified: 2022-10-21 00:41:06 +0300

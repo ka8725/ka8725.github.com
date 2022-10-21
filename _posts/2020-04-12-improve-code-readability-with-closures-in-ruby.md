@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/improve-code-readability-with-closures-in-ruby
 layout: post
 title: "Improve code readability with closures in Ruby"
 modified: 2020-04-12 00:41:06 +0300

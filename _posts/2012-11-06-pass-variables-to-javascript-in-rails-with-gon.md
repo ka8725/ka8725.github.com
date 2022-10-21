@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/pass-variables-to-javascript-in-rails-with-gon
 layout: post
 title: "Pass variables to javascript with gon"
 description: "This post describes how to use gon gem with fun. Gon allows to pass ruby variables from rails server to javascript, but it can grow your controllers in huge monsters. So I offer interesting approach how to avoid it"

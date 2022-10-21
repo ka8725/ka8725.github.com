@@ -1,6 +1,4 @@
 ---
-redirect_to:
-  - https://blog.widefix.com/financial-plan-on-rails
 layout: post
 title: "Financial plan on Rails"
 modified: 2022-05-18 00:41:06 +0300
