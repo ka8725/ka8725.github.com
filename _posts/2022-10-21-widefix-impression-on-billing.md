@@ -20,7 +20,7 @@ They’re a platform that published reviews on our work like this.
 
 This particular review was provided by a telecommunications firm that we helped integrate a billing system for in the cloud. This was a fairly straightforward project for our team and we were able to flex our capabilities.
 
-Those interested in getting more details on the engagement can read the full review on our Clutch profile. But the effect of this particular review extends beyond the five-star score. Thanks to the positive feedback we were given, Clutch included us in their list of top web developers in Easter Europe.
+Those interested in getting more details on the engagement can read the full review on our [Clutch profile](https://clutch.co/profile/widefix#summary). But the effect of this particular review extends beyond the five-star score. Thanks to the positive feedback we were given, Clutch included us in their list of top web developers in Easter Europe.
 
 This is a great milestone for our team because it helps us in so many ways. Not only does this make us easier to find for prospective clients, it quickly establishes us as experts people can trust with their projects. Our team won’t take this opportunity for granted and will work to continue being worthy of the praise being heaped on us.
 
