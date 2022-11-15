@@ -12,7 +12,7 @@ Apart the commercial commitment I've contributed to open source projects:
 Rails, Datagrid, Inherited resources, Devise, Sinatra, Rake, Enumerize, Homebrew, Cocaine, etc.
 See the whole list [here](https://github.com/ka8725?tab=repositories).
 
-I'm also the sole book author of [Rake Task Management Essentials](http://www.packtpub.com/rake-task-management-essentials/book).
+I'm also the sole book author of [Rake Task Management Essentials](https://www.packtpub.com/product/rake-task-management-essentials/9781783280773?_ga=2.19088061.400786981.1668522155-1689462152.1668522155).
 
 I would be glad to help with implementing an IT project of your dream. See my [CV](/files/cv.pdf).
 

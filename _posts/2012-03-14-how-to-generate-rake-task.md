@@ -14,11 +14,11 @@ redirect_from:
 Have you ever written your own __rake tasks__? If you write them very often this post will be very useful for you. I won't describe what is __rake task__ here because there are a lot of information about it yet. I will tell you how to easy _generate_ __rake task__.
 
 
-<a onclick="_gaq.push(['_trackEvent', 'Reference', 'Packt', '#rake-task-management-essentials']);" href="http://goo.gl/0Bw6H4" target="_blank">
+<a onclick="_gaq.push(['_trackEvent', 'Reference', 'Packt', '#rake-task-management-essentials']);" href="https://www.packtpub.com/product/rake-task-management-essentials/9781783280773?_ga=2.19088061.400786981.1668522155-1689462152.1668522155" target="_blank">
   <img src="/images/rake_book.jpg" alt="Rake Task Management Essentials" align="right" vspace="5" hspace="5" width="120"/>
 </a>
 
-> Recently I have written a book about **Rake**. It's called **Rake Task Management Essentials**. If you like this post's content and interested in **Rake**, if you would like to know more about this great tool you can buy it [here](http://goo.gl/0Bw6H4). I promise that after reading the book you will understand main goals of **Rake**, how to use it in your development process, daily work or just for fun. You will understand how to refactor and speed up rake tasks. You will be introduced to all **Rake**'s features by straightforward and practical examples.
+> Recently I have written a book about **Rake**. It's called **Rake Task Management Essentials**. If you like this post's content and interested in **Rake**, if you would like to know more about this great tool you can buy it [here](https://www.packtpub.com/product/rake-task-management-essentials/9781783280773?_ga=2.19088061.400786981.1668522155-1689462152.1668522155). I promise that after reading the book you will understand main goals of **Rake**, how to use it in your development process, daily work or just for fun. You will understand how to refactor and speed up rake tasks. You will be introduced to all **Rake**'s features by straightforward and practical examples.
 
 
 Today I found interesting generator in __Ruby On Rails__. I have never read about it in any post, doc, book or tutorial, I have never seen it in any screencast, I've never heart about it from any podcast and I wondered that Google doesn't tell me nothing about it. So I decided to write about it here.
