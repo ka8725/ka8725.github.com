@@ -1,5 +1,7 @@
 ---
 layout: page
+redirect_to:
+  - https://blog.widefix.com/about-author
 permalink: /about-author/
 title : About me
 ---
