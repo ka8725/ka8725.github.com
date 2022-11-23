@@ -9,8 +9,6 @@ share: true
 comments: true
 redirect_from:
   - /2012/03/02/do-not-give-name-test-for-your-models/
-redirect_to:
-  - https://blog.widefix.com/do-not-give-name-test-for-your-models/
 ---
 
 
