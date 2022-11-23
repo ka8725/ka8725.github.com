@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/skip-callbacks-in-tests
 layout: post
 title: "Skip callbacks in tests"
 description: "Simple solution to skip callbacks in tests if they should not be run there. The solution is for Rails ActiveRecord."

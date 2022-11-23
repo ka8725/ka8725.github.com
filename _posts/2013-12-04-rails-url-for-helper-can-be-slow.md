@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/rails-url-for-helper-can-be-slow
 layout: post
 title: "Rails's url_for weaknesses"
 description: "url_for is used by link_to which is used any Rails developer.

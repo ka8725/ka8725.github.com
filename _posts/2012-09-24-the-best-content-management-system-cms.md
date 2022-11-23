@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/the-best-content-management-system-cms
 layout: post
 title: "Locomotive CMS - the best content management system"
 description: "Hello! Today I and this post will show you the best content management system in the world for now - it is Locomotive CMS! Locomotive CMS is open source content management system and it means that it is absolutely free CMS! It contains content management framework and manager for models and entities - it's awesome!"

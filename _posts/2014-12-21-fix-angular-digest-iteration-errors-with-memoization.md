@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/fix-angular-digest-iteration-errors-with-memoization
 layout: post
 title: "Fix Angular's digest iterations errors with memoization"
 description: "Memoize your methods in Javascript to avoid performance problems in Angular and errors saying that 10 digest iterations reached."

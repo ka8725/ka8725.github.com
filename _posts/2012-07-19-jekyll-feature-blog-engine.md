@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/jekyll-feature-blog-engine
 layout: post
 title: "Jekyll - the best blog engine"
 description: "This post describes how to use github pages (gh-pages) as hosting to have a simple blog based on jekyll engine. You don't have to pay for hosting at all for it"

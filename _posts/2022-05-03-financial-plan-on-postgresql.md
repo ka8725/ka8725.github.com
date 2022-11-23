@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/financial-plan-on-postgresql
 layout: post
 title: "Financial plan on PostgreSQL"
 modified: 2022-05-03 00:41:06 +0300

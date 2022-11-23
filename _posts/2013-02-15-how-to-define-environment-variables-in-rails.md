@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/how-to-define-environment-variables-in-rails
 layout: post
 title: "Environment variables in Rails"
 description: "The post about defining ENV variables in Rails. Explanation what does ENV['FOG_PROVIDER'] mean and how to configure Capistrano deployment with ENV variables"

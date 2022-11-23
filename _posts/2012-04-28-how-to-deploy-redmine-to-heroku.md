@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/how-to-deploy-redmine-to-heroku
 layout: post
 title: "How to deploy Redmine to Heroku"
 description: "This post describes how to deploy free bugtracker Redmine 2 to free Hosting - Heroku"

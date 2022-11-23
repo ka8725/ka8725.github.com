@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/dry-struct-use-cases
 layout: post
 title: "Dry-struct use cases"
 modified: 2019-12-27 00:41:06 +0300

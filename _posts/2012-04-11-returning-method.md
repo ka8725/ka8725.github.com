@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/returning-method
 layout: post
 title: "Returning method"
 description: "Ruby On Rails has beautiful method which can help you clean up your code. It is returning method"

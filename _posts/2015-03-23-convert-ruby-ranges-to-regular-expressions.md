@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/convert-ruby-ranges-to-regular-expressions
 layout: post
 title: "Convert Ruby ranges to regular expressions"
 description: "In this post I will share the gem which allows to convert Ruby ranges to regular expressions."

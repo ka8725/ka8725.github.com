@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/change-data-in-migrations-like-a-boss
 layout: post
 title: "Change data in migrations like a boss"
 description: "Update data in migrations like a boss. Don't write raw SQL in migration, don't define models in migrations again, don't use seeds. Use migration_data gem to keep your migrations up to date, migrate data in production, test data migration code and clean them up."

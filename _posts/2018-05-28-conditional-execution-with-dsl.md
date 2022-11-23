@@ -1,4 +1,6 @@
 ---
+redirect_to:
+  - https://blog.widefix.com/conditional-execution-with-dsl
 layout: post
 title: "Conditional execution with DSL in Ruby"
 modified: 2018-05-28 00:41:06 +0300
